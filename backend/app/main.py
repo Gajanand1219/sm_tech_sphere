@@ -14,17 +14,17 @@ app = FastAPI(
 
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=[
-        settings.FRONTEND_URL,
-        "http://localhost:5173",
-        "http://127.0.0.1:5173",
-    ],
-
     # allow_origins=[
     #     settings.FRONTEND_URL,
-    #     "https://sm-tech-platform.vercel.app",
-    #     "https://sm-tech-platform.vercel.app",
+    #     "http://localhost:5173",
+    #     "http://127.0.0.1:5173",
     # ],
+
+    allow_origins=[
+        settings.FRONTEND_URL,
+        "https://smtechsphere.vercel.app",
+        "https://smtechsphere.vercel.app",
+    ],
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
