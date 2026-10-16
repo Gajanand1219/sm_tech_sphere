@@ -337,7 +337,8 @@ export default function Chatbot() {
     try {
       const response = await fetch(
         'http://127.0.0.1:8000/api/chat',
-        // 'https://sm-cleantech-platform.onrender.com/api/chat',
+        // 'https://sm-tech-sphere.onrender.com/api/chat',
+         
         {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
