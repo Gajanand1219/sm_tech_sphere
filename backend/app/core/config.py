@@ -10,8 +10,8 @@ class Settings(BaseSettings):
     JWT_ALGORITHM: str = "HS256"
     ACCESS_TOKEN_EXPIRE_MINUTES: int = 1440
 
-    FRONTEND_URL: str = "http://localhost:5173"
-    # FRONTEND_URL: str = "https://sm-tech-platform.vercel.app"
+    # FRONTEND_URL: str = "http://localhost:5173"
+    FRONTEND_URL: str = "https://smtechsphere.vercel.app"
 
     # Admin credentials
     ADMIN_EMAIL: str = "admin@smcleantech.com"
