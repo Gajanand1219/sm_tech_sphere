@@ -698,15 +698,15 @@ async def forgot_password(
 
     token = create_password_reset_token(user.id)
 
-    reset_url = (
-        "http://localhost:5173/reset-password"
-        f"?token={token}"
-    )
-
     # reset_url = (
-    #         "https://sm-tech-platform.vercel.app/reset-password"
-    #         f"?token={token}"
-    #     )
+    #     "http://localhost:5173/reset-password"
+    #     f"?token={token}"
+    # )
+
+    reset_url = (
+            "https://smtechsphere.vercel.app/reset-password"
+            f"?token={token}"
+        )
 
     html = email_template(
         "Reset your password",
