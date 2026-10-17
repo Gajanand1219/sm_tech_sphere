@@ -148,7 +148,7 @@ export default function VendorDashboard() {
         </nav>
 
         <div className="ev-side-foot">
-          <b>Diagnose. Match. Solution.</b>
+          <b>SM Techsphere Pvt Ltd.</b>
           Vendor workspace
         </div>
       </aside>
