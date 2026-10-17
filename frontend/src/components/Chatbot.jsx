@@ -337,7 +337,7 @@ export default function Chatbot() {
     try {
       const response = await fetch(
         
-         'https://sm-tech-sphere.onrender.com/api/chat',
+         'https://sm-tech-sphere-mem9.onrender.com/api/chat',
          
         {
           method: 'POST',
