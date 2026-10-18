@@ -22,7 +22,7 @@ const initials = (name = '') => {
 const normStatus = (v) => String(v || '').toUpperCase().split('.').pop()
 
 /* ---------------------------------------------------------
-   Tab filter — same logic used on dashboard + list pages
+   Tab filter
    --------------------------------------------------------- */
 export function matchTab(m, tab) {
   const enquiryStatus = normStatus(m.status)
@@ -34,7 +34,6 @@ export function matchTab(m, tab) {
     case 'new':
     case 'current':
       return !quoted && !closed
-
     case 'quoted':
       return (
         quoted &&
@@ -42,33 +41,166 @@ export function matchTab(m, tab) {
         quoteStatus !== 'ACCEPTED' &&
         quoteStatus !== 'REJECTED'
       )
-
     case 'accepted':
       return quoteStatus === 'ACCEPTED' || Boolean(m.buyer_accepted)
-
     case 'rejected':
       return quoteStatus === 'REJECTED'
-
     case 'win':
       return closed && String(m.outcome || '').toLowerCase() === 'win'
-
     case 'loss':
       return closed && String(m.outcome || '').toLowerCase() === 'loss'
-
     case 'history':
       return closed
-
     default:
       return true
   }
 }
 
+/* =========================================================
+   COMPANY AVATAR
+   ========================================================= */
+
+function CompanyAvatar({ logo, name, size = 'md' }) {
+  const [errored, setErrored] = useState(false)
+  const hasLogo = Boolean(logo) && !errored
+  const hasName = String(name || '').trim().length > 0
+
+  return (
+    <span className={`ev-av ev-av--${size} ${hasLogo ? 'ev-av--logo' : ''}`}>
+      {hasLogo ? (
+        <img
+          src={logo}
+          alt={name || 'Company'}
+          className="ev-av-img"
+          onError={() => setErrored(true)}
+        />
+      ) : hasName ? (
+        initials(name)
+      ) : (
+        <span className="ev-av-placeholder">🏢</span>
+      )}
+    </span>
+  )
+}
+
+/* =========================================================
+   NOTIFICATION BUILDER (vendor-side)
+   ========================================================= */
+
+function buildNotifications(matches) {
+  const notes = []
+
+  matches.forEach((m) => {
+    const enquiryStatus = normStatus(m.status)
+    const quoteStatus = normStatus(m.quotation_status)
+    const closed = enquiryStatus === 'CLOSED'
+
+    // New enquiry awaiting quote
+    if (!m.quotation_exists && !closed) {
+      notes.push({
+        id: `new-${m.id}`,
+        type: 'warning',
+        title: `New enquiry · #${m.id}`,
+        desc: m.title || 'Awaiting your quote',
+        time: m.id,
+        link: `/vendor/enquiries/${m.id}`,
+        icon: '📥',
+      })
+    }
+
+    // Quote submitted, waiting for buyer
+    if (
+      m.quotation_exists &&
+      !closed &&
+      quoteStatus !== 'ACCEPTED' &&
+      quoteStatus !== 'REJECTED'
+    ) {
+      notes.push({
+        id: `quoted-${m.id}`,
+        type: 'info',
+        title: `Quote submitted · #${m.id}`,
+        desc: 'Waiting for buyer response',
+        time: m.id,
+        link: `/vendor/enquiries/${m.id}`,
+        icon: '📤',
+      })
+    }
+
+    // Buyer accepted
+    if (quoteStatus === 'ACCEPTED' || m.buyer_accepted) {
+      notes.push({
+        id: `acc-${m.id}`,
+        type: 'success',
+        title: `Buyer accepted quote · #${m.id}`,
+        desc: 'Contact details unlocked',
+        time: m.id,
+        link: `/vendor/enquiries/${m.id}`,
+        icon: '✅',
+      })
+    }
+
+    // Buyer rejected
+    if (quoteStatus === 'REJECTED') {
+      notes.push({
+        id: `rej-${m.id}`,
+        type: 'danger',
+        title: `Quote rejected · #${m.id}`,
+        desc: m.title || 'Buyer rejected your quote',
+        time: m.id,
+        link: `/vendor/enquiries/${m.id}`,
+        icon: '❌',
+      })
+    }
+
+    // Closed — won
+    if (closed && String(m.outcome || '').toLowerCase() === 'win') {
+      notes.push({
+        id: `win-${m.id}`,
+        type: 'success',
+        title: `Enquiry won · #${m.id}`,
+        desc: 'Buyer selected you',
+        time: m.id,
+        link: `/vendor/enquiries/${m.id}`,
+        icon: '🏆',
+      })
+    }
+
+    // Closed — lost
+    if (closed && String(m.outcome || '').toLowerCase() === 'loss') {
+      notes.push({
+        id: `loss-${m.id}`,
+        type: 'danger',
+        title: `Enquiry lost · #${m.id}`,
+        desc: 'Buyer selected someone else',
+        time: m.id,
+        link: `/vendor/enquiries/${m.id}`,
+        icon: '📉',
+      })
+    }
+  })
+
+  return notes.sort((a, b) => (b.time || 0) - (a.time || 0)).slice(0, 15)
+}
+
+/* =========================================================
+   VENDOR DASHBOARD
+   ========================================================= */
+
 export default function VendorDashboard() {
   const navigate = useNavigate()
   const [data, setData] = useState({ stats: {}, matches: [] })
   const [profile, setProfile] = useState(null)
+  const [networkLogo, setNetworkLogo] = useState(null)
   const [loading, setLoading] = useState(true)
   const [mobileOpen, setMobileOpen] = useState(false)
+  const [notifOpen, setNotifOpen] = useState(false)
+  const [readIds, setReadIds] = useState(() => {
+    try {
+      return JSON.parse(localStorage.getItem('vendor_read_notifs') || '[]')
+    } catch {
+      return []
+    }
+  })
 
   useEffect(() => {
     let alive = true
@@ -76,16 +208,52 @@ export default function VendorDashboard() {
     const load = async () => {
       try {
         setLoading(true)
+
         const [dashRes, profRes] = await Promise.allSettled([
           API.get('/vendor/dashboard'),
-          API.get('/auth/me'),
+          API.get('/auth/profile'),
         ])
         if (!alive) return
+
         if (dashRes.status === 'fulfilled') {
           setData(dashRes.value.data || { stats: {}, matches: [] })
         }
         if (profRes.status === 'fulfilled') {
-          setProfile(profRes.value.data)
+          const p = profRes.value.data
+          setProfile(p)
+
+          // ⭐ Fetch network logo for vendor
+          try {
+            const net = await API.get('/public/network-companies')
+            const vendors = Array.isArray(net.data?.vendors) ? net.data.vendors : []
+
+            const myCompany = String(
+              p?.company_name || p?.company || p?.name || ''
+            )
+              .toLowerCase()
+              .trim()
+
+            const me =
+              vendors.find(
+                (b) =>
+                  b.company_name &&
+                  String(b.company_name).toLowerCase().trim() === myCompany
+              ) ||
+              vendors.find(
+                (b) =>
+                  b.email &&
+                  p?.email &&
+                  String(b.email).toLowerCase().trim() ===
+                    String(p.email).toLowerCase().trim()
+              )
+
+            if (alive && me?.logo) setNetworkLogo(me.logo)
+
+            console.log('[VendorDashboard Logo] profile:', p)
+            console.log('[VendorDashboard Logo] matched:', me)
+          } catch (netErr) {
+            console.debug('[VendorDashboard Logo] network-companies failed:', netErr)
+          }
         }
       } finally {
         if (alive) setLoading(false)
@@ -99,7 +267,6 @@ export default function VendorDashboard() {
   const matches = Array.isArray(data.matches) ? data.matches : []
   const stats = data.stats || {}
 
-  /* Counts — prefer backend stats, fallback to local compute */
   const counts = {
     new: stats.new ?? matches.filter((m) => matchTab(m, 'new')).length,
     current: stats.current ?? matches.filter((m) => matchTab(m, 'current')).length,
@@ -111,13 +278,43 @@ export default function VendorDashboard() {
     history: stats.history ?? matches.filter((m) => matchTab(m, 'history')).length,
   }
 
+  /* ⭐ No 'Your Company' fallback */
   const companyName =
     profile?.company_name ||
     profile?.company ||
     profile?.name ||
-    'Your Company'
+    profile?.full_name ||
+    ''
 
-  const userInitials = initials(companyName)
+  const companyLogo =
+    profile?.logo ||
+    profile?.company_logo ||
+    profile?.profile_image ||
+    networkLogo ||
+    null
+
+  /* ---------- Notifications ---------- */
+
+  const notifications = buildNotifications(matches)
+  const unreadCount = notifications.filter((n) => !readIds.includes(n.id)).length
+
+  const markAllRead = () => {
+    const ids = notifications.map((n) => n.id)
+    setReadIds(ids)
+    try {
+      localStorage.setItem('vendor_read_notifs', JSON.stringify(ids))
+    } catch {}
+  }
+
+  const markOneRead = (id) => {
+    const next = Array.from(new Set([...readIds, id]))
+    setReadIds(next)
+    try {
+      localStorage.setItem('vendor_read_notifs', JSON.stringify(next))
+    } catch {}
+  }
+
+  const handleBack = () => navigate('/vendor')
 
   return (
     <div className="enviquo-dash">
@@ -134,10 +331,16 @@ export default function VendorDashboard() {
         </div>
 
         <nav className="ev-nav">
-          <Link to="/vendor" className="ev-nav-item on">
-            <span>🏠</span> Dashboard
+          <Link to="/" className="ev-nav-item" title="Go to Home Page">
+            <span>🏠</span> Home
           </Link>
+
+          <Link to="/vendor" className="ev-nav-item on" title="Dashboard">
+            <span>⌂</span> Dashboard
+          </Link>
+
           <div className="ev-nav-sep" />
+
           {MENU.map((m) => (
             <Link key={m.id} to={m.to} className="ev-nav-item">
               <span>{m.i}</span>
@@ -148,7 +351,7 @@ export default function VendorDashboard() {
         </nav>
 
         <div className="ev-side-foot">
-          <b>SM Techsphere Pvt Ltd.</b>
+          <b>Diagnose. Match. Solution.</b>
           Vendor workspace
         </div>
       </aside>
@@ -168,15 +371,106 @@ export default function VendorDashboard() {
           >
             ☰
           </button>
+
+          <button
+            type="button"
+            className="ev-back-btn"
+            onClick={handleBack}
+            title="Back to Vendor Dashboard"
+          >
+            ← Back
+          </button>
+
           <span className="ev-top-title">Dashboard</span>
           <span className="ev-sp" />
+
+          {/* 🔔 NOTIFICATION BELL */}
+          <div className="ev-bell-wrap">
+            <button
+              type="button"
+              className="ev-bell"
+              aria-label="Notifications"
+              onClick={() => setNotifOpen((v) => !v)}
+              title="Notifications"
+            >
+              🔔
+              {unreadCount > 0 && (
+                <span className="ev-bell-badge">
+                  {unreadCount > 99 ? '99+' : unreadCount}
+                </span>
+              )}
+            </button>
+
+            {notifOpen && (
+              <>
+                <div
+                  className="ev-bell-scrim"
+                  onClick={() => setNotifOpen(false)}
+                />
+                <div className="ev-bell-panel" role="dialog" aria-label="Notifications">
+                  <div className="ev-bell-head">
+                    <b>Notifications</b>
+                    {unreadCount > 0 && (
+                      <button
+                        type="button"
+                        className="ev-bell-mark"
+                        onClick={markAllRead}
+                      >
+                        Mark all read
+                      </button>
+                    )}
+                  </div>
+
+                  <div className="ev-bell-list">
+                    {notifications.length ? (
+                      notifications.map((n) => {
+                        const unread = !readIds.includes(n.id)
+                        return (
+                          <button
+                            key={n.id}
+                            type="button"
+                            className={`ev-bell-item ev-bell-item--${n.type} ${
+                              unread ? 'is-unread' : ''
+                            }`}
+                            onClick={() => {
+                              markOneRead(n.id)
+                              setNotifOpen(false)
+                              navigate(n.link)
+                            }}
+                          >
+                            <span className="ev-bell-icon">{n.icon}</span>
+                            <span className="ev-bell-body">
+                              <strong>{n.title}</strong>
+                              <small>{n.desc}</small>
+                            </span>
+                            {unread && <span className="ev-bell-dot" />}
+                          </button>
+                        )
+                      })
+                    ) : (
+                      <div className="ev-bell-empty">
+                        <div>🔕</div>
+                        <p>No notifications yet</p>
+                        <small>You'll see updates here when buyers respond</small>
+                      </div>
+                    )}
+                  </div>
+                </div>
+              </>
+            )}
+          </div>
+
+          {/* 🖼️ COMPANY CHIP */}
           <button
             type="button"
             className="ev-chip"
             onClick={() => navigate('/profile')}
+            title={companyName || 'My Profile'}
           >
-            <span className="ev-av">{userInitials}</span>
-            <span className="ev-chip-name">{companyName}</span>
+            <CompanyAvatar logo={companyLogo} name={companyName} />
+            {companyName && (
+              <span className="ev-chip-name">{companyName}</span>
+            )}
           </button>
         </header>
 
@@ -191,7 +485,9 @@ export default function VendorDashboard() {
             </div>
             <div className="ev-hero-body">
               <p className="ev-hero-welcome">Welcome,</p>
-              <h1 className="ev-hero-company">{companyName}</h1>
+              <h1 className="ev-hero-company">
+                {companyName || 'Vendor'}
+              </h1>
               <p className="ev-hero-to">
                 to <span className="ev-wm">ENVIQUO</span>
               </p>
@@ -199,30 +495,30 @@ export default function VendorDashboard() {
                 Matched enquiries, quotes and results in one place. Quote within 10 days of receiving an enquiry.
               </p>
               <div className="ev-hero-actions">
-  <Link
-    className="ev-btn ev-btn-lite"
-    to="/vendor/enquiries?view=new"
-    style={{
-      backgroundColor: '#2563eb',
-      color: '#ffffff',
-      border: '1px solid #2563eb',
-    }}
-  >
-    📥 Open new enquiries ({counts.new})
-  </Link>
+                <Link
+                  className="ev-btn ev-btn-lite"
+                  to="/vendor/enquiries?view=new"
+                  style={{
+                    backgroundColor: '#2563eb',
+                    color: '#ffffff',
+                    border: '1px solid #2563eb',
+                  }}
+                >
+                  📥 Open new enquiries ({counts.new})
+                </Link>
 
-  <Link
-    className="ev-btn ev-btn-ghost"
-    to="/vendor/enquiries?view=quoted"
-    style={{
-      backgroundColor: '#2563eb',
-      color: '#ffffff',
-      border: '1px solid #2563eb',
-    }}
-  >
-    📤 My quotes
-  </Link>
-</div>
+                <Link
+                  className="ev-btn ev-btn-ghost"
+                  to="/vendor/enquiries?view=quoted"
+                  style={{
+                    backgroundColor: '#2563eb',
+                    color: '#ffffff',
+                    border: '1px solid #2563eb',
+                  }}
+                >
+                  📤 My quotes
+                </Link>
+              </div>
             </div>
           </section>
 
