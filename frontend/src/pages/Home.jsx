@@ -806,7 +806,7 @@ export default function Home() {
                   </div>
 
                   <a
-                    href="mailto:smTECHSPHERE2910@gmail.com"
+                    href="mailto:smtechsphere2910@gmail.com"
                     className="contact-direct-link"
                   >
                     <div className="contact-direct-icon contact-email-icon">
@@ -814,7 +814,7 @@ export default function Home() {
                     </div>
                     <div className="contact-direct-content">
                       <span>Email</span>
-                      <strong>smTECHSPHERE2910@gmail.com</strong>
+                      <strong>smtechsphere2910@gmail.com</strong>
                     </div>
                     <span className="contact-direct-arrow">→</span>
                   </a>
@@ -961,10 +961,10 @@ export default function Home() {
                 <p>
                   Email:{" "}
                   <a
-                    href="mailto:smTECHSPHERE2910@gmail.com"
+                    href="mailto:smtechsphere2910@gmail.com"
                     style={{ color: "#007bff", textDecoration: "underline" }}
                   >
-                    smTECHSPHERE2910@gmail.com
+                    smtechsphere2910@gmail.com
                   </a>
                 </p>
                 <p>India</p>
