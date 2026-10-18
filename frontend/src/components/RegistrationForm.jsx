@@ -27,11 +27,14 @@ const buyerFields = [
 ]
 
 const vendorFields = [
-  // BUSINESS INFORMATION FIRST
   ['company_name', 'Company Name', 'text', true],
-  ['industry_type', 'Industry Type', 'text', true],
+
   ['area_of_work', 'Geographical Territories', 'text', true],
+
   ['industrial_verticals', 'Industrial Verticals', 'text', true],
+
+  ['industry_type', 'Industry Type', 'text', true],
+
   ['experience_years', 'Experience (Years)', 'number', true],
   ['capacity', 'Capacity', 'text', false],
   ['specialization', 'Specialization', 'text', true],
@@ -42,7 +45,7 @@ const vendorFields = [
   ['director_email', 'Director Email', 'email', true],
   ['address', 'Address', 'text', true],
 
-  // ACCOUNT INFORMATION SECOND
+  // Account Information
   ['full_name', 'Full Name', 'text', true],
   ['email', 'Business Email', 'email', true],
   ['phone', 'Mobile Number', 'tel', true],
@@ -56,6 +59,64 @@ const domains = [
   'Solar & Renewables',
   'Carbon & ESG',
   'SPCB Consents & Air Pollution'
+]
+
+const geographicalTerritories = [
+  'Pan India',
+  'Maharashtra',
+  'Telangana',
+  'Karnataka',
+  'Gujarat',
+  'Tamil Nadu',
+  'Andhra Pradesh',
+  'Madhya Pradesh',
+  'Rajasthan',
+  'Delhi NCR',
+  'Uttar Pradesh',
+  'West Bengal',
+  'Kerala',
+  'Haryana',
+  'Punjab',
+  'Other States / Union Territories',
+  'International',
+]
+
+const industrialVerticalOptions = [
+  'Manufacturing',
+  'Automotive & Automobile',
+  'Pharmaceuticals & Healthcare',
+  'Food & Beverage',
+  'Chemicals & Petrochemicals',
+  'Oil & Gas',
+  'Power & Energy',
+  'Cement & Construction',
+  'Steel & Metals',
+  'Textile & Garments',
+  'IT & Electronics',
+  'Agriculture & Agro-processing',
+  'Mining & Minerals',
+  'Paper & Pulp',
+  'Hospitality & Commercial Buildings',
+  'Government & Public Sector',
+  'Other',
+]
+
+const industryTypeOptions = [
+  'Manufacturer',
+  'Original Equipment Manufacturer (OEM)',
+  'EPC Contractor',
+  'System Integrator',
+  'Distributor',
+  'Supplier',
+  'Service Provider',
+  'Engineering Consultant',
+  'Installation Contractor',
+  'Maintenance & Repair Provider',
+  'Technology Provider',
+  'Environmental Consultant',
+  'Waste Management Company',
+  'Recycler',
+  'Other',
 ]
 
 /* =========================================================
@@ -102,6 +163,11 @@ export default function RegistrationForm({ type }) {
   const [msgType, setMsgType] = useState('')
   const [loading, setLoading] = useState(false)
   const [showSuccess, setShowSuccess] = useState(false)
+  const [openMultiSelect, setOpenMultiSelect] = useState('');
+  const [multiSearch, setMultiSearch] = useState({
+    area_of_work: '',
+    industrial_verticals: '',
+  });
 
   const nav = useNavigate()
 
@@ -149,10 +215,17 @@ export default function RegistrationForm({ type }) {
     }
 
     for (const field of requiredFields) {
-      if (!String(form[field] ?? '').trim()) {
-        return `Please enter ${field.replaceAll('_', ' ')}.`
-      }
-    }
+          if (
+            !isBuyer &&
+            ['area_of_work', 'industrial_verticals'].includes(field)
+          ) {
+            continue
+          }
+
+          if (!String(form[field] ?? '').trim()) {
+            return `Please enter ${field.replaceAll('_', ' ')}.`
+          }
+        }
 
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
     if (!emailRegex.test(form.email.trim())) return 'Please enter a valid email address.'
@@ -204,10 +277,13 @@ export default function RegistrationForm({ type }) {
     try {
       const payload = { ...form }
 
-      if (!isBuyer) {
-        payload.experience_years = Number(form.experience_years)
-        payload.domains = selected
-      }
+        if (!isBuyer) {
+          payload.experience_years = Number(form.experience_years)
+          payload.domains = selected
+
+          payload.area_of_work = form.area_of_work.join(', ')
+          payload.industrial_verticals = form.industrial_verticals.join(', ')
+        }
 
       const response = await API.post(`/auth/register/${type}`, payload)
 
@@ -263,35 +339,209 @@ export default function RegistrationForm({ type }) {
   }
 
   /* ================= RENDER FIELD ================= */
+  const multiSelectOptions = {
+    area_of_work: geographicalTerritories,
+    industrial_verticals: industrialVerticalOptions,
+  }
 
-  const renderField = ([key, label, kind = 'text', required = false]) => (
-    <div
-      className={`field-group ${
-        key === 'registered_address' || key === 'plant_location' || key === 'address'
-          ? 'field-group--wide'
-          : ''
-      }`}
-      key={key}
-    >
-      <label>
-        <span className="field-icon">{getIcon(key)}</span>
-        {label}
-        {required && <span className="required-star">*</span>}
-      </label>
+  const fieldDescriptions = {
+    area_of_work: 'Select all regions where your company provides services.',
+    industrial_verticals: 'Select all industries your company serves.',
+    industry_type: 'Select your primary business category.',
+  }
 
-      <input
-        type={kind}
-        min={key === 'experience_years' ? 0 : undefined}
-        max={key === 'experience_years' ? 100 : undefined}
-        step={key === 'experience_years' ? 1 : undefined}
-        value={form[key] ?? ''}
-        onChange={(e) => updateField(key, e.target.value)}
-        placeholder={`Enter ${label}`}
-        required={required}
-      />
-    </div>
-  )
+  const renderField = ([key, label, kind = 'text', required = false]) => {
+    const isMultiSelect = Boolean(multiSelectOptions[key])
 
+    const options =
+      multiSelectOptions[key] ||
+      (key === 'industry_type' ? industryTypeOptions : [])
+
+    return (
+      <div
+        className={`field-group ${
+          key === 'registered_address' ||
+          key === 'plant_location' ||
+          key === 'address'
+            ? 'field-group--wide'
+            : ''
+        } ${isMultiSelect || key === 'industry_type' ? 'field-group--select' : ''}`}
+        key={key}
+      >
+        <label htmlFor={key}>
+          <span className="field-icon">{getIcon(key)}</span>
+          {label}
+          {required && <span className="required-star">*</span>}
+        </label>
+
+        {isMultiSelect ? (
+          <div className="multi-select-wrap">
+            <button
+              type="button"
+              className={`multi-select-trigger ${
+                openMultiSelect === key ? 'is-open' : ''
+              }`}
+              aria-expanded={openMultiSelect === key}
+              onClick={() => {
+                setOpenMultiSelect((prev) => (prev === key ? '' : key));
+                setMultiSearch((prev) => ({ ...prev, [key]: '' }));
+              }}
+            >
+              <span className="multi-select-trigger-content">
+                {Array.isArray(form[key]) && form[key].length > 0 ? (
+                  <span className="multi-select-summary">
+                    {form[key].length} selected
+                  </span>
+                ) : (
+                  <span className="multi-select-placeholder">
+                    Select {label}
+                  </span>
+                )}
+              </span>
+
+              <span className="multi-select-chevron">
+                {openMultiSelect === key ? '▴' : '▾'}
+              </span>
+            </button>
+
+            {Array.isArray(form[key]) && form[key].length > 0 && (
+              <div className="selected-values">
+                {form[key].map((value) => (
+                  <button
+                    key={value}
+                    type="button"
+                    className="selected-value-chip"
+                    onClick={() =>
+                      updateField(
+                        key,
+                        form[key].filter((item) => item !== value)
+                      )
+                    }
+                  >
+                    {value} <span aria-hidden="true">×</span>
+                  </button>
+                ))}
+              </div>
+            )}
+
+            {openMultiSelect === key && (
+              <div className="multi-select-menu">
+                <input
+                  type="search"
+                  className="multi-select-search"
+                  placeholder={`Search ${label.toLowerCase()}...`}
+                  value={multiSearch[key] || ''}
+                  onChange={(e) =>
+                    setMultiSearch((prev) => ({
+                      ...prev,
+                      [key]: e.target.value,
+                    }))
+                  }
+                />
+
+                <div className="multi-select-options">
+                  {options
+                    .filter((option) =>
+                      option
+                        .toLowerCase()
+                        .includes((multiSearch[key] || '').toLowerCase())
+                    )
+                    .map((option) => {
+                      const checked = (form[key] || []).includes(option);
+
+                      return (
+                        <label
+                          key={option}
+                          className={`multi-select-option ${
+                            checked ? 'is-selected' : ''
+                          }`}
+                        >
+                          <input
+                            type="checkbox"
+                            checked={checked}
+                            onChange={() => {
+                              const current = form[key] || [];
+
+                              updateField(
+                                key,
+                                checked
+                                  ? current.filter((item) => item !== option)
+                                  : [...current, option]
+                              );
+                            }}
+                          />
+
+                          <span>{option}</span>
+                          {checked && (
+                            <span className="multi-select-check">✓</span>
+                          )}
+                        </label>
+                      );
+                    })}
+
+                  {options.filter((option) =>
+                    option
+                      .toLowerCase()
+                      .includes((multiSearch[key] || '').toLowerCase())
+                  ).length === 0 && (
+                    <p className="multi-select-empty">No options found.</p>
+                  )}
+                </div>
+
+                <div className="multi-select-footer">
+                  <span>{(form[key] || []).length} selected</span>
+                  <button
+                    type="button"
+                    onClick={() => setOpenMultiSelect('')}
+                  >
+                    Done
+                  </button>
+                </div>
+              </div>
+            )}
+
+            <small className="select-help">{fieldDescriptions[key]}</small>
+          </div>
+        ) : key === 'industry_type' ? (
+          <>
+            <select
+              id={key}
+              name={key}
+              // className="registration-select"
+              value={form[key] ?? ''}
+              onChange={(e) => updateField(key, e.target.value)}
+              required={required}
+            >
+              <option value="">Select industry type</option>
+              {industryTypeOptions.map((option) => (
+                <option key={option} value={option}>
+                  {option}
+                </option>
+              ))}
+            </select>
+
+            <small className="select-help">
+              {fieldDescriptions[key]}
+            </small>
+          </>
+        ) : (
+          // Keep your existing input field code here unchanged
+          <input
+            id={key}
+            name={key}
+            type={kind}
+            min={key === 'experience_years' ? 0 : undefined}
+            max={key === 'experience_years' ? 100 : undefined}
+            step={key === 'experience_years' ? 1 : undefined}
+            value={form[key] ?? ''}
+            onChange={(e) => updateField(key, e.target.value)}
+            placeholder={`Enter ${label}`}
+            required={required}
+          />
+        )}
+      </div>
+    )
+  }
   /* ================= RENDER ================= */
 
   return (
