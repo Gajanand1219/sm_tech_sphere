@@ -4,7 +4,7 @@ import API from '../services/api'
 import '../styles/BuyerDashboard.css'
 
 /* =========================================================
-   DOMAIN DATA (matches HTML prototype)
+   DOMAIN DATA
    ========================================================= */
 
 const DOMAINS = [
@@ -57,7 +57,7 @@ const DOMAINS = [
 ]
 
 /* =========================================================
-   MENU ITEMS (matches HTML prototype)
+   MENU ITEMS
    ========================================================= */
 
 const MENU = [
@@ -111,6 +111,107 @@ const initials = (name = '') => {
 }
 
 /* =========================================================
+   COMPANY AVATAR
+   ========================================================= */
+
+function CompanyAvatar({ logo, name, size = 'md' }) {
+  const [errored, setErrored] = useState(false)
+  const hasLogo = Boolean(logo) && !errored
+
+  return (
+    <span className={`ev-av ev-av--${size} ${hasLogo ? 'ev-av--logo' : ''}`}>
+      {hasLogo ? (
+        <img
+          src={logo}
+          alt={name || 'Company'}
+          className="ev-av-img"
+          onError={() => setErrored(true)}
+        />
+      ) : (
+        initials(name)
+      )}
+    </span>
+  )
+}
+
+/* =========================================================
+   NOTIFICATION BUILDER
+   ========================================================= */
+
+function buildNotifications(enquiries) {
+  const notes = []
+
+  enquiries.forEach((e) => {
+    const status = normalizeStatus(e.status)
+
+    e.acceptedQuotations?.forEach((q) => {
+      notes.push({
+        id: `acc-${e.id}-${q.id}`,
+        type: 'success',
+        title: `Quote accepted on #${e.id}`,
+        desc: `${q.vendor_company || 'Vendor'} · ₹${Number(q.capex || 0).toLocaleString('en-IN')}`,
+        time: q.id,
+        link: `/buyer/enquiries/${e.id}`,
+        icon: '✅',
+      })
+    })
+
+    e.rejectedQuotations?.forEach((q) => {
+      notes.push({
+        id: `rej-${e.id}-${q.id}`,
+        type: 'danger',
+        title: `Quote rejected on #${e.id}`,
+        desc: `${q.vendor_company || 'Vendor'}`,
+        time: q.id,
+        link: `/buyer/enquiries/${e.id}`,
+        icon: '❌',
+      })
+    })
+
+    if (e.mutualHandshake) {
+      notes.push({
+        id: `mut-${e.id}`,
+        type: 'info',
+        title: `Handshake completed · #${e.id}`,
+        desc: 'Contact details unlocked',
+        time: e.id,
+        link: `/buyer/enquiries/${e.id}`,
+        icon: '🤝',
+      })
+    }
+
+    const pending = e.quotationsList?.filter(
+      (q) => normalizeStatus(q.status) === 'PENDING'
+    )
+    if (pending && pending.length) {
+      notes.push({
+        id: `pend-${e.id}`,
+        type: 'warning',
+        title: `${pending.length} new quote${pending.length > 1 ? 's' : ''} on #${e.id}`,
+        desc: 'Review and take action',
+        time: e.id,
+        link: `/buyer/enquiries/${e.id}`,
+        icon: '📄',
+      })
+    }
+
+    if (status === 'CLOSED') {
+      notes.push({
+        id: `closed-${e.id}`,
+        type: 'info',
+        title: `Enquiry #${e.id} closed`,
+        desc: 'Moved to history',
+        time: e.id,
+        link: `/buyer/enquiries/${e.id}`,
+        icon: '🔒',
+      })
+    }
+  })
+
+  return notes.sort((a, b) => (b.time || 0) - (a.time || 0)).slice(0, 15)
+}
+
+/* =========================================================
    BUYER DASHBOARD
    ========================================================= */
 
@@ -120,16 +221,25 @@ export default function BuyerDashboard() {
 
   const [data, setData] = useState({ stats: {}, enquiries: [] })
   const [profile, setProfile] = useState(null)
+  const [networkLogo, setNetworkLogo] = useState(null)
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState('')
   const [mobileOpen, setMobileOpen] = useState(false)
+  const [notifOpen, setNotifOpen] = useState(false)
+  const [readIds, setReadIds] = useState(() => {
+    try {
+      return JSON.parse(localStorage.getItem('buyer_read_notifs') || '[]')
+    } catch {
+      return []
+    }
+  })
 
   const requestedView = (searchParams.get('view') || '').toLowerCase()
   const view = requestedView === 'quote' ? 'quotes' : requestedView
   const isListingView = Boolean(view)
   const pageInfo = PAGE_INFO[view]
 
-  /* ---------- Load dashboard + profile ---------- */
+  /* ---------- Load dashboard + profile + network logo ---------- */
 
   useEffect(() => {
     let alive = true
@@ -198,12 +308,52 @@ export default function BuyerDashboard() {
       }
     }
 
+    /* ---------- Profile + Network Logo ---------- */
     const loadProfile = async () => {
       try {
-        const { data } = await API.get('/auth/me')
+        // ✅ FIX: /auth/profile (NOT /auth/me)
+        const { data } = await API.get('/auth/profile')
         if (alive) setProfile(data)
-      } catch {
-        /* profile is optional */
+
+        console.log('[BuyerLogo] profile loaded:', data)
+
+        // Fetch logo from /public/network-companies (same as Home marquee)
+        try {
+          const net = await API.get('/public/network-companies')
+          const buyers = Array.isArray(net.data?.buyers) ? net.data.buyers : []
+
+          const myCompany = String(
+            data?.company_name || data?.company || data?.name || ''
+          )
+            .toLowerCase()
+            .trim()
+
+          const me =
+            buyers.find(
+              (b) =>
+                b.company_name &&
+                String(b.company_name).toLowerCase().trim() === myCompany
+            ) ||
+            buyers.find(
+              (b) =>
+                b.email &&
+                data?.email &&
+                String(b.email).toLowerCase().trim() ===
+                  String(data.email).toLowerCase().trim()
+            )
+
+          if (alive && me?.logo) {
+            setNetworkLogo(me.logo)
+          }
+
+          console.log('[BuyerLogo] my company:', myCompany)
+          console.log('[BuyerLogo] buyers list:', buyers)
+          console.log('[BuyerLogo] matched:', me)
+        } catch (netErr) {
+          console.debug('[BuyerLogo] network-companies failed:', netErr)
+        }
+      } catch (err) {
+        console.error('[BuyerLogo] profile load failed:', err)
       }
     }
 
@@ -217,7 +367,28 @@ export default function BuyerDashboard() {
 
   const enquiries = data.enquiries
 
-  /* ---------- Counts for sidebar + stats ---------- */
+  /* ---------- Notifications ---------- */
+
+  const notifications = buildNotifications(enquiries)
+  const unreadCount = notifications.filter((n) => !readIds.includes(n.id)).length
+
+  const markAllRead = () => {
+    const ids = notifications.map((n) => n.id)
+    setReadIds(ids)
+    try {
+      localStorage.setItem('buyer_read_notifs', JSON.stringify(ids))
+    } catch {}
+  }
+
+  const markOneRead = (id) => {
+    const next = Array.from(new Set([...readIds, id]))
+    setReadIds(next)
+    try {
+      localStorage.setItem('buyer_read_notifs', JSON.stringify(next))
+    } catch {}
+  }
+
+  /* ---------- Counts ---------- */
 
   const counts = {
     open: enquiries.filter((e) =>
@@ -238,7 +409,7 @@ export default function BuyerDashboard() {
     history: counts.hist,
   }
 
-  /* ---------- Filter list by view ---------- */
+  /* ---------- Filter by view ---------- */
 
   const filteredEnquiries = enquiries.filter((enquiry) => {
     const status = normalizeStatus(enquiry.status)
@@ -275,16 +446,20 @@ export default function BuyerDashboard() {
     description: 'Review all your enquiries and their progress.',
   }
 
-  /* ---------- Company / user info ---------- */
-
   const companyName =
     profile?.company_name ||
     profile?.company ||
     profile?.name ||
+    profile?.full_name ||
     'Your Company'
 
-  const userEmail = profile?.email || ''
-  const userInitials = initials(companyName)
+  /* ⭐ Logo priority */
+  const companyLogo =
+    profile?.logo ||
+    profile?.company_logo ||
+    profile?.profile_image ||
+    networkLogo ||
+    null
 
   /* ---------- Render ---------- */
 
@@ -295,11 +470,7 @@ export default function BuyerDashboard() {
       <aside className={`ev-side ${mobileOpen ? 'open' : ''}`}>
         <div className="ev-brand">
           <div className="ev-logo">
-            <svg width="42" height="42" viewBox="20 10 390 390" aria-hidden="true">
-              <circle cx="180" cy="168" r="126.5" fill="none" stroke="#1e9bc9" strokeWidth="45" />
-              <path d="M263 251C298 258 338 266 362 284C390 305 392 345 365 366C338 386 305 380 288 350C272 322 266 285 263 251Z" fill="#1fa971" />
-              <path d="M180 135L204 168L180 201L156 168Z" fill="#62d6a8" />
-            </svg>
+            <img src="/logo2.jpeg" alt="ENVIQUO" />
           </div>
           <div>
             <b>ENVIQUO</b>
@@ -308,11 +479,17 @@ export default function BuyerDashboard() {
         </div>
 
         <nav className="ev-nav">
+          <Link to="/" className="ev-nav-item" title="Go to Home Page">
+            <span>🏠</span>
+            Home
+          </Link>
+
           <Link
             to="/buyer"
             className={`ev-nav-item ${!isListingView ? 'on' : ''}`}
+            title="Dashboard"
           >
-            <span>🏠</span>
+            <span>⌂</span>
             Dashboard
           </Link>
 
@@ -338,7 +515,7 @@ export default function BuyerDashboard() {
         </nav>
 
         <div className="ev-side-foot">
-          <b>SM Techsphere Pvt Ltd.</b>
+          <b>Diagnose. Match. Solution.</b>
           Buyer workspace
         </div>
       </aside>
@@ -350,7 +527,6 @@ export default function BuyerDashboard() {
       {/* ================= MAIN ================= */}
 
       <div className="ev-main">
-        {/* TOPBAR */}
         <header className="ev-top">
           <button
             type="button"
@@ -361,26 +537,109 @@ export default function BuyerDashboard() {
             ☰
           </button>
 
+          <button
+            type="button"
+            className="ev-back-btn"
+            onClick={() => navigate('/buyer')}
+            title="Back to Dashboard"
+          >
+            ← Back
+          </button>
+
           <span className="ev-top-title">
             {isListingView ? heading.title : 'Dashboard'}
           </span>
 
           <span className="ev-sp" />
 
+          <div className="ev-bell-wrap">
+            <button
+              type="button"
+              className="ev-bell"
+              aria-label="Notifications"
+              onClick={() => setNotifOpen((v) => !v)}
+              title="Notifications"
+            >
+              🔔
+              {unreadCount > 0 && (
+                <span className="ev-bell-badge">
+                  {unreadCount > 99 ? '99+' : unreadCount}
+                </span>
+              )}
+            </button>
+
+            {notifOpen && (
+              <>
+                <div
+                  className="ev-bell-scrim"
+                  onClick={() => setNotifOpen(false)}
+                />
+                <div className="ev-bell-panel" role="dialog" aria-label="Notifications">
+                  <div className="ev-bell-head">
+                    <b>Notifications</b>
+                    {unreadCount > 0 && (
+                      <button
+                        type="button"
+                        className="ev-bell-mark"
+                        onClick={markAllRead}
+                      >
+                        Mark all read
+                      </button>
+                    )}
+                  </div>
+
+                  <div className="ev-bell-list">
+                    {notifications.length ? (
+                      notifications.map((n) => {
+                        const unread = !readIds.includes(n.id)
+                        return (
+                          <button
+                            key={n.id}
+                            type="button"
+                            className={`ev-bell-item ev-bell-item--${n.type} ${
+                              unread ? 'is-unread' : ''
+                            }`}
+                            onClick={() => {
+                              markOneRead(n.id)
+                              setNotifOpen(false)
+                              navigate(n.link)
+                            }}
+                          >
+                            <span className="ev-bell-icon">{n.icon}</span>
+                            <span className="ev-bell-body">
+                              <strong>{n.title}</strong>
+                              <small>{n.desc}</small>
+                            </span>
+                            {unread && <span className="ev-bell-dot" />}
+                          </button>
+                        )
+                      })
+                    ) : (
+                      <div className="ev-bell-empty">
+                        <div>🔕</div>
+                        <p>No notifications yet</p>
+                        <small>You'll see updates here when vendors respond</small>
+                      </div>
+                    )}
+                  </div>
+                </div>
+              </>
+            )}
+          </div>
+
           <button
             type="button"
             className="ev-chip"
             onClick={() => navigate('/profile')}
+            title={companyName}
           >
-            <span className="ev-av">{userInitials}</span>
+            <CompanyAvatar logo={companyLogo} name={companyName} />
             <span className="ev-chip-name">{companyName}</span>
           </button>
         </header>
 
-        {/* CONTENT */}
         <main className="ev-content">
           {isListingView ? (
-            /* ---------- LISTING VIEW ---------- */
             <section className="ev-section">
               <div className="ev-heading">
                 <div>
@@ -466,9 +725,7 @@ export default function BuyerDashboard() {
               )}
             </section>
           ) : (
-            /* ---------- DASHBOARD VIEW ---------- */
             <>
-              {/* HERO */}
               <section className="ev-hero">
                 <div className="ev-hero-mark" aria-hidden="true">
                   <svg width="300" height="300" viewBox="20 10 390 390">
@@ -488,13 +745,26 @@ export default function BuyerDashboard() {
                     Raise an enquiry, compare vendor quotes and close the loop in one place.
                   </p>
 
-                 <div className="ev-hero-actions">
+                  <div
+  className="ev-hero-actions"
+  style={{
+    display: 'flex',
+    gap: '12px',
+    flexWrap: 'wrap',
+  }}
+>
   <Link
-    className="ev-btn ev-btn-lite"
     to="/buyer/enquiries/new"
     style={{
       backgroundColor: '#2563eb',
       color: '#ffffff',
+      padding: '10px 20px',
+      borderRadius: '8px',
+      textDecoration: 'none',
+      fontWeight: '600',
+      display: 'inline-flex',
+      alignItems: 'center',
+      gap: '6px',
       border: '1px solid #2563eb',
     }}
   >
@@ -502,12 +772,18 @@ export default function BuyerDashboard() {
   </Link>
 
   <Link
-    className="ev-btn ev-btn-ghost"
     to="/buyer/enquiries?view=quotes"
     style={{
-      backgroundColor: '#2563eb',
+      backgroundColor: '#1d4ed8',
       color: '#ffffff',
-      border: '1px solid #2563eb',
+      padding: '10px 20px',
+      borderRadius: '8px',
+      textDecoration: 'none',
+      fontWeight: '600',
+      display: 'inline-flex',
+      alignItems: 'center',
+      gap: '6px',
+      border: '1px solid #1d4ed8',
     }}
   >
     📄 View quotes
@@ -516,7 +792,6 @@ export default function BuyerDashboard() {
                 </div>
               </section>
 
-              {/* STATS */}
               <div className="ev-stats">
                 <div className="ev-stat">
                   <b>{counts.open}</b>
@@ -536,7 +811,6 @@ export default function BuyerDashboard() {
                 </div>
               </div>
 
-              {/* DOMAIN SHORTCUTS */}
               <h2 className="ev-h2">Start an enquiry</h2>
               <div className="ev-dgrid">
                 {DOMAINS.map((d, i) => (
@@ -552,7 +826,6 @@ export default function BuyerDashboard() {
                 ))}
               </div>
 
-              {/* MENU TILES */}
               <h2 className="ev-h2">Your workspace</h2>
               <div className="ev-mgrid">
                 {MENU.map((m) => (
