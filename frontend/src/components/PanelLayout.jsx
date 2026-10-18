@@ -47,11 +47,41 @@ const ROLE_COMPANY = {
   vendor: 'Your Company',
 }
 
+const ROLE_DASHBOARD = {
+  admin: '/admin',
+  buyer: '/buyer',
+  vendor: '/vendor',
+}
+
 const initials = (name = '') => {
   const words = String(name).trim().split(/\s+/)
   return (
     (words[0] || '?').charAt(0) + (words[1] ? words[1].charAt(0) : '')
   ).toUpperCase()
+}
+
+/* =========================================================
+   COMPANY AVATAR
+   ========================================================= */
+
+function CompanyAvatar({ logo, name, size = 'md' }) {
+  const [errored, setErrored] = useState(false)
+  const hasLogo = Boolean(logo) && !errored
+
+  return (
+    <span className={`ev-av ev-av--${size} ${hasLogo ? 'ev-av--logo' : ''}`}>
+      {hasLogo ? (
+        <img
+          src={logo}
+          alt={name || 'Company'}
+          className="ev-av-img"
+          onError={() => setErrored(true)}
+        />
+      ) : (
+        initials(name)
+      )}
+    </span>
+  )
 }
 
 export default function PanelLayout({
@@ -64,6 +94,7 @@ export default function PanelLayout({
 
   const [mobileOpen, setMobileOpen] = useState(false)
   const [profile, setProfile] = useState(null)
+  const [networkLogo, setNetworkLogo] = useState(null)
   const [userMenuOpen, setUserMenuOpen] = useState(false)
 
   const [counts, setCounts] = useState({
@@ -74,26 +105,78 @@ export default function PanelLayout({
 
   const items = MENUS[role] || MENUS.admin
   const roleLabel = ROLE_LABEL[role] || role
+  const dashboardPath = ROLE_DASHBOARD[role] || '/'
 
-  /* ---------- Load profile ---------- */
+  /* ---------- Load profile + network logo ---------- */
   useEffect(() => {
     let alive = true
-    API.get('/auth/me')
-      .then(({ data }) => { if (alive) setProfile(data) })
-      .catch(() => {})
+
+    const loadProfile = async () => {
+      try {
+        const { data } = await API.get('/auth/profile')
+        if (!alive) return
+        setProfile(data)
+
+        try {
+          const net = await API.get('/public/network-companies')
+          const list =
+            role === 'vendor'
+              ? (Array.isArray(net.data?.vendors) ? net.data.vendors : [])
+              : (Array.isArray(net.data?.buyers) ? net.data.buyers : [])
+
+          const myCompany = String(
+            data?.company_name || data?.company || data?.name || ''
+          )
+            .toLowerCase()
+            .trim()
+
+          const me =
+            list.find(
+              (b) =>
+                b.company_name &&
+                String(b.company_name).toLowerCase().trim() === myCompany
+            ) ||
+            list.find(
+              (b) =>
+                b.email &&
+                data?.email &&
+                String(b.email).toLowerCase().trim() ===
+                  String(data.email).toLowerCase().trim()
+            )
+
+          if (alive && me?.logo) setNetworkLogo(me.logo)
+
+          console.log(`[PanelLayout ${role} Logo] profile:`, data)
+          console.log(`[PanelLayout ${role} Logo] matched:`, me)
+        } catch (netErr) {
+          console.debug('[PanelLayout Logo] network-companies failed:', netErr)
+        }
+      } catch (err) {
+        console.error('[PanelLayout Logo] profile load failed:', err)
+      }
+    }
+
+    loadProfile()
     return () => { alive = false }
-  }, [])
+  }, [role])
 
   const companyName =
     profile?.company_name ||
     profile?.company ||
     profile?.name ||
+    profile?.full_name ||
     user?.company_name ||
     user?.name ||
     ROLE_COMPANY[role]
 
+  const companyLogo =
+    profile?.logo ||
+    profile?.company_logo ||
+    profile?.profile_image ||
+    networkLogo ||
+    null
+
   const userEmail = profile?.email || user?.email || ''
-  const userInitials = initials(companyName)
 
   /* ---------- Load counts (buyer) ---------- */
   useEffect(() => {
@@ -180,6 +263,12 @@ export default function PanelLayout({
     navigate('/')
   }
 
+  /* ---------- Back button → dashboard ---------- */
+  const handleBack = () => {
+    closeMobile()
+    navigate(dashboardPath)
+  }
+
   const isViewActive = (itemLabel) => {
     const params = new URLSearchParams(window.location.search)
     const view = params.get('view') || ''
@@ -213,17 +302,26 @@ export default function PanelLayout({
         </div>
 
         <nav className="ev-nav">
+          {/* 🏠 HOME → main site */}
           <NavLink
-            to={
-              role === 'admin' ? '/admin'
-                : role === 'vendor' ? '/vendor'
-                : '/buyer'
-            }
+            to="/"
+            onClick={closeMobile}
+            className={({ isActive }) => `ev-nav-item ${isActive ? 'on' : ''}`}
+            title="Go to Home Page"
+          >
+            <span>🏠</span>
+            Home
+          </NavLink>
+
+          {/* ⌂ DASHBOARD */}
+          <NavLink
+            to={dashboardPath}
             end
             onClick={closeMobile}
             className={({ isActive }) => `ev-nav-item ${isActive ? 'on' : ''}`}
+            title="Dashboard"
           >
-            <span>🏠</span>
+            <span>⌂</span>
             Dashboard
           </NavLink>
 
@@ -252,7 +350,7 @@ export default function PanelLayout({
         </nav>
 
         <div className="ev-side-foot">
-          <b>SM Techsphere Pvt Ltd.</b>
+          <b>Diagnose. Match. Solution.</b>
           {roleLabel} workspace
         </div>
       </aside>
@@ -274,6 +372,16 @@ export default function PanelLayout({
             ☰
           </button>
 
+          {/* ⬅️ BACK → dashboard */}
+          <button
+            type="button"
+            className="ev-back-btn"
+            onClick={handleBack}
+            title={`Back to ${roleLabel} Dashboard`}
+          >
+            ← Back
+          </button>
+
           <span className="ev-top-title">{title}</span>
 
           <span className="ev-sp" />
@@ -291,7 +399,7 @@ export default function PanelLayout({
               aria-label="Open profile menu"
               onClick={() => setUserMenuOpen((v) => !v)}
             >
-              <span className="ev-av">{userInitials}</span>
+              <CompanyAvatar logo={companyLogo} name={companyName} />
               <span className="ev-chip-name">{companyName}</span>
               <span className="ev-chip-caret">▾</span>
             </button>
@@ -304,7 +412,11 @@ export default function PanelLayout({
                 />
                 <div className="ev-user-menu" role="menu">
                   <div className="ev-user-head">
-                    <span className="ev-av lg">{userInitials}</span>
+                    <CompanyAvatar
+                      logo={companyLogo}
+                      name={companyName}
+                      size="lg"
+                    />
                     <div>
                       <b>{companyName}</b>
                       <small>{userEmail || roleLabel}</small>
@@ -320,17 +432,6 @@ export default function PanelLayout({
                     }}
                   >
                     <span>👤</span> View Profile
-                  </button>
-
-                  <button
-                    type="button"
-                    className="ev-user-item"
-                    onClick={() => {
-                      setUserMenuOpen(false)
-                      navigate('/profile?edit=1')
-                    }}
-                  >
-                    <span>✏️</span> Edit Profile
                   </button>
 
                   <div className="ev-user-sep" />
@@ -354,7 +455,7 @@ export default function PanelLayout({
           <span>
             © {new Date().getFullYear()} SM Techsphere Engineering Solutions
           </span>
-          <span>SM Techsphere Pvt Ltd.</span>
+          <span>Diagnose. Match. Solution.</span>
         </footer>
       </div>
     </div>
