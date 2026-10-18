@@ -39,7 +39,7 @@ const initials = (name = '') => {
 }
 
 /* =========================================================
-   SIDEBAR MENU (matches HTML prototype)
+   SIDEBAR MENU
    ========================================================= */
 
 const MENU = [
@@ -51,6 +51,34 @@ const MENU = [
   { id: 'closed', l: 'Closed', i: '🔒', to: '/buyer/enquiries?view=closed', countKey: 'closed' },
   { id: 'history', l: 'History', i: '🕒', to: '/buyer/enquiries?view=history', countKey: 'history' },
 ]
+
+/* =========================================================
+   COMPANY AVATAR
+   ========================================================= */
+
+function CompanyAvatar({ logo, name, size = 'md' }) {
+  const [errored, setErrored] = useState(false)
+  const hasLogo = Boolean(logo) && !errored
+
+  return (
+    <span className={`ev-av ev-av--${size} ${hasLogo ? 'ev-av--logo' : ''}`}>
+      {hasLogo ? (
+        <img
+          src={logo}
+          alt={name || 'Company'}
+          className="ev-av-img"
+          onError={() => setErrored(true)}
+        />
+      ) : (
+        initials(name)
+      )}
+    </span>
+  )
+}
+
+/* =========================================================
+   BUYER CREATE
+   ========================================================= */
 
 export default function BuyerCreate() {
   const navigate = useNavigate()
@@ -74,6 +102,7 @@ export default function BuyerCreate() {
   const [messageType, setMessageType] = useState('error')
 
   const [profile, setProfile] = useState(null)
+  const [networkLogo, setNetworkLogo] = useState(null)
   const [counts, setCounts] = useState({
     current: 0, quotes: 0, accepted: 0,
     rejected: 0, closed: 0, history: 0,
@@ -85,27 +114,70 @@ export default function BuyerCreate() {
     setMessageType(type)
   }
 
-  /* ---------- Load profile + counts for sidebar ---------- */
+  /* ---------- Load profile + network logo + counts ---------- */
 
   useEffect(() => {
     let alive = true
 
-    API.get('/auth/me')
-      .then(({ data }) => { if (alive) setProfile(data) })
-      .catch(() => {})
-
-    API.get('/buyer/dashboard')
-      .then(({ data }) => {
+    // ✅ FIX: /auth/profile (NOT /auth/me)
+    const loadProfile = async () => {
+      try {
+        const { data } = await API.get('/auth/profile')
         if (!alive) return
+        setProfile(data)
+
+        // Fetch logo from network-companies
+        try {
+          const net = await API.get('/public/network-companies')
+          const buyers = Array.isArray(net.data?.buyers) ? net.data.buyers : []
+
+          const myCompany = String(
+            data?.company_name || data?.company || data?.name || ''
+          )
+            .toLowerCase()
+            .trim()
+
+          const me =
+            buyers.find(
+              (b) =>
+                b.company_name &&
+                String(b.company_name).toLowerCase().trim() === myCompany
+            ) ||
+            buyers.find(
+              (b) =>
+                b.email &&
+                data?.email &&
+                String(b.email).toLowerCase().trim() ===
+                  String(data.email).toLowerCase().trim()
+            )
+
+          if (alive && me?.logo) setNetworkLogo(me.logo)
+
+          console.log('[BuyerCreate Logo] profile:', data)
+          console.log('[BuyerCreate Logo] matched:', me)
+        } catch (netErr) {
+          console.debug('[BuyerCreate Logo] network-companies failed:', netErr)
+        }
+      } catch (err) {
+        console.error('[BuyerCreate Logo] profile load failed:', err)
+      }
+    }
+
+    const loadCounts = async () => {
+      try {
+        const { data } = await API.get('/buyer/dashboard')
+        if (!alive) return
+
         const stats = data?.stats || {}
         const enquiries = Array.isArray(data?.enquiries) ? data.enquiries : []
         const get = (...keys) => {
           const k = Object.keys(stats).find((x) => keys.includes(x.toLowerCase()))
           return k !== undefined ? Number(stats[k]) || 0 : null
         }
-        const byStatus = (...st) => enquiries.filter((e) =>
-          st.includes(String(e.status || '').toUpperCase().split('.').pop())
-        ).length
+        const byStatus = (...st) =>
+          enquiries.filter((e) =>
+            st.includes(String(e.status || '').toUpperCase().split('.').pop())
+          ).length
 
         setCounts({
           current: get('open_enquiries', 'current_enquiries', 'current', 'open') ??
@@ -116,8 +188,11 @@ export default function BuyerCreate() {
           closed: get('closed', 'closed_enquiries') ?? byStatus('CLOSED'),
           history: get('history', 'history_enquiries') ?? 0,
         })
-      })
-      .catch(() => {})
+      } catch {}
+    }
+
+    loadProfile()
+    loadCounts()
 
     return () => { alive = false }
   }, [])
@@ -205,9 +280,20 @@ export default function BuyerCreate() {
     ? Math.round((answeredCount / questions.length) * 100)
     : 0
 
-  const companyName = profile?.company_name || profile?.company || profile?.name || 'Your Company'
-  const userEmail = profile?.email || ''
-  const userInitials = initials(companyName)
+  const companyName =
+    profile?.company_name ||
+    profile?.company ||
+    profile?.name ||
+    profile?.full_name ||
+    'Your Company'
+
+  /* ⭐ Logo priority */
+  const companyLogo =
+    profile?.logo ||
+    profile?.company_logo ||
+    profile?.profile_image ||
+    networkLogo ||
+    null
 
   function selectDomain(id) {
     setDomainId(String(id)); setCategory(''); setProblemId('')
@@ -319,11 +405,7 @@ export default function BuyerCreate() {
       <aside className={`ev-side ${mobileOpen ? 'open' : ''}`}>
         <div className="ev-brand">
           <div className="ev-logo">
-            <svg width="42" height="42" viewBox="20 10 390 390" aria-hidden="true">
-              <circle cx="180" cy="168" r="126.5" fill="none" stroke="#1e9bc9" strokeWidth="45" />
-              <path d="M263 251C298 258 338 266 362 284C390 305 392 345 365 366C338 386 305 380 288 350C272 322 266 285 263 251Z" fill="#1fa971" />
-              <path d="M180 135L204 168L180 201L156 168Z" fill="#62d6a8" />
-            </svg>
+            <img src="/logo2.jpeg" alt="ENVIQUO" />
           </div>
           <div>
             <b>ENVIQUO</b>
@@ -332,10 +414,16 @@ export default function BuyerCreate() {
         </div>
 
         <nav className="ev-nav">
-          <Link to="/buyer" className="ev-nav-item">
-            <span>🏠</span> Dashboard
+          <Link to="/" className="ev-nav-item" title="Go to Home Page">
+            <span>🏠</span> Home
           </Link>
+
+          <Link to="/buyer" className="ev-nav-item">
+            <span>⌂</span> Dashboard
+          </Link>
+
           <div className="ev-nav-sep" />
+
           {MENU.map((m) => (
             <Link
               key={m.id}
@@ -373,30 +461,36 @@ export default function BuyerCreate() {
           >
             ☰
           </button>
+
+          <button
+            type="button"
+            className="ev-back-btn"
+            onClick={() => navigate('/buyer')}
+            title="Back to Dashboard"
+          >
+            ← Back
+          </button>
+
           <span className="ev-top-title">Create Enquiry</span>
           <span className="ev-sp" />
+
           <button
             type="button"
             className="ev-chip"
             onClick={() => navigate('/profile')}
+            title={companyName}
           >
-            <span className="ev-av">{userInitials}</span>
+            <CompanyAvatar logo={companyLogo} name={companyName} />
             <span className="ev-chip-name">{companyName}</span>
           </button>
         </header>
 
         <main className="ev-content">
-          <button
-            type="button"
-            className="ev-back"
-            onClick={() => navigate(-1)}
-          >
-            ← Back
-          </button>
-
           <div className="ev-page-head">
             <span className="ev-eyebrow">BUYER WORKSPACE</span>
-            <h1>Create Enquiry</h1>
+            <h1 style={{ backgroundColor: '#000000', color: '#ffffff', padding: '12px 16px', borderRadius: '8px' }}>
+  Create Enquiry
+</h1>
             <p>
               Select your service requirement and share the technical details
               with matched vendors.
