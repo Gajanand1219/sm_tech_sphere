@@ -21,6 +21,10 @@ const initials = (name = '') => {
 
 const normStatus = (v) => String(v || '').toUpperCase().split('.').pop()
 
+/* =========================================================
+   TAB FILTER
+   ========================================================= */
+
 function matchTab(m, tab) {
   const enquiryStatus = normStatus(m.status)
   const quoteStatus = normStatus(m.quotation_status)
@@ -53,6 +57,133 @@ function matchTab(m, tab) {
   }
 }
 
+/* =========================================================
+   COMPANY AVATAR
+   ========================================================= */
+
+function CompanyAvatar({ logo, name, size = 'md' }) {
+  const [errored, setErrored] = useState(false)
+  const hasLogo = Boolean(logo) && !errored
+
+  return (
+    <span className={`ev-av ev-av--${size} ${hasLogo ? 'ev-av--logo' : ''}`}>
+      {hasLogo ? (
+        <img
+          src={logo}
+          alt={name || 'Company'}
+          className="ev-av-img"
+          onError={() => setErrored(true)}
+        />
+      ) : (
+        initials(name)
+      )}
+    </span>
+  )
+}
+
+/* =========================================================
+   NOTIFICATION BUILDER (vendor-side)
+   ========================================================= */
+
+function buildNotifications(matches) {
+  const notes = []
+
+  matches.forEach((m) => {
+    const enquiryStatus = normStatus(m.status)
+    const quoteStatus = normStatus(m.quotation_status)
+    const closed = enquiryStatus === 'CLOSED'
+
+    // New enquiry awaiting quote
+    if (!m.quotation_exists && !closed) {
+      notes.push({
+        id: `new-${m.id}`,
+        type: 'warning',
+        title: `New enquiry · #${m.id}`,
+        desc: m.title || 'Awaiting your quote',
+        time: m.id,
+        link: `/vendor/enquiries/${m.id}`,
+        icon: '📥',
+      })
+    }
+
+    // Quote submitted, waiting for buyer
+    if (
+      m.quotation_exists &&
+      !closed &&
+      quoteStatus !== 'ACCEPTED' &&
+      quoteStatus !== 'REJECTED'
+    ) {
+      notes.push({
+        id: `quoted-${m.id}`,
+        type: 'info',
+        title: `Quote submitted · #${m.id}`,
+        desc: 'Waiting for buyer response',
+        time: m.id,
+        link: `/vendor/enquiries/${m.id}`,
+        icon: '📤',
+      })
+    }
+
+    // Buyer accepted
+    if (quoteStatus === 'ACCEPTED' || m.buyer_accepted) {
+      notes.push({
+        id: `acc-${m.id}`,
+        type: 'success',
+        title: `Buyer accepted quote · #${m.id}`,
+        desc: 'Contact details unlocked',
+        time: m.id,
+        link: `/vendor/enquiries/${m.id}`,
+        icon: '✅',
+      })
+    }
+
+    // Buyer rejected
+    if (quoteStatus === 'REJECTED') {
+      notes.push({
+        id: `rej-${m.id}`,
+        type: 'danger',
+        title: `Quote rejected · #${m.id}`,
+        desc: m.title || 'Buyer rejected your quote',
+        time: m.id,
+        link: `/vendor/enquiries/${m.id}`,
+        icon: '❌',
+      })
+    }
+
+    // Closed — won
+    if (closed && String(m.outcome || '').toLowerCase() === 'win') {
+      notes.push({
+        id: `win-${m.id}`,
+        type: 'success',
+        title: `Enquiry won · #${m.id}`,
+        desc: 'Buyer selected you',
+        time: m.id,
+        link: `/vendor/enquiries/${m.id}`,
+        icon: '🏆',
+      })
+    }
+
+    // Closed — lost
+    if (closed && String(m.outcome || '').toLowerCase() === 'loss') {
+      notes.push({
+        id: `loss-${m.id}`,
+        type: 'danger',
+        title: `Enquiry lost · #${m.id}`,
+        desc: 'Buyer selected someone else',
+        time: m.id,
+        link: `/vendor/enquiries/${m.id}`,
+        icon: '📉',
+      })
+    }
+  })
+
+  return notes.sort((a, b) => (b.time || 0) - (a.time || 0)).slice(0, 15)
+}
+
+/* =========================================================
+   VENDOR ENQUIRIES
+   ========================================================= */
+
 export default function VendorEnquiries() {
   const navigate = useNavigate()
   const [searchParams] = useSearchParams()
@@ -60,11 +191,22 @@ export default function VendorEnquiries() {
 
   const [matches, setMatches] = useState([])
   const [profile, setProfile] = useState(null)
+  const [networkLogo, setNetworkLogo] = useState(null)
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState('')
   const [mobileOpen, setMobileOpen] = useState(false)
+  const [notifOpen, setNotifOpen] = useState(false)
+  const [readIds, setReadIds] = useState(() => {
+    try {
+      return JSON.parse(localStorage.getItem('vendor_read_notifs') || '[]')
+    } catch {
+      return []
+    }
+  })
 
   const heading = PAGE_INFO[view] || PAGE_INFO.new
+
+  /* ---------- Load data ---------- */
 
   useEffect(() => {
     let alive = true
@@ -72,9 +214,11 @@ export default function VendorEnquiries() {
       try {
         setLoading(true)
         setError('')
+
+        // ✅ FIX: /auth/profile (NOT /auth/me)
         const [dashRes, profRes] = await Promise.allSettled([
           API.get('/vendor/dashboard'),
-          API.get('/auth/me'),
+          API.get('/auth/profile'),
         ])
         if (!alive) return
 
@@ -87,7 +231,43 @@ export default function VendorEnquiries() {
           setError('Unable to load enquiries.')
         }
 
-        if (profRes.status === 'fulfilled') setProfile(profRes.value.data)
+        if (profRes.status === 'fulfilled') {
+          const p = profRes.value.data
+          setProfile(p)
+
+          // ⭐ Fetch network logo
+          try {
+            const net = await API.get('/public/network-companies')
+            const vendors = Array.isArray(net.data?.vendors) ? net.data.vendors : []
+
+            const myCompany = String(
+              p?.company_name || p?.company || p?.name || ''
+            )
+              .toLowerCase()
+              .trim()
+
+            const me =
+              vendors.find(
+                (b) =>
+                  b.company_name &&
+                  String(b.company_name).toLowerCase().trim() === myCompany
+              ) ||
+              vendors.find(
+                (b) =>
+                  b.email &&
+                  p?.email &&
+                  String(b.email).toLowerCase().trim() ===
+                    String(p.email).toLowerCase().trim()
+              )
+
+            if (alive && me?.logo) setNetworkLogo(me.logo)
+
+            console.log('[VendorEnquiries Logo] profile:', p)
+            console.log('[VendorEnquiries Logo] matched:', me)
+          } catch (netErr) {
+            console.debug('[VendorEnquiries Logo] network-enq failed:', netErr)
+          }
+        }
       } finally {
         if (alive) setLoading(false)
       }
@@ -95,6 +275,8 @@ export default function VendorEnquiries() {
     load()
     return () => { alive = false }
   }, [])
+
+  /* ---------- Filtered list ---------- */
 
   const filtered = matches.filter((m) => matchTab(m, view))
 
@@ -109,9 +291,44 @@ export default function VendorEnquiries() {
     history: matches.filter((m) => matchTab(m, 'history')).length,
   }
 
+  /* ---------- Notifications ---------- */
+
+  const notifications = buildNotifications(matches)
+  const unreadCount = notifications.filter((n) => !readIds.includes(n.id)).length
+
+  const markAllRead = () => {
+    const ids = notifications.map((n) => n.id)
+    setReadIds(ids)
+    try {
+      localStorage.setItem('vendor_read_notifs', JSON.stringify(ids))
+    } catch {}
+  }
+
+  const markOneRead = (id) => {
+    const next = Array.from(new Set([...readIds, id]))
+    setReadIds(next)
+    try {
+      localStorage.setItem('vendor_read_notifs', JSON.stringify(next))
+    } catch {}
+  }
+
+  /* ---------- Company info ---------- */
+
   const companyName =
-    profile?.company_name || profile?.company || profile?.name || 'Your Company'
-  const userInitials = initials(companyName)
+    profile?.company_name ||
+    profile?.company ||
+    profile?.name ||
+    profile?.full_name ||
+    'Your Company'
+
+  const companyLogo =
+    profile?.logo ||
+    profile?.company_logo ||
+    profile?.profile_image ||
+    networkLogo ||
+    null
+
+  const handleBack = () => navigate('/vendor')
 
   const MENU = [
     { id: 'new', l: 'New enquiry', i: '📥', to: '/vendor/enquiries?view=new', countKey: 'new' },
@@ -126,6 +343,7 @@ export default function VendorEnquiries() {
 
   return (
     <div className="enviquo-dash">
+      {/* ============ SIDEBAR ============ */}
       <aside className={`ev-side ${mobileOpen ? 'open' : ''}`}>
         <div className="ev-brand">
           <div className="ev-logo">
@@ -138,10 +356,18 @@ export default function VendorEnquiries() {
         </div>
 
         <nav className="ev-nav">
-          <Link to="/vendor" className="ev-nav-item">
-            <span>🏠</span> Dashboard
+          {/* 🏠 HOME */}
+          <Link to="/" className="ev-nav-item" title="Go to Home Page">
+            <span>🏠</span> Home
           </Link>
+
+          {/* ⌂ DASHBOARD */}
+          <Link to="/vendor" className="ev-nav-item" title="Dashboard">
+            <span>⌂</span> Dashboard
+          </Link>
+
           <div className="ev-nav-sep" />
+
           {MENU.map((m) => (
             <Link
               key={m.id}
@@ -156,7 +382,7 @@ export default function VendorEnquiries() {
         </nav>
 
         <div className="ev-side-foot">
-          <b>SM Techsphere Pvt Ltd.</b>
+          <b>Diagnose. Match. Solution.</b>
           Vendor workspace
         </div>
       </aside>
@@ -165,6 +391,7 @@ export default function VendorEnquiries() {
         <div className="ev-scrim" onClick={() => setMobileOpen(false)} />
       )}
 
+      {/* ============ MAIN ============ */}
       <div className="ev-main">
         <header className="ev-top">
           <button
@@ -175,14 +402,104 @@ export default function VendorEnquiries() {
           >
             ☰
           </button>
+
+          {/* ← BACK */}
+          <button
+            type="button"
+            className="ev-back-btn"
+            onClick={handleBack}
+            title="Back to Vendor Dashboard"
+          >
+            ← Back
+          </button>
+
           <span className="ev-top-title">{heading.title}</span>
           <span className="ev-sp" />
+
+          {/* 🔔 NOTIFICATIONS */}
+          <div className="ev-bell-wrap">
+            <button
+              type="button"
+              className="ev-bell"
+              aria-label="Notifications"
+              onClick={() => setNotifOpen((v) => !v)}
+              title="Notifications"
+            >
+              🔔
+              {unreadCount > 0 && (
+                <span className="ev-bell-badge">
+                  {unreadCount > 99 ? '99+' : unreadCount}
+                </span>
+              )}
+            </button>
+
+            {notifOpen && (
+              <>
+                <div
+                  className="ev-bell-scrim"
+                  onClick={() => setNotifOpen(false)}
+                />
+                <div className="ev-bell-panel" role="dialog" aria-label="Notifications">
+                  <div className="ev-bell-head">
+                    <b>Notifications</b>
+                    {unreadCount > 0 && (
+                      <button
+                        type="button"
+                        className="ev-bell-mark"
+                        onClick={markAllRead}
+                      >
+                        Mark all read
+                      </button>
+                    )}
+                  </div>
+
+                  <div className="ev-bell-list">
+                    {notifications.length ? (
+                      notifications.map((n) => {
+                        const unread = !readIds.includes(n.id)
+                        return (
+                          <button
+                            key={n.id}
+                            type="button"
+                            className={`ev-bell-item ev-bell-item--${n.type} ${
+                              unread ? 'is-unread' : ''
+                            }`}
+                            onClick={() => {
+                              markOneRead(n.id)
+                              setNotifOpen(false)
+                              navigate(n.link)
+                            }}
+                          >
+                            <span className="ev-bell-icon">{n.icon}</span>
+                            <span className="ev-bell-body">
+                              <strong>{n.title}</strong>
+                              <small>{n.desc}</small>
+                            </span>
+                            {unread && <span className="ev-bell-dot" />}
+                          </button>
+                        )
+                      })
+                    ) : (
+                      <div className="ev-bell-empty">
+                        <div>🔕</div>
+                        <p>No notifications yet</p>
+                        <small>You'll see updates here when buyers respond</small>
+                      </div>
+                    )}
+                  </div>
+                </div>
+              </>
+            )}
+          </div>
+
+          {/* 🖼️ COMPANY CHIP */}
           <button
             type="button"
             className="ev-chip"
             onClick={() => navigate('/profile')}
+            title={companyName}
           >
-            <span className="ev-av">{userInitials}</span>
+            <CompanyAvatar logo={companyLogo} name={companyName} />
             <span className="ev-chip-name">{companyName}</span>
           </button>
         </header>
