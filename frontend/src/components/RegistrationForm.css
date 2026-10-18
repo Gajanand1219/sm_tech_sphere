@@ -1060,3 +1060,357 @@
     transition-duration: 0.01ms !important;
   }
 }
+
+
+/* Vendor registration dropdowns */
+.registration-select {
+  display: block;
+  width: 100%;
+  min-width: 0;
+  min-height: 48px;
+  padding: 12px 14px;
+  border: 1px solid #d1d5db;
+  border-radius: 10px;
+  background: #fff;
+  color: #1f2937;
+  font: inherit;
+  font-size: 14px;
+  outline: none;
+  box-sizing: border-box;
+  transition: border-color 0.2s ease, box-shadow 0.2s ease;
+}
+
+.registration-select:focus {
+  border-color: #2563eb;
+  box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.12);
+}
+
+.registration-select--multiple {
+  min-height: 132px;
+  padding: 6px;
+}
+
+.registration-select--multiple option {
+  padding: 10px;
+  border-radius: 6px;
+}
+
+.registration-select--multiple option:checked {
+  background: #2563eb linear-gradient(#2563eb, #2563eb);
+  color: #37d417;
+}
+
+.select-help {
+  display: block;
+  margin-top: 7px;
+  color: #6b7280;
+  font-size: 12px;
+  line-height: 1.5;
+}
+
+.selected-values {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 7px;
+  margin-top: 10px;
+}
+
+.selected-value-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  max-width: 100%;
+  padding: 7px 10px;
+  border: 1px solid #bfdbfe;
+  border-radius: 20px;
+  background: #eff6ff;
+  color: #1d4ed8;
+  font-size: 12px;
+  overflow-wrap: anywhere;
+  cursor: pointer;
+}
+
+.selected-value-chip span {
+  font-size: 16px;
+  line-height: 1;
+}
+
+@media (max-width: 600px) {
+  .registration-select {
+    min-height: 46px;
+    font-size: 16px;
+  }
+
+  .registration-select--multiple {
+    min-height: 150px;
+    font-size: 16px;
+  }
+
+  .field-group--select {
+    width: 100%;
+    min-width: 0;
+  }
+
+  .select-help {
+    font-size: 12px;
+  }
+
+  .selected-value-chip {
+    max-width: 100%;
+    white-space: normal;
+    text-align: left;
+  }
+}
+
+/* Custom searchable multi-select */
+.multi-select-wrap {
+  position: relative;
+  width: 100%;
+  min-width: 0;
+}
+
+.multi-select-trigger {
+  width: 100%;
+  min-height: 48px;
+  padding: 12px 14px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  border: 1px solid #cfdcd5;
+  border-radius: 9px;
+  background: #fafdfb;
+  color: #263b30;
+  font: inherit;
+  font-size: 13px;
+  text-align: left;
+  cursor: pointer;
+  transition: border-color 0.2s, box-shadow 0.2s, background 0.2s;
+}
+
+.multi-select-trigger:hover,
+.multi-select-trigger.is-open {
+  background: #fff;
+  border-color: #087f45;
+}
+
+.multi-select-trigger:focus-visible {
+  /* outline: 3px solid rgba(8, 127, 69, 0.15); */
+  outline-offset: 2px;
+}
+
+.multi-select-trigger-content {
+  min-width: 0;
+  overflow-wrap: anywhere;
+}
+
+.multi-select-placeholder {
+  color: #89968f;
+}
+
+.multi-select-summary {
+  color: #087f45;
+  font-weight: 700;
+}
+
+.multi-select-chevron {
+  flex-shrink: 0;
+  color: #087f45;
+  font-size: 17px;
+}
+
+.multi-select-menu {
+  position: absolute;
+  top: calc(100% + 6px);
+  left: 0;
+  right: 0;
+  z-index: 100;
+  overflow: hidden;
+  border: 1px solid #cfdcd5;
+  border-radius: 12px;
+  background: #fff;
+  /* box-shadow: 0 12px 30px rgba(20, 70, 45, 0.16); */
+}
+
+.multi-select-search {
+  display: block;
+  width: calc(100% - 20px);
+  margin: 10px;
+  padding: 10px 12px;
+  border: 1px solid #dce7e1;
+  border-radius: 8px;
+  background: #fafdfb;
+  color: #17201c;
+  font: inherit;
+  font-size: 13px;
+  outline: none;
+}
+
+.multi-select-search:focus {
+  border-color: #087f45;
+  /* box-shadow: 0 0 0 3px rgba(8, 127, 69, 0.09); */
+}
+
+.multi-select-options {
+  max-height: 220px;
+  overflow-y: auto;
+  padding: 4px 8px;
+  overscroll-behavior: contain;
+}
+
+.multi-select-option {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  min-height: 42px;
+  padding: 9px 10px;
+  border-radius: 7px;
+  color: #263b30;
+  font-size: 13px;
+  line-height: 1.4;
+  cursor: pointer;
+  overflow-wrap: anywhere;
+}
+
+.multi-select-option:hover {
+  background: #f0f8f3;
+}
+
+.multi-select-option.is-selected {
+  background: #eaf7f0;
+  color: #056b3a;
+  font-weight: 600;
+}
+
+.multi-select-option input {
+  width: 16px;
+  height: 16px;
+  flex-shrink: 0;
+  margin: 0;
+  accent-color: #087f45;
+  cursor: pointer;
+}
+
+.multi-select-check {
+  margin-left: auto;
+  color: #087f45;
+  font-weight: 800;
+}
+
+.multi-select-empty {
+  margin: 0;
+  padding: 16px 10px;
+  color: #69766f;
+  font-size: 13px;
+  text-align: center;
+}
+
+.multi-select-footer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 10px 12px;
+  border-top: 1px solid #e5eee8;
+  background: #fafdfb;
+  color: #5f6d66;
+  font-size: 12px;
+}
+
+.multi-select-footer button {
+  padding: 7px 14px;
+  border: none;
+  border-radius: 7px;
+  background: #087f45;
+  color: #fff;
+  font: inherit;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.multi-select-footer button:hover {
+  background: #056b3a;
+}
+
+.selected-values {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin-top: 9px;
+}
+
+.selected-value-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  max-width: 100%;
+  padding: 6px 10px;
+  border: 1px solid #c9e7d7;
+  border-radius: 20px;
+  background: #eaf7f0;
+  color: #056b3a;
+  font: inherit;
+  font-size: 12px;
+  overflow-wrap: anywhere;
+  cursor: pointer;
+}
+
+.selected-value-chip span {
+  font-size: 16px;
+  line-height: 1;
+}
+
+.selected-value-chip:hover {
+  border-color: #087f45;
+  background: #d9f0e3;
+}
+
+.registration-select {
+  width: 100%;
+  min-width: 0;
+  min-height: 48px;
+  padding: 12px 36px 12px 14px;
+  border: 1px solid #cfdcd5;
+  border-radius: 9px;
+  background-color: #fafdfb;
+  color: #263b30;
+  font-family: inherit;
+  font-size: 13px;
+  cursor: pointer;
+  outline: none;
+}
+
+.registration-select:focus {
+  border-color: #087f45;
+  background-color: #fff;
+  box-shadow: 0 0 0 3px rgba(8, 127, 69, 0.1);
+}
+
+.select-help {
+  display: block;
+  margin-top: 7px;
+  color: #68756e;
+  font-size: 12px;
+  line-height: 1.5;
+}
+
+@media (max-width: 640px) {
+  .multi-select-trigger,
+  .registration-select {
+    min-height: 46px;
+    font-size: 13px;
+  }
+
+  .multi-select-menu {
+    max-height: min(65vh, 380px);
+  }
+
+  .multi-select-options {
+    max-height: min(45vh, 240px);
+  }
+
+  .multi-select-option {
+    min-height: 46px;
+    font-size: 13px;
+  }
+}
