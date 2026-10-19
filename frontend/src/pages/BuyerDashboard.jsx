@@ -9,7 +9,7 @@ import '../styles/BuyerDashboard.css'
 
 const DOMAINS = [
   {
-    n: 'Water and wastewater',
+    n: 'WATER AND WASTEWATER',
     i: '💧',
     cats: [
       { n: 'Water treatment (WTP)', s: ['Raw water treatment', 'DM and RO plant', 'Softener and filters'] },
@@ -19,7 +19,7 @@ const DOMAINS = [
     ],
   },
   {
-    n: 'Solid and hazardous waste',
+    n: 'SOLID AND HAZARDOUS WASTE',
     i: '🗑️',
     cats: [
       { n: 'Hazardous waste disposal', s: ['Collection and transport', 'Incineration', 'Co-processing'] },
@@ -27,17 +27,19 @@ const DOMAINS = [
       { n: 'Authorisation and audit', s: ['Hazardous waste authorisation', 'Waste audit', 'Records and returns'] },
     ],
   },
+  
+  
   {
-    n: 'SPCB and air pollution',
-    i: '💨',
+    n: 'SOLAR AND RENEWABLE ENERGY',
+    i: '☀️',
     cats: [
-      { n: 'Consent and compliance', s: ['Consent to establish', 'Consent to operate', 'Renewal and amendment'] },
-      { n: 'Air pollution control', s: ['Dust collector', 'Scrubber', 'Stack monitoring'] },
-      { n: 'Environmental reports', s: ['Environmental statement (Form V)', 'Environmental audit', 'Compliance report'] },
+      { n: 'Rooftop solar', s: ['Up to 100 kW', '100 kW to 1 MW', 'Above 1 MW'] },
+      { n: 'Open access and captive', s: ['Captive solar', 'Open access PPA', 'Wheeling'] },
+      { n: 'Storage and hybrid', s: ['Battery storage', 'Solar plus wind hybrid', 'Biogas'] },
     ],
   },
   {
-    n: 'Carbon and ESG',
+    n: 'CARBON AND ESG',
     i: '🌿',
     cats: [
       { n: 'Carbon footprint', s: ['GHG inventory', 'Carbon audit', 'Reduction roadmap'] },
@@ -46,12 +48,12 @@ const DOMAINS = [
     ],
   },
   {
-    n: 'Solar and renewable energy',
-    i: '☀️',
+    n: 'AIR POLLUTION & ENVIRONMENTAL LEGAL SERVICES',
+    i: '💨',
     cats: [
-      { n: 'Rooftop solar', s: ['Up to 100 kW', '100 kW to 1 MW', 'Above 1 MW'] },
-      { n: 'Open access and captive', s: ['Captive solar', 'Open access PPA', 'Wheeling'] },
-      { n: 'Storage and hybrid', s: ['Battery storage', 'Solar plus wind hybrid', 'Biogas'] },
+      { n: 'Consent and compliance', s: ['Consent to establish', 'Consent to operate', 'Renewal and amendment'] },
+      { n: 'Air pollution control', s: ['Dust collector', 'Scrubber', 'Stack monitoring'] },
+      { n: 'Environmental reports', s: ['Environmental statement (Form V)', 'Environmental audit', 'Compliance report'] },
     ],
   },
 ]
