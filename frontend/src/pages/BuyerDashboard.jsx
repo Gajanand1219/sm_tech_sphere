@@ -811,7 +811,12 @@ export default function BuyerDashboard() {
                 </div>
               </div>
 
-              <h2 className="ev-h2">Start an enquiry</h2>
+              <h2
+                  className="ev-h2"
+                  style={{ backgroundColor: 'blue', color: 'white', padding: '10px' }}
+                >
+                  Start an enquiry
+                </h2>
               <div className="ev-dgrid">
                 {DOMAINS.map((d, i) => (
                   <Link
