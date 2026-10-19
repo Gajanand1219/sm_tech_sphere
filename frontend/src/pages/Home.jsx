@@ -7,7 +7,7 @@ import '../styles/ScrollAnimations.css'
 
 const solutionsList = [
   {
-    name: 'Water & Wastewater Treatment',
+    name: 'WATER AND WASTEWATER',
     icon: '💧',
     image:
       'https://images.unsplash.com/photo-1538300342682-cf57afb97285?auto=format&fit=crop&w=900&q=80',
@@ -20,7 +20,7 @@ const solutionsList = [
     ]
   },
   {
-    name: 'Solid & Hazardous Waste',
+    name: 'SOLID AND HAZARDOUS WASTE',
     icon: '♻️',
     image:
       'https://images.unsplash.com/photo-1532996122724-e3c354a0b15b?auto=format&fit=crop&w=900&q=80',
@@ -33,7 +33,7 @@ const solutionsList = [
     ]
   },
   {
-    name: 'Solar & Renewables',
+    name: 'SOLAR AND RENEWABLES',
     icon: '☀️',
     image:
       'https://images.unsplash.com/photo-1509391366360-2e959784a276?auto=format&fit=crop&w=900&q=80',
@@ -46,7 +46,7 @@ const solutionsList = [
     ]
   },
   {
-    name: 'Carbon & ESG',
+    name: 'CARBON AND ESG',
     icon: '🌱',
     image:
       'https://images.unsplash.com/photo-1441974231531-c6227db76b6e?auto=format&fit=crop&w=900&q=80',
@@ -59,7 +59,7 @@ const solutionsList = [
     ]
   },
   {
-    name: 'Air Pollution & Environmental Legal Services',
+    name: 'AIR POLLUTION & ENVIRONMENTAL LEGAL SERVICES',
     icon: '🏭',
     image:
       'https://images.unsplash.com/photo-1565793298595-6a879b1d9492?auto=format&fit=crop&w=900&q=80',
