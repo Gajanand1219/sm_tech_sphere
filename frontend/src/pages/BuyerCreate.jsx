@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from 'react'
+import { useEffect, useMemo, useRef, useState } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
 import API from '../services/api'
 import '../styles/BuyerCreate.css'
@@ -13,17 +13,9 @@ const STEPS = [
 ]
 
 const DOMAIN_ICONS = {
-  water: '💧',
-  wastewater: '💧',
-  waste: '🗑️',
-  hazardous: '🗑️',
-  solar: '☀️',
-  renewable: '☀️',
-  carbon: '🌿',
-  esg: '🌿',
-  spcb: '💨',
-  pollution: '💨',
-  air: '💨',
+  water: '💧', wastewater: '💧', waste: '🗑️', hazardous: '🗑️',
+  solar: '☀️', renewable: '☀️', carbon: '🌿', esg: '🌿',
+  spcb: '💨', pollution: '💨', air: '💨',
 }
 
 const getDomainIcon = (name = '') => {
@@ -38,10 +30,6 @@ const initials = (name = '') => {
   return ((words[0] || '?').charAt(0) + (words[1] ? words[1].charAt(0) : '')).toUpperCase()
 }
 
-/* =========================================================
-   SIDEBAR MENU
-   ========================================================= */
-
 const MENU = [
   { id: 'create', l: 'Create enquiry', i: '➕', to: '/buyer/enquiries/new' },
   { id: 'current', l: 'Current enquiry', i: '📋', to: '/buyer/enquiries?view=current', countKey: 'current' },
@@ -52,33 +40,19 @@ const MENU = [
   { id: 'history', l: 'History', i: '🕒', to: '/buyer/enquiries?view=history', countKey: 'history' },
 ]
 
-/* =========================================================
-   COMPANY AVATAR
-   ========================================================= */
-
 function CompanyAvatar({ logo, name, size = 'md' }) {
   const [errored, setErrored] = useState(false)
   const hasLogo = Boolean(logo) && !errored
-
   return (
     <span className={`ev-av ev-av--${size} ${hasLogo ? 'ev-av--logo' : ''}`}>
       {hasLogo ? (
-        <img
-          src={logo}
-          alt={name || 'Company'}
-          className="ev-av-img"
-          onError={() => setErrored(true)}
-        />
+        <img src={logo} alt={name || 'Company'} className="ev-av-img" onError={() => setErrored(true)} />
       ) : (
         initials(name)
       )}
     </span>
   )
 }
-
-/* =========================================================
-   BUYER CREATE
-   ========================================================= */
 
 export default function BuyerCreate() {
   const navigate = useNavigate()
@@ -109,52 +83,32 @@ export default function BuyerCreate() {
   })
   const [mobileOpen, setMobileOpen] = useState(false)
 
+  // ✅ NEW: auto-advance guard so we don't double-navigate
+  const advanceTimer = useRef(null)
+  useEffect(() => () => clearTimeout(advanceTimer.current), [])
+
   const notify = (text, type = 'error') => {
     setMessage(text)
     setMessageType(type)
   }
 
   /* ---------- Load profile + network logo + counts ---------- */
-
   useEffect(() => {
     let alive = true
 
-    // ✅ FIX: /auth/profile (NOT /auth/me)
     const loadProfile = async () => {
       try {
         const { data } = await API.get('/auth/profile')
         if (!alive) return
         setProfile(data)
-
-        // Fetch logo from network-companies
         try {
           const net = await API.get('/public/network-companies')
           const buyers = Array.isArray(net.data?.buyers) ? net.data.buyers : []
-
-          const myCompany = String(
-            data?.company_name || data?.company || data?.name || ''
-          )
-            .toLowerCase()
-            .trim()
-
+          const myCompany = String(data?.company_name || data?.company || data?.name || '').toLowerCase().trim()
           const me =
-            buyers.find(
-              (b) =>
-                b.company_name &&
-                String(b.company_name).toLowerCase().trim() === myCompany
-            ) ||
-            buyers.find(
-              (b) =>
-                b.email &&
-                data?.email &&
-                String(b.email).toLowerCase().trim() ===
-                  String(data.email).toLowerCase().trim()
-            )
-
+            buyers.find((b) => b.company_name && String(b.company_name).toLowerCase().trim() === myCompany) ||
+            buyers.find((b) => b.email && data?.email && String(b.email).toLowerCase().trim() === String(data.email).toLowerCase().trim())
           if (alive && me?.logo) setNetworkLogo(me.logo)
-
-          console.log('[BuyerCreate Logo] profile:', data)
-          console.log('[BuyerCreate Logo] matched:', me)
         } catch (netErr) {
           console.debug('[BuyerCreate Logo] network-companies failed:', netErr)
         }
@@ -167,7 +121,6 @@ export default function BuyerCreate() {
       try {
         const { data } = await API.get('/buyer/dashboard')
         if (!alive) return
-
         const stats = data?.stats || {}
         const enquiries = Array.isArray(data?.enquiries) ? data.enquiries : []
         const get = (...keys) => {
@@ -175,13 +128,9 @@ export default function BuyerCreate() {
           return k !== undefined ? Number(stats[k]) || 0 : null
         }
         const byStatus = (...st) =>
-          enquiries.filter((e) =>
-            st.includes(String(e.status || '').toUpperCase().split('.').pop())
-          ).length
-
+          enquiries.filter((e) => st.includes(String(e.status || '').toUpperCase().split('.').pop())).length
         setCounts({
-          current: get('open_enquiries', 'current_enquiries', 'current', 'open') ??
-            byStatus('APPROVED', 'MATCHED', 'QUOTATION', 'SUBMITTED'),
+          current: get('open_enquiries', 'current_enquiries', 'current', 'open') ?? byStatus('APPROVED', 'MATCHED', 'QUOTATION', 'SUBMITTED'),
           quotes: get('quotations', 'quotes', 'total_quotations') ?? 0,
           accepted: get('accepted', 'accepted_quotes', 'accepted_quotations') ?? 0,
           rejected: get('rejected', 'rejected_quotes', 'rejected_quotations') ?? 0,
@@ -193,12 +142,10 @@ export default function BuyerCreate() {
 
     loadProfile()
     loadCounts()
-
     return () => { alive = false }
   }, [])
 
   /* ---------- Load domains ---------- */
-
   useEffect(() => {
     let active = true
     API.get('/public/domains')
@@ -209,38 +156,28 @@ export default function BuyerCreate() {
   }, [])
 
   /* ---------- Load problems for domain ---------- */
-
   useEffect(() => {
     let active = true
     setProblems([]); setCategory(''); setProblemId(''); setQuestions([]); setAnswers({})
-
     if (!domainId) { setLoadingProblems(false); return }
-
     setLoadingProblems(true)
-
     API.get(`/public/domains/${domainId}/problems`)
       .then(({ data }) => { if (active) setProblems(Array.isArray(data) ? data : []) })
       .catch(() => { if (active) notify('Unable to load categories for this domain.') })
       .finally(() => { if (active) setLoadingProblems(false) })
-
     return () => { active = false }
   }, [domainId])
 
   /* ---------- Load questions for problem ---------- */
-
   useEffect(() => {
     let active = true
     setQuestions([]); setAnswers({})
-
     if (!problemId) { setLoadingQuestions(false); return }
-
     setLoadingQuestions(true)
-
     API.get(`/public/problems/${problemId}/questions`)
       .then(({ data }) => { if (active) setQuestions(Array.isArray(data) ? data : []) })
       .catch(() => { if (active) notify('Unable to load the questionnaire.') })
       .finally(() => { if (active) setLoadingQuestions(false) })
-
     return () => { active = false }
   }, [problemId])
 
@@ -249,72 +186,69 @@ export default function BuyerCreate() {
     [domains, domainId]
   )
 
-
   const categories = useMemo(() => {
-    const unique = new Map();
-
+    const unique = new Map()
     problems.forEach((problem) => {
-      const name = (problem.name || "").trim();
+      const name = (problem.name || '').trim()
+      if (name && !unique.has(name)) unique.set(name, name)
+    })
+    return Array.from(unique.values()).sort((a, b) => a.localeCompare(b))
+  }, [problems])
 
-      if (name && !unique.has(name)) {
-        unique.set(name, name);
-      }
-    });
+  const subCategories = useMemo(
+    () => problems.filter((problem) => (problem.name || '').trim() === category),
+    [problems, category]
+  )
 
-    return Array.from(unique.values()).sort((a, b) =>
-      a.localeCompare(b)
-    );
-  }, [problems]);
+  const selectedProblem = useMemo(
+    () => problems.find((problem) => String(problem.id) === String(problemId)),
+    [problems, problemId]
+  )
 
-  const subCategories = useMemo(() => {
-    return problems.filter(
-      (problem) =>
-        (problem.name || "").trim() === category
-    );
-  }, [problems, category]);
-
-  const selectedProblem = useMemo(() => {
-    return problems.find(
-      (problem) => String(problem.id) === String(problemId)
-    );
-  }, [problems, problemId]);
-
-  const answeredCount = questions.filter(
-    (q) => String(answers[q.field_key] || '').trim()
-  ).length
-
+  const answeredCount = questions.filter((q) => String(answers[q.field_key] || '').trim()).length
   const requiredQuestionsComplete = questions.every(
     (q) => !q.required || String(answers[q.field_key] || '').trim().length > 0
   )
-
-  const progress = questions.length
-    ? Math.round((answeredCount / questions.length) * 100)
-    : 0
+  const progress = questions.length ? Math.round((answeredCount / questions.length) * 100) : 0
 
   const companyName =
-    profile?.company_name ||
-    profile?.company ||
-    profile?.name ||
-    profile?.full_name ||
-    'Your Company'
+    profile?.company_name || profile?.company || profile?.name ||
+    profile?.full_name || 'Your Company'
 
-  /* ⭐ Logo priority */
   const companyLogo =
-    profile?.logo ||
-    profile?.company_logo ||
-    profile?.profile_image ||
-    networkLogo ||
-    null
+    profile?.logo || profile?.company_logo || profile?.profile_image ||
+    networkLogo || null
+
+  /* ---------- Navigation helpers ---------- */
+  function goToStep(next) {
+    setMessage('')
+    setStep(Math.max(0, Math.min(next, STEPS.length - 1)))
+    // scroll to top of content for better UX
+    if (typeof window !== 'undefined') {
+      window.scrollTo({ top: 0, behavior: 'smooth' })
+    }
+  }
+
+  // ✅ NEW: auto-advance after selection (small delay so user sees the check)
+  function autoAdvance(toStep) {
+    clearTimeout(advanceTimer.current)
+    advanceTimer.current = setTimeout(() => {
+      goToStep(toStep)
+    }, 320)
+  }
 
   function selectDomain(id) {
     setDomainId(String(id)); setCategory(''); setProblemId('')
     setQuestions([]); setAnswers({}); setMessage('')
+    autoAdvance(1) // ✅ auto go to Category
   }
   function selectCategory(name) {
     setCategory(name); setProblemId(''); setQuestions([]); setAnswers({}); setMessage('')
+    autoAdvance(2) // ✅ auto go to Sub-category
   }
   function selectProblem(id) {
     setProblemId(String(id)); setQuestions([]); setAnswers({}); setMessage('')
+    autoAdvance(3) // ✅ auto go to Questionnaire
   }
 
   function validateStep() {
@@ -332,52 +266,100 @@ export default function BuyerCreate() {
   function nextStep() {
     setMessage('')
     if (!validateStep()) return
-    setStep((c) => Math.min(c + 1, STEPS.length - 1))
+    goToStep(step + 1)
   }
 
   function previousStep() {
-    setMessage('')
-    setStep((c) => Math.max(c - 1, 0))
+    goToStep(step - 1)
   }
 
+  /* ---------- Download as formatted report (HTML → printable) ---------- */
   function downloadReview() {
-    const lines = [
-      'SM TECHSPHERE Engineering Pvt Ltd',
-      'ENQUIRY REVIEW',
-      '',
-      `Domain: ${selectedDomain?.name || ''}`,
-      `Category: ${category}`,
-      `Sub-category: ${selectedProblem?.sub_domain || ''}`,
-      `Enquiry title: ${title}`,
-      '',
-      'QUESTIONNAIRE',
-      ...questions.map((q) => `${q.question_text}\n${answers[q.field_key] || 'Not answered'}\n`),
-    ]
-    const blob = new Blob([lines.join('\n')], { type: 'text/plain;charset=utf-8' })
+    const rows = questions
+      .map((q) => `
+        <tr>
+          <td class="q">${escapeHtml(q.question_text)}${q.required ? ' <span class="req">*</span>' : ''}</td>
+          <td class="a">${escapeHtml(answers[q.field_key] || 'Not answered')}</td>
+        </tr>`)
+      .join('')
+
+    const html = `<!DOCTYPE html>
+<html><head><meta charset="utf-8"/>
+<title>Enquiry Review — SM Techsphere</title>
+<style>
+  *{box-sizing:border-box}
+  body{font-family:system-ui,-apple-system,Segoe UI,Roboto,sans-serif;color:#0f2a4a;margin:0;padding:32px;background:#f3f6fa}
+  .sheet{max-width:820px;margin:0 auto;background:#fff;border-radius:16px;padding:34px 38px;box-shadow:0 20px 50px -20px rgba(15,42,74,.35)}
+  .brand{display:flex;justify-content:space-between;align-items:center;border-bottom:2px solid #1e9bc9;padding-bottom:14px;margin-bottom:22px}
+  .brand h1{margin:0;font-size:20px;letter-spacing:.08em}
+  .brand small{color:#5c6b80}
+  .badge{background:#e8f4fa;color:#12406f;padding:6px 12px;border-radius:20px;font-size:12px;font-weight:700;letter-spacing:.08em}
+  h2{font-size:15px;color:#12406f;margin:24px 0 8px;text-transform:uppercase;letter-spacing:.06em}
+  .meta{display:grid;grid-template-columns:repeat(2,1fr);gap:10px 22px}
+  .meta div{background:#f6f9fc;border:1px solid #e0e7f0;border-radius:10px;padding:10px 14px}
+  .meta span{display:block;font-size:11.5px;color:#5c6b80;text-transform:uppercase;letter-spacing:.07em;margin-bottom:3px}
+  .meta strong{font-size:14px;font-weight:600}
+  table{width:100%;border-collapse:collapse;margin-top:8px}
+  td{border:1px solid #e0e7f0;padding:11px 13px;vertical-align:top;font-size:13.5px}
+  td.q{background:#f6f9fc;width:55%;font-weight:600}
+  td.a{color:#183958}
+  .req{color:#a3200f}
+  .foot{margin-top:28px;padding-top:14px;border-top:1px solid #e0e7f0;font-size:11.5px;color:#5c6b80;text-align:center}
+</style></head><body>
+  <div class="sheet">
+    <div class="brand">
+      <div>
+        <h1>SM TECHSPHERE</h1>
+        <small>ENVIQUO · Buyer Enquiry Report</small>
+      </div>
+      <span class="badge">ENQUIRY REVIEW</span>
+    </div>
+
+    <h2>Enquiry Details</h2>
+    <div class="meta">
+      <div><span>Domain</span><strong>${escapeHtml(selectedDomain?.name || '—')}</strong></div>
+      <div><span>Category</span><strong>${escapeHtml(category || '—')}</strong></div>
+      <div><span>Sub-category</span><strong>${escapeHtml(selectedProblem?.sub_domain || selectedProblem?.name || '—')}</strong></div>
+      <div><span>Title</span><strong>${escapeHtml(title || '—')}</strong></div>
+    </div>
+
+    <h2>Technical Questionnaire</h2>
+    <table>
+      <tbody>${rows || '<tr><td colspan="2">No questions configured.</td></tr>'}</tbody>
+    </table>
+
+    <div class="foot">Generated on ${new Date().toLocaleString()} · SM Techsphere Pvt Ltd</div>
+  </div>
+</body></html>`
+
+    const blob = new Blob([html], { type: 'text/html;charset=utf-8' })
     const url = URL.createObjectURL(blob)
-    const anchor = document.createElement('a')
-    anchor.href = url
-    anchor.download = 'SM-TECHSPHERE-Enquiry-Review.txt'
-    anchor.click()
+    const a = document.createElement('a')
+    a.href = url
+    a.download = 'SM-TECHSPHERE-Enquiry-Review.html'
+    a.click()
     URL.revokeObjectURL(url)
+  }
+
+  function escapeHtml(s) {
+    return String(s ?? '').replace(/[&<>"']/g, (c) => ({
+      '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;',
+    }[c]))
   }
 
   async function submitEnquiry(event) {
     event.preventDefault()
     setMessage('')
-
     if (!domainId || !category || !problemId || !title.trim()) {
       notify('Please complete the domain, category, sub-category and title.')
       return
     }
     if (!requiredQuestionsComplete) {
       notify('Please answer all required questions.')
-      setStep(3)
+      goToStep(3)
       return
     }
-
     setSubmitting(true)
-
     try {
       const response = await API.post('/buyer/enquiries', {
         domain_id: Number(domainId),
@@ -385,9 +367,7 @@ export default function BuyerCreate() {
         title: title.trim(),
         answers,
       })
-
       notify('Enquiry submitted successfully.', 'success')
-
       const enquiryId = response.data?.enquiry_id
       window.setTimeout(() => {
         if (enquiryId) navigate(`/buyer/enquiries/${enquiryId}`)
@@ -408,89 +388,41 @@ export default function BuyerCreate() {
   /* ======================================================
      RENDER
      ====================================================== */
-
   return (
     <div className="enviquo-dash">
-      {/* ============ SIDEBAR ============ */}
-
+      {/* SIDEBAR */}
       <aside className={`ev-side ${mobileOpen ? 'open' : ''}`}>
         <div className="ev-brand">
-          <div className="ev-logo">
-            <img src="/logo2.jpeg" alt="ENVIQUO" />
-          </div>
-          <div>
-            <b>ENVIQUO</b>
-            <small>by SM Techsphere Pvt Ltd</small>
-          </div>
+          <div className="ev-logo"><img src="/logo2.jpeg" alt="ENVIQUO" /></div>
+          <div><b>ENVIQUO</b><small>by SM Techsphere Pvt Ltd</small></div>
         </div>
-
         <nav className="ev-nav">
-          <Link to="/" className="ev-nav-item" title="Go to Home Page">
-            <span>🏠</span> Home
-          </Link>
-
-          <Link to="/buyer" className="ev-nav-item">
-            <span>⌂</span> Dashboard
-          </Link>
-
+          <Link to="/" className="ev-nav-item" title="Go to Home Page"><span>🏠</span> Home</Link>
+          <Link to="/buyer" className="ev-nav-item"><span>⌂</span> Dashboard</Link>
           <div className="ev-nav-sep" />
-
           {MENU.map((m) => (
-            <Link
-              key={m.id}
-              to={m.to}
-              className={`ev-nav-item ${m.id === 'create' ? 'on' : ''}`}
-            >
-              <span>{m.i}</span>
-              {m.l}
-              {m.countKey != null && (
-                <span className="ev-nav-count">{counts[m.countKey] ?? 0}</span>
-              )}
+            <Link key={m.id} to={m.to} className={`ev-nav-item ${m.id === 'create' ? 'on' : ''}`}>
+              <span>{m.i}</span>{m.l}
+              {m.countKey != null && (<span className="ev-nav-count">{counts[m.countKey] ?? 0}</span>)}
             </Link>
           ))}
         </nav>
-
         <div className="ev-side-foot">
           <b>SM Techsphere Pvt Ltd.</b>
           Buyer workspace
         </div>
       </aside>
 
-      {mobileOpen && (
-        <div className="ev-scrim" onClick={() => setMobileOpen(false)} />
-      )}
+      {mobileOpen && <div className="ev-scrim" onClick={() => setMobileOpen(false)} />}
 
-      {/* ============ MAIN ============ */}
-
+      {/* MAIN */}
       <div className="ev-main">
         <header className="ev-top">
-          <button
-            type="button"
-            className="ev-ham"
-            aria-label="Open menu"
-            onClick={() => setMobileOpen((v) => !v)}
-          >
-            ☰
-          </button>
-
-          <button
-            type="button"
-            className="ev-back-btn"
-            onClick={() => navigate('/buyer')}
-            title="Back to Dashboard"
-          >
-            ← Back
-          </button>
-
+          <button type="button" className="ev-ham" aria-label="Open menu" onClick={() => setMobileOpen((v) => !v)}>☰</button>
+          <button type="button" className="ev-back-btn" onClick={() => navigate('/buyer')} title="Back to Dashboard">← Back</button>
           <span className="ev-top-title">Create Enquiry</span>
           <span className="ev-sp" />
-
-          <button
-            type="button"
-            className="ev-chip"
-            onClick={() => navigate('/profile')}
-            title={companyName}
-          >
+          <button type="button" className="ev-chip" onClick={() => navigate('/profile')} title={companyName}>
             <CompanyAvatar logo={companyLogo} name={companyName} />
             <span className="ev-chip-name">{companyName}</span>
           </button>
@@ -499,29 +431,19 @@ export default function BuyerCreate() {
         <main className="ev-content">
           <div className="ev-page-head">
             <span className="ev-eyebrow">BUYER WORKSPACE</span>
-            <h1 style={{ backgroundColor: '#000000', color: '#ffffff', padding: '12px 16px', borderRadius: '8px' }}>
-  Create Enquiry
-</h1>
-            <p>
-              Select your service requirement and share the technical details
-              with matched vendors.
-            </p>
+            {/* <h6 className="ev-title-pill">Create Enquiry</h6> */}
+            <p>Select your service requirement and share the technical details with matched vendors.</p>
           </div>
 
-          {/* ============ STEPPER ============ */}
-
+          {/* STEPPER */}
           <nav className="ev-steps" aria-label="Enquiry creation steps">
             {STEPS.map((label, index) => (
               <button
                 key={label}
                 type="button"
-                className={`ev-step ${
-                  index === step ? 'on' : ''
-                } ${index < step ? 'done' : ''}`}
+                className={`ev-step ${index === step ? 'on' : ''} ${index < step ? 'done' : ''}`}
                 disabled={index > step || submitting}
-                onClick={() => {
-                  if (index < step) { setMessage(''); setStep(index) }
-                }}
+                onClick={() => { if (index < step) goToStep(index) }}
               >
                 <i>{index < step ? '✓' : index + 1}</i>
                 <span>{label}</span>
@@ -529,25 +451,16 @@ export default function BuyerCreate() {
             ))}
           </nav>
 
-          {message && (
-            <div
-              className={`ev-msg ev-msg--${messageType}`}
-              role="status"
-            >
-              {message}
-            </div>
-          )}
+          {message && <div className={`ev-msg ev-msg--${messageType}`} role="status">{message}</div>}
 
           <form className="ev-form" onSubmit={submitEnquiry}>
-            {/* ============ STEP 1: DOMAIN ============ */}
-
+            {/* STEP 1: DOMAIN */}
             {step === 0 && (
               <section className="ev-panel">
                 <div className="ev-panel-head">
                   <h2>Select Domain</h2>
                   <p>Select one of the domains configured in your database.</p>
                 </div>
-
                 {loadingDomains ? (
                   <div className="ev-loading">Loading domains...</div>
                 ) : domains.length === 0 ? (
@@ -557,22 +470,11 @@ export default function BuyerCreate() {
                     {domains.map((domain) => {
                       const selected = String(domain.id) === String(domainId)
                       return (
-                        <button
-                          key={domain.id}
-                          type="button"
-                          className={`ev-dc ${selected ? 'on' : ''}`}
-                          onClick={() => selectDomain(domain.id)}
-                        >
-                          <span className="ev-dc-ico">
-                            {getDomainIcon(domain.name)}
-                          </span>
+                        <button key={domain.id} type="button" className={`ev-dc ${selected ? 'on' : ''}`} onClick={() => selectDomain(domain.id)}>
+                          <span className="ev-dc-ico">{getDomainIcon(domain.name)}</span>
                           <strong>{domain.name}</strong>
-                          {domain.description && (
-                            <span className="ev-dc-hint">{domain.description}</span>
-                          )}
-                          {selected && (
-                            <span className="ev-dc-check">✓</span>
-                          )}
+                          {domain.description && <span className="ev-dc-hint">{domain.description}</span>}
+                          {selected && <span className="ev-dc-check">✓</span>}
                         </button>
                       )
                     })}
@@ -581,21 +483,18 @@ export default function BuyerCreate() {
               </section>
             )}
 
-            {/* ============ STEP 2: CATEGORY ============ */}
-
+            {/* STEP 2: CATEGORY */}
             {step === 1 && (
               <section className="ev-panel">
                 <div className="ev-panel-head">
                   <h2>Select Category</h2>
                   <p>Categories are grouped from the selected domain's records.</p>
                 </div>
-
                 <div className="ev-sum">
                   <span>Selected domain</span>
                   <strong>{selectedDomain?.name}</strong>
-                  <button type="button" onClick={() => setStep(0)}>Change</button>
+                  <button type="button" onClick={() => goToStep(0)}>Change</button>
                 </div>
-
                 {loadingProblems ? (
                   <div className="ev-loading">Loading categories...</div>
                 ) : categories.length === 0 ? (
@@ -604,25 +503,11 @@ export default function BuyerCreate() {
                   <div className="ev-lst">
                     {categories.map((name) => {
                       const selected = category === name
-                      const count = problems.filter(
-                        (p) => (p.name || '').trim() === name
-                      ).length
+                      const count = problems.filter((p) => (p.name || '').trim() === name).length
                       return (
-                        <button
-                          key={name}
-                          type="button"
-                          className={`ev-opt ${selected ? 'on' : ''}`}
-                          onClick={() => selectCategory(name)}
-                        >
-                          <span>
-                            {name}
-                            <small>
-                              {count} {count === 1 ? 'sub-category' : 'sub-categories'}
-                            </small>
-                          </span>
-                          <span className="ev-opt-check">
-                            {selected ? '✓' : ''}
-                          </span>
+                        <button key={name} type="button" className={`ev-opt ${selected ? 'on' : ''}`} onClick={() => selectCategory(name)}>
+                          <span>{name}<small>{count} {count === 1 ? 'sub-category' : 'sub-categories'}</small></span>
+                          <span className="ev-opt-check">{selected ? '✓' : ''}</span>
                         </button>
                       )
                     })}
@@ -631,50 +516,31 @@ export default function BuyerCreate() {
               </section>
             )}
 
-            {/* ============ STEP 3: SUB-CATEGORY ============ */}
-
+            {/* STEP 3: SUB-CATEGORY */}
             {step === 2 && (
               <section className="ev-panel">
                 <div className="ev-panel-head">
                   <h2>Select Sub-category</h2>
                   <p>Select the problem that best describes your requirement.</p>
                 </div>
-
                 <div className="ev-sum">
-                  <span>Domain</span>
-                  <strong>{selectedDomain?.name}</strong>
-                  <button type="button" onClick={() => setStep(0)}>Change</button>
+                  <span>Domain</span><strong>{selectedDomain?.name}</strong>
+                  <button type="button" onClick={() => goToStep(0)}>Change</button>
                 </div>
                 <div className="ev-sum">
-                  <span>Category</span>
-                  <strong>{category}</strong>
-                  <button type="button" onClick={() => setStep(1)}>Change</button>
+                  <span>Category</span><strong>{category}</strong>
+                  <button type="button" onClick={() => goToStep(1)}>Change</button>
                 </div>
-
                 {subCategories.length === 0 ? (
-                  <div className="ev-empty-sm">
-                    No sub-categories available for this category.
-                  </div>
+                  <div className="ev-empty-sm">No sub-categories available for this category.</div>
                 ) : (
                   <div className="ev-lst">
                     {subCategories.map((problem) => {
                       const selected = String(problem.id) === String(problemId)
                       return (
-                        <button
-                          key={problem.id}
-                          type="button"
-                          className={`ev-opt ${selected ? 'on' : ''}`}
-                          onClick={() => selectProblem(problem.id)}
-                        >
-                          <span>
-                            {problem.sub_domain || problem.name}
-                            {problem.description && (
-                              <small>{problem.description}</small>
-                            )}
-                          </span>
-                          <span className="ev-opt-check">
-                            {selected ? '✓' : ''}
-                          </span>
+                        <button key={problem.id} type="button" className={`ev-opt ${selected ? 'on' : ''}`} onClick={() => selectProblem(problem.id)}>
+                          <span>{problem.sub_domain || problem.name}{problem.description && <small>{problem.description}</small>}</span>
+                          <span className="ev-opt-check">{selected ? '✓' : ''}</span>
                         </button>
                       )
                     })}
@@ -683,80 +549,44 @@ export default function BuyerCreate() {
               </section>
             )}
 
-            {/* ============ STEP 4: QUESTIONNAIRE ============ */}
-
+            {/* STEP 4: QUESTIONNAIRE */}
             {step === 3 && (
               <section className="ev-panel">
                 <div className="ev-panel-head">
                   <h2>Technical Questionnaire</h2>
                   <p>Questions loaded from the database for your selection.</p>
                 </div>
-
                 <div className="ev-context">
                   <span>{selectedDomain?.name}</span>
                   <span>{category}</span>
                   <span>{selectedProblem?.sub_domain}</span>
                 </div>
-
                 <div className="ev-field">
-                  <label htmlFor="ev-title">
-                    Enquiry Title <em>*</em>
-                  </label>
-                  <input
-                    id="ev-title"
-                    value={title}
-                    onChange={(e) => setTitle(e.target.value)}
-                    placeholder="Enter A Clear Title For Your Requirement"
-                    maxLength={255}
-                    required
-                  />
+                  <label htmlFor="ev-title">Enquiry Title <em>*</em></label>
+                  <input id="ev-title" value={title} onChange={(e) => setTitle(e.target.value)}
+                    placeholder="Enter A Clear Title For Your Requirement" maxLength={255} required />
                 </div>
-
                 <div className="ev-q-head">
-                  <div>
-                    <h3>Project Questions</h3>
-                    <p>Fields marked * are required.</p>
-                  </div>
+                  <div><h3>Project Questions</h3><p>Fields marked * are required.</p></div>
                   <strong>{progress}%</strong>
                 </div>
-
-                <div className="ev-prog">
-                  <span style={{ width: `${progress}%` }} />
-                </div>
-
+                <div className="ev-prog"><span style={{ width: `${progress}%` }} /></div>
                 {loadingQuestions ? (
                   <div className="ev-loading">Loading questionnaire...</div>
                 ) : questions.length === 0 ? (
-                  <div className="ev-empty-sm">
-                    No questions configured for this sub-category. You can still
-                    enter the title and continue.
-                  </div>
+                  <div className="ev-empty-sm">No questions configured for this sub-category. You can still enter the title and continue.</div>
                 ) : (
                   <div className="ev-questions">
                     {questions.map((question, index) => (
                       <div className="ev-question" key={question.id}>
                         <label htmlFor={`ev-q-${question.id}`}>
-                          <span className="ev-q-num">
-                            {String(index + 1).padStart(2, '0')}
-                          </span>
-                          <span>
-                            {question.question_text}
-                            {question.required && <em> *</em>}
-                          </span>
+                          <span className="ev-q-num">{String(index + 1).padStart(2, '0')}</span>
+                          <span>{question.question_text}{question.required && <em> *</em>}</span>
                         </label>
-                        <textarea
-                          id={`ev-q-${question.id}`}
-                          rows={3}
-                          required={Boolean(question.required)}
+                        <textarea id={`ev-q-${question.id}`} rows={3} required={Boolean(question.required)}
                           value={answers[question.field_key] || ''}
-                          onChange={(e) =>
-                            setAnswers((prev) => ({
-                              ...prev,
-                              [question.field_key]: e.target.value,
-                            }))
-                          }
-                          placeholder="Enter Your Answer"
-                        />
+                          onChange={(e) => setAnswers((prev) => ({ ...prev, [question.field_key]: e.target.value }))}
+                          placeholder="Enter Your Answer" />
                       </div>
                     ))}
                   </div>
@@ -764,85 +594,82 @@ export default function BuyerCreate() {
               </section>
             )}
 
-            {/* ============ STEP 5: REVIEW ============ */}
-
+            {/* STEP 5: REVIEW — ✅ NEW attractive report UI */}
             {step === 4 && (
-              <section className="ev-panel">
+              <section className="ev-panel ev-report-panel">
                 <div className="ev-panel-head">
                   <h2>Review Your Enquiry</h2>
                   <p>Verify your selections and answers before submitting.</p>
                 </div>
 
-                <div className="ev-review">
-                  <div>
-                    <span>Domain</span>
-                    <strong>{selectedDomain?.name || '—'}</strong>
-                    <button type="button" onClick={() => setStep(0)}>Edit</button>
-                  </div>
-                  <div>
-                    <span>Category</span>
-                    <strong>{category || '—'}</strong>
-                    <button type="button" onClick={() => setStep(1)}>Edit</button>
-                  </div>
-                  <div>
-                    <span>Sub-category</span>
-                    <strong>{selectedProblem?.sub_domain || '—'}</strong>
-                    <button type="button" onClick={() => setStep(2)}>Edit</button>
-                  </div>
-                  <div>
-                    <span>Enquiry Title</span>
-                    <strong>{title || '—'}</strong>
-                    <button type="button" onClick={() => setStep(3)}>Edit</button>
-                  </div>
-                  {questions.map((question) => (
-                    <div key={question.id}>
-                      <span>{question.question_text}</span>
-                      <strong>{answers[question.field_key] || 'Not answered'}</strong>
-                      <button type="button" onClick={() => setStep(3)}>Edit</button>
+                <div className="ev-report">
+                  <div className="ev-report-head">
+                    <div>
+                      <span className="ev-report-eyebrow">ENVIQUO · BUYER ENQUIRY</span>
+                      <h3>Enquiry Review Report</h3>
                     </div>
-                  ))}
+                    <span className="ev-report-badge">REVIEW</span>
+                  </div>
+
+                  <div className="ev-report-meta">
+                    <div><span>Domain</span><strong>{selectedDomain?.name || '—'}</strong>
+                      <button type="button" onClick={() => goToStep(0)}>Edit</button></div>
+                    <div><span>Category</span><strong>{category || '—'}</strong>
+                      <button type="button" onClick={() => goToStep(1)}>Edit</button></div>
+                    <div><span>Sub-category</span><strong>{selectedProblem?.sub_domain || selectedProblem?.name || '—'}</strong>
+                      <button type="button" onClick={() => goToStep(2)}>Edit</button></div>
+                    <div><span>Title</span><strong>{title || '—'}</strong>
+                      <button type="button" onClick={() => goToStep(3)}>Edit</button></div>
+                  </div>
+
+                  <h4 className="ev-report-sub">Technical Questionnaire</h4>
+                  <table className="ev-report-table">
+                    <tbody>
+                      {questions.length === 0 && (
+                        <tr><td colSpan={2} className="ev-report-empty">No questions configured.</td></tr>
+                      )}
+                      {questions.map((question) => (
+                        <tr key={question.id}>
+                          <td className="q">
+                            {question.question_text}{question.required && <span className="req"> *</span>}
+                          </td>
+                          <td className="a">{answers[question.field_key] || 'Not answered'}</td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+
+                  <div className="ev-report-foot">
+                    Generated on {new Date().toLocaleString()} · SM Techsphere Pvt Ltd
+                  </div>
                 </div>
 
-                <button
-                  className="ev-btn"
-                  type="button"
-                  onClick={downloadReview}
-                  style={{ marginTop: 16 }}
-                >
-                  ↓ Download Review Copy
-                </button>
+                <div className="ev-report-actions">
+                  <button className="ev-btn" type="button" onClick={downloadReview}>⬇ Download Report</button>
+                  <button className="ev-btn" type="button" onClick={() => window.print()}>🖨 Print</button>
+                  <button className="ev-btn ev-btn-pri" type="button" onClick={nextStep}>Continue to Submit →</button>
+                </div>
               </section>
             )}
 
-            {/* ============ STEP 6: SUBMIT ============ */}
-
+            {/* STEP 6: SUBMIT */}
             {step === 5 && (
               <section className="ev-panel ev-submit-panel">
                 <span className="ev-submit-icon">✓</span>
                 <h2>Ready To Submit?</h2>
-                <p>
-                  Your enquiry will be created using the existing SM TECHSPHERE
-                  backend workflow.
-                </p>
-
+                <p>Your enquiry will be created using the existing SM TECHSPHERE backend workflow.</p>
                 <div className="ev-submit-summary">
                   <span>{selectedDomain?.name}</span>
                   <strong>{title}</strong>
                   <small>{category} / {selectedProblem?.sub_domain}</small>
                 </div>
-
-                <button
-                  className="ev-btn ev-btn-pri"
-                  type="submit"
-                  disabled={submitting}
-                >
+                <button className="ev-btn ev-btn-pri" type="submit" disabled={submitting}>
                   {submitting ? 'Submitting...' : 'Submit Enquiry →'}
                 </button>
               </section>
             )}
 
-            {/* ============ FOOTER ACTIONS ============ */}
-
+            {/* ✅ NEW: Back / Continue footer — Back always visible from step > 0 */}
             <footer className="ev-actions">
               <button
                 type="button"
