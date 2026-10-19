@@ -350,7 +350,7 @@ export default function PanelLayout({
         </nav>
 
         <div className="ev-side-foot">
-          <b>Diagnose. Match. Solution.</b>
+          <b>SM Techsphere Pvt Ltd.</b>
           {roleLabel} workspace
         </div>
       </aside>
@@ -455,7 +455,7 @@ export default function PanelLayout({
           <span>
             © {new Date().getFullYear()} SM Techsphere Engineering Solutions
           </span>
-          <span>Diagnose. Match. Solution.</span>
+          <span>SM Techsphere Pvt Ltd.</span>
         </footer>
       </div>
     </div>
