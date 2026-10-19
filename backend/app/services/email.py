@@ -1292,3 +1292,109 @@ async def send_contact_form_email(
         "NEW ENQUIRY",
     ),
 )
+
+
+
+
+
+
+# ============================================================
+# 18. ENQUIRY SUBMITTED → BUYER
+# ============================================================
+
+async def send_buyer_enquiry_confirmation_email(
+    buyer,
+    enquiry,
+) -> bool:
+
+    subject = f"Your Enquiry #{enquiry.id} Has Been Submitted Successfully"
+
+    body = f"""
+        <p>Hello <strong>{escape(buyer.full_name)}</strong>,</p>
+
+        <p>
+            Your technical enquiry has been submitted successfully
+            to <strong>SM TECHSPHERE Pvt Ltd</strong>.
+        </p>
+
+        <div style="
+            background:#eef7f0;
+            padding:18px;
+            border-radius:8px;
+        ">
+            <strong>Enquiry ID:</strong> #{enquiry.id}<br>
+            <strong>Title:</strong> {escape(enquiry.title)}<br>
+            <strong>Domain:</strong> {escape(enquiry.domain.name)}<br>
+            <strong>Problem:</strong> {escape(enquiry.problem.name)}
+        </div>
+
+        <p>
+            Our platform has received your enquiry. You can log in
+            to your dashboard to track its status and quotation activity.
+        </p>
+
+        <p>Thank you for choosing SM TECHSPHERE Pvt Ltd.</p>
+    """
+
+    return await send_email(
+        buyer.email,
+        subject,
+        email_template(
+            "Enquiry Submitted Successfully",
+            body,
+            "SUBMITTED",
+        ),
+    )
+
+
+# ============================================================
+# 19. NEW ENQUIRY ADDED → MATCHED VENDOR
+# ============================================================
+
+async def send_vendor_new_enquiry_email(
+    vendor,
+    enquiry,
+) -> bool:
+
+    subject = f"New Enquiry Added - #{enquiry.id}"
+
+    body = f"""
+        <p>Hello <strong>{escape(vendor.full_name)}</strong>,</p>
+
+        <p>
+            A new technical enquiry matching your registered domain
+            has been added to SM TECHSPHERE Pvt Ltd.
+        </p>
+
+        <div style="
+            background:#f7faf8;
+            padding:18px;
+            border-radius:8px;
+        ">
+            <strong>Enquiry ID:</strong> #{enquiry.id}<br>
+            <strong>Title:</strong> {escape(enquiry.title)}<br>
+            <strong>Domain:</strong> {escape(enquiry.domain.name)}<br>
+            <strong>Problem:</strong> {escape(enquiry.problem.name)}
+        </div>
+
+        <p>
+            Please log in to your vendor dashboard to review the
+            enquiry and check whether you can submit a quotation.
+        </p>
+
+        <p>
+            The buyer's identity remains confidential until the
+            required connection process is completed.
+        </p>
+    """
+
+    return await send_email(
+        vendor.email,
+        subject,
+        email_template(
+            "New Enquiry Added",
+            body,
+            "NEW ENQUIRY",
+        ),
+    )
+
