@@ -515,7 +515,7 @@ export default function BuyerDashboard() {
         </nav>
 
         <div className="ev-side-foot">
-          <b>Diagnose. Match. Solution.</b>
+          <b>SM Techsphere Pvt Ltd.</b>
           Buyer workspace
         </div>
       </aside>
