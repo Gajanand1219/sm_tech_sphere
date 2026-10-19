@@ -249,24 +249,35 @@ export default function BuyerCreate() {
     [domains, domainId]
   )
 
+
   const categories = useMemo(() => {
-    const unique = new Map()
+    const unique = new Map();
+
     problems.forEach((problem) => {
-      const name = (problem.sub_domain || '').trim()
-      if (name && !unique.has(name)) unique.set(name, name)
-    })
-    return Array.from(unique.values()).sort((a, b) => a.localeCompare(b))
-  }, [problems])
+      const name = (problem.name || "").trim();
 
-  const subCategories = useMemo(
-    () => problems.filter((problem) => (problem.sub_domain || '').trim() === category),
-    [problems, category]
-  )
+      if (name && !unique.has(name)) {
+        unique.set(name, name);
+      }
+    });
 
-  const selectedProblem = useMemo(
-    () => problems.find((problem) => String(problem.id) === String(problemId)),
-    [problems, problemId]
-  )
+    return Array.from(unique.values()).sort((a, b) =>
+      a.localeCompare(b)
+    );
+  }, [problems]);
+
+  const subCategories = useMemo(() => {
+    return problems.filter(
+      (problem) =>
+        (problem.name || "").trim() === category
+    );
+  }, [problems, category]);
+
+  const selectedProblem = useMemo(() => {
+    return problems.find(
+      (problem) => String(problem.id) === String(problemId)
+    );
+  }, [problems, problemId]);
 
   const answeredCount = questions.filter(
     (q) => String(answers[q.field_key] || '').trim()
@@ -336,7 +347,7 @@ export default function BuyerCreate() {
       '',
       `Domain: ${selectedDomain?.name || ''}`,
       `Category: ${category}`,
-      `Sub-category: ${selectedProblem?.name || ''}`,
+      `Sub-category: ${selectedProblem?.sub_domain || ''}`,
       `Enquiry title: ${title}`,
       '',
       'QUESTIONNAIRE',
@@ -594,7 +605,7 @@ export default function BuyerCreate() {
                     {categories.map((name) => {
                       const selected = category === name
                       const count = problems.filter(
-                        (p) => (p.sub_domain || '').trim() === name
+                        (p) => (p.name || '').trim() === name
                       ).length
                       return (
                         <button
@@ -656,7 +667,7 @@ export default function BuyerCreate() {
                           onClick={() => selectProblem(problem.id)}
                         >
                           <span>
-                            {problem.name}
+                            {problem.sub_domain || problem.name}
                             {problem.description && (
                               <small>{problem.description}</small>
                             )}
@@ -684,7 +695,7 @@ export default function BuyerCreate() {
                 <div className="ev-context">
                   <span>{selectedDomain?.name}</span>
                   <span>{category}</span>
-                  <span>{selectedProblem?.name}</span>
+                  <span>{selectedProblem?.sub_domain}</span>
                 </div>
 
                 <div className="ev-field">
@@ -775,7 +786,7 @@ export default function BuyerCreate() {
                   </div>
                   <div>
                     <span>Sub-category</span>
-                    <strong>{selectedProblem?.name || '—'}</strong>
+                    <strong>{selectedProblem?.sub_domain || '—'}</strong>
                     <button type="button" onClick={() => setStep(2)}>Edit</button>
                   </div>
                   <div>
@@ -817,7 +828,7 @@ export default function BuyerCreate() {
                 <div className="ev-submit-summary">
                   <span>{selectedDomain?.name}</span>
                   <strong>{title}</strong>
-                  <small>{category} / {selectedProblem?.name}</small>
+                  <small>{category} / {selectedProblem?.sub_domain}</small>
                 </div>
 
                 <button
