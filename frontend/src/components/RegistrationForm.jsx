@@ -33,7 +33,7 @@ const vendorFields = [
 
   ['industrial_verticals', 'Industrial Verticals', 'text', true],
 
-  ['industry_type', 'Industry Type', 'text', true],
+  ['industry_type', 'Vender Type', 'text', true],
 
   ['experience_years', 'Experience (Years)', 'number', true],
   ['capacity', 'Capacity', 'text', false],
