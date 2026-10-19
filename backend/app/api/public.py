@@ -75,16 +75,64 @@ async def submit_contact_form(data: ContactRequest):
 def domains(db: Session = Depends(get_db)):
     return [{"id":d.id,"name":d.name,"description":d.description} for d in db.query(Domain).all()]
 
+
+
 @router.get("/domains/{domain_id}/problems")
 def problems(domain_id: int, db: Session = Depends(get_db)):
-    return [{"id":p.id,"name":p.name,"sub_domain":p.sub_domain,"description":p.description} for p in db.query(Problem).filter(Problem.domain_id==domain_id).all()]
+    domain = (
+        db.query(Domain)
+        .filter(Domain.id == domain_id)
+        .first()
+    )
+
+    if not domain:
+        raise HTTPException(
+            status_code=404,
+            detail="Domain not found"
+        )
+
+    records = (
+        db.query(Problem)
+        .filter(Problem.domain_id == domain_id)
+        .order_by(Problem.id)
+        .all()
+    )
+
+    return [
+        {
+            "id": p.id,
+            "name": p.name,
+            "sub_domain": p.sub_domain,
+            "description": p.description,
+        }
+        for p in records
+    ]
+
+
 
 @router.get("/problems/{problem_id}/questions")
 def questions(problem_id: int, db: Session = Depends(get_db)):
-    return [{"id":q.id,"question_text":q.question_text,"field_key":q.field_key,"required":q.required} for q in db.query(Question).filter(Question.problem_id==problem_id).all()]
+    problem = db.query(Problem).filter(Problem.id == problem_id).first()
 
+    if not problem:
+        raise HTTPException(status_code=404, detail="Sub-category not found")
 
+    items = (
+        db.query(Question)
+        .filter(Question.problem_id == problem_id)
+        .order_by(Question.id)
+        .all()
+    )
 
+    return [
+        {
+            "id": q.id,
+            "question_text": q.question_text,
+            "field_key": q.field_key,
+            "required": q.required,
+        }
+        for q in items
+    ]
 # ============================================================
 # VERIFIED BUYERS + APPROVED VENDORS
 # ============================================================
