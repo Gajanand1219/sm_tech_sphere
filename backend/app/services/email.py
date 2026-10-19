@@ -12,7 +12,7 @@ from app.core.config import settings
 # ============================================================
 
 EMAIL_RELAY_URL = "https://gajanan.pythonanywhere.com/api/send-email"
-EMAIL_RELAY_SECRET = "SM_CLEAN_TECH_EMAIL_2026_SECRET"
+EMAIL_RELAY_SECRET = "SM_TECHSPHERE_Pvt_Ltd_EMAIL_2026_SECRET"
 
 
 # ============================================================
@@ -209,7 +209,7 @@ def email_template(
                     margin:0;
                     font-size:22px;
                 ">
-                    SM Clean Tech
+                    SM TECHSPHERE Pvt Ltd
                 </h2>
 
                 <p style="
@@ -252,7 +252,7 @@ def email_template(
             ">
 
                 <strong>
-                    SM Clean Tech Engineering Solutions
+                    SM TECHSPHERE Pvt Ltd
                 </strong>
 
                 <br>
@@ -278,7 +278,7 @@ async def send_otp_email(
     otp: str,
 ) -> bool:
 
-    subject = "Verify your SM Clean Tech account"
+    subject = "Verify your SM TECHSPHERE Pvt Ltd account"
 
     body = f"""
         <p>Hello,</p>
@@ -341,13 +341,13 @@ async def send_account_status_email(
     note: str | None = None,
 ) -> bool:
 
-    subject = f"Your SM Clean Tech account is {status}"
+    subject = f"Your SM TECHSPHERE Pvt Ltd account is {status}"
 
     body = f"""
         <p>Hello <strong>{escape(name)}</strong>,</p>
 
         <p>
-            Your SM Clean Tech account status has been updated.
+            Your SM TECHSPHERE Pvt Ltd account status has been updated.
         </p>
 
         <p>
@@ -463,7 +463,7 @@ async def send_enquiry_approved_email(
 
         <p>
             Your technical enquiry has been reviewed and
-            <strong>approved</strong> by the SM Clean Tech admin team.
+            <strong>approved</strong> by the SM TECHSPHERE Pvt Ltd admin team.
         </p>
 
         <div style="
@@ -1240,7 +1240,7 @@ async def send_contact_form_email(
 
         <p>
             A new enquiry has been submitted from the
-            <strong>SM Clean Tech website contact form</strong>.
+            <strong>SM TECHSPHERE Pvt Ltd website contact form</strong>.
         </p>
 
         <div style="
