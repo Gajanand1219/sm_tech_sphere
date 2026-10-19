@@ -34,6 +34,8 @@ from app.services.email import (
     send_vendor_matched_email,
     send_mutual_handshake_buyer_email,
     send_mutual_handshake_vendor_email,
+    send_buyer_enquiry_confirmation_email,
+    send_vendor_new_enquiry_email,
 )
 
 from app.core.config import settings
@@ -327,11 +329,19 @@ async def create_enquiry(
     # EMAIL → ADMIN
     # ========================================================
 
+    # EMAIL → ADMIN
     await send_enquiry_submitted_email(
         admin_email=settings.ADMIN_EMAIL,
         enquiry=e,
         buyer=user,
     )
+
+    # EMAIL → BUYER
+    if user.email:
+        await send_buyer_enquiry_confirmation_email(
+            buyer=user,
+            enquiry=e,
+        )
 
 
     # ========================================================
@@ -339,10 +349,8 @@ async def create_enquiry(
     # ========================================================
 
     for vendor in matched_vendors:
-
         if vendor.email:
-
-            await send_vendor_matched_email(
+            await send_vendor_new_enquiry_email(
                 vendor=vendor,
                 enquiry=e,
             )
