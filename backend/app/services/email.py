@@ -217,7 +217,6 @@ def email_template(
                     font-size:13px;
                     opacity:0.85;
                 ">
-                    Engineering Solutions
                 </p>
             </div>
 
