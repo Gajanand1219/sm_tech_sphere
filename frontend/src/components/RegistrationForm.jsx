@@ -407,6 +407,7 @@ export default function RegistrationForm({ type }) {
     area_of_work: geographicalTerritories,
     industrial_verticals: industrialVerticalOptions, // Vendor — Industrial Verticals
     industry: industrialVerticalOptions,             // Buyer — Industry Type (same data)
+     industry_type: industryTypeOptions,
   }
 
   // फक्त Vendor Type हा single select आहे
