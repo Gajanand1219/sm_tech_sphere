@@ -216,10 +216,10 @@ const handleForgotPassword = async () => {
       <div className="login-topbar">
         <div className="login-brand">
           <div className="login-brand-logo">
-            <img src="/logo2.jpeg" alt="SM Clean Tech" />
+            <img src="/logo2.jpeg" alt="SM TECHSPHERE Pvt Ltd" />
           </div>
           <div>
-            <strong>SM Clean Tech</strong>
+            <strong>SM TECHSPHERE Pvt Ltd</strong>
             <span>Engineering Solutions</span>
           </div>
         </div>
@@ -454,7 +454,7 @@ const handleForgotPassword = async () => {
             {/* FOOTER */}
 
             <div className="login-footer">
-              <span>New To SM Clean Tech?</span>
+              <span>New To SM TECHSPHERE Pvt Ltd </span>
               <button
                 type="button"
                 onClick={() => setShowRegisterChoice(true)}
@@ -470,13 +470,13 @@ const handleForgotPassword = async () => {
 
           {/* DEMO BOX */}
 
-          <div className="demo-box">
+          {/* <div className="demo-box">
             <span className="demo-dot" />
             <div>
               <strong>Demo Admin</strong>
               <span>admin@smcleantech.com · Admin@12345</span>
             </div>
-          </div>
+          </div> */}
         </section>
       </main>
 
