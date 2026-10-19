@@ -1097,7 +1097,7 @@
 
 .registration-select--multiple option:checked {
   background: #2563eb linear-gradient(#2563eb, #2563eb);
-  color: #37d417;
+  color: #4bfd28;
 }
 
 .select-help {
@@ -1414,3 +1414,6 @@
     font-size: 13px;
   }
 }
+
+
+
