@@ -11,7 +11,7 @@ import './RegistrationForm.css'
 const buyerFields = [
   ['company_name', 'Company Name', 'text', true],
   ['director_email', 'Director Email', 'email', true],
-  ['industry', 'Industry', 'text', true],
+  ['industry', 'Industry Type', 'text', true],
   ['gst_number', 'GST Number', 'text', false],
   ['website', 'Website', 'url', true],
   ['head_office_contact', 'Head Office Contact', 'tel', false],
@@ -33,7 +33,7 @@ const vendorFields = [
 
   ['industrial_verticals', 'Industrial Verticals', 'text', true],
 
-  ['industry_type', 'Vender Type', 'text', true],
+  ['industry_type', 'Vendor Type', 'text', true],
 
   ['experience_years', 'Experience (Years)', 'number', true],
   ['capacity', 'Capacity', 'text', false],
@@ -82,42 +82,95 @@ const geographicalTerritories = [
 ]
 
 const industrialVerticalOptions = [
-  'Manufacturing',
-  'Automotive & Automobile',
   'Pharmaceuticals & Healthcare',
-  'Food & Beverage',
-  'Chemicals & Petrochemicals',
-  'Oil & Gas',
-  'Power & Energy',
-  'Cement & Construction',
-  'Steel & Metals',
+  'API & Bulk Drug Manufacturing',
+  'Biotechnology & Life Sciences',
+  'Chemicals & Specialty Chemicals',
+  'Petrochemicals, Oil & Gas',
+  'Fertilizers & Agrochemicals',
+  'Food & Beverages',
+  'Dairy & Milk Processing',
+  'Sugar & Distilleries',
   'Textile & Garments',
-  'IT & Electronics',
-  'Agriculture & Agro-processing',
-  'Mining & Minerals',
-  'Paper & Pulp',
-  'Hospitality & Commercial Buildings',
-  'Government & Public Sector',
-  'Other',
-]
+  'Automobile & Automotive Components',
+  'Electric Vehicles (EV) & Batteries',
+  'Semiconductor & Electronics',
+  'Electrical Equipment Manufacturing',
+  'Steel & Iron Industries',
+  'Metal Processing & Fabrication',
+  'Engineering & Industrial Manufacturing',
+  'Cement & Building Materials',
+  'Glass & Ceramics',
+  'Paper, Pulp & Packaging',
+  'Plastic, Polymer & Rubber',
+  'Paints, Dyes & Pigments',
+  'Cosmetics & Personal Care',
+  'FMCG & Consumer Goods',
+  'Agriculture & Agro-Processing',
+  'Pulp, Paper & Wood Processing',
+  'Mining & Mineral Processing',
+  'Power Generation & Utilities',
+  'Renewable Energy & Solar',
+  'Aerospace & Defence',
+  'Shipbuilding & Marine Industries',
+  'Railways & Metro Infrastructure',
+  'IT Parks & Data Centres',
+  'Commercial Buildings & Shopping Malls',
+  'Hotels, Resorts & Hospitality',
+  'Hospitals & Healthcare Facilities',
+  'Educational Institutions & Universities',
+  'Warehousing & Logistics',
+  'Ports & Airports',
+  'Municipal Corporations & Government Facilities',
+  'Water & Wastewater Treatment Facilities',
+  'Waste Management & Recycling',
+  'Environmental Services & Consulting',
+  'Construction & Infrastructure',
+  'Printing & Packaging',
+  'Leather & Tanning',
+  'Biotechnology & Fermentation',
+  'Semiconductor & Advanced Materials',
+  'Cold Storage & Food Warehousing',
+  'Other Industries',
+];
+
 
 const industryTypeOptions = [
-  'Manufacturer',
   'Original Equipment Manufacturer (OEM)',
-  'EPC Contractor',
-  'System Integrator',
-  'Distributor',
-  'Supplier',
-  'Service Provider',
-  'Engineering Consultant',
-  'Installation Contractor',
-  'Maintenance & Repair Provider',
+  'Equipment Manufacturer',
   'Technology Provider',
+  'Turnkey Project Executor (EPC Contractor)',
+  'Engineering & Design Service Provider',
+  'Equipment Supplier',
+  'Chemical Supplier',
+  'Raw Material Supplier',
+  'Distributor / Dealer',
+  'Trading Company',
+  'Importer / Exporter',
+  'System Integrator',
+  'Installation & Erection Contractor',
+  'Commissioning Service Provider',
+  'Operation & Maintenance (O&M) Service Provider',
+  'Repair & Maintenance Service Provider',
+  'Consultant',
   'Environmental Consultant',
-  'Waste Management Company',
-  'Recycler',
+  'Regulatory Compliance Service Provider',
+  'Testing & Laboratory Service Provider',
+  'Inspection & Audit Service Provider',
+  'Monitoring & Measurement Service Provider',
+  'Waste Collection & Transportation Provider',
+  'Waste Treatment & Disposal Service Provider',
+  'Waste Recycling & Recovery Provider',
+  'Renewable Energy Project Developer',
+  'Carbon Credit Service Provider',
+  'ESG & Sustainability Service Provider',
+  'Software / SaaS Provider',
+  'Industrial Automation & IoT Provider',
+  'Rental / Leasing Service Provider',
+  'Project Management Consultant (PMC)',
+  'Research & Development (R&D) Provider',
   'Other',
-]
+];
 
 /* =========================================================
    ERROR HELPER
@@ -164,9 +217,12 @@ export default function RegistrationForm({ type }) {
   const [loading, setLoading] = useState(false)
   const [showSuccess, setShowSuccess] = useState(false)
   const [openMultiSelect, setOpenMultiSelect] = useState('');
+
+  // ✅ multiSearch मध्ये आता तिन्ही multi-select keys
   const [multiSearch, setMultiSearch] = useState({
     area_of_work: '',
     industrial_verticals: '',
+    industry: '',
   });
 
   const nav = useNavigate()
@@ -215,17 +271,19 @@ export default function RegistrationForm({ type }) {
     }
 
     for (const field of requiredFields) {
-          if (
-            !isBuyer &&
-            ['area_of_work', 'industrial_verticals'].includes(field)
-          ) {
-            continue
-          }
-
-          if (!String(form[field] ?? '').trim()) {
-            return `Please enter ${field.replaceAll('_', ' ')}.`
-          }
+      // ✅ multi-select fields साठी array length तपासा
+      if (['area_of_work', 'industrial_verticals', 'industry'].includes(field)) {
+        const value = form[field]
+        if (!Array.isArray(value) || value.length === 0) {
+          return `Please select at least one ${field.replaceAll('_', ' ')}.`
         }
+        continue
+      }
+
+      if (!String(form[field] ?? '').trim()) {
+        return `Please enter ${field.replaceAll('_', ' ')}.`
+      }
+    }
 
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
     if (!emailRegex.test(form.email.trim())) return 'Please enter a valid email address.'
@@ -277,13 +335,17 @@ export default function RegistrationForm({ type }) {
     try {
       const payload = { ...form }
 
-        if (!isBuyer) {
-          payload.experience_years = Number(form.experience_years)
-          payload.domains = selected
+      if (!isBuyer) {
+        payload.experience_years = Number(form.experience_years)
+        payload.domains = selected
 
-          payload.area_of_work = form.area_of_work.join(', ')
-          payload.industrial_verticals = form.industrial_verticals.join(', ')
-        }
+        // ✅ दोन्ही multi-select arrays ला comma-separated string करा
+        payload.area_of_work = (form.area_of_work || []).join(', ')
+        payload.industrial_verticals = (form.industrial_verticals || []).join(', ')
+      } else {
+        // ✅ Buyer चा industry सुद्धा multi-select -> string
+        payload.industry = (form.industry || []).join(', ')
+      }
 
       const response = await API.post(`/auth/register/${type}`, payload)
 
@@ -339,23 +401,33 @@ export default function RegistrationForm({ type }) {
   }
 
   /* ================= RENDER FIELD ================= */
+
+  // ✅ आता तिन्ही keys multi-select आहेत — समान data
   const multiSelectOptions = {
     area_of_work: geographicalTerritories,
-    industrial_verticals: industrialVerticalOptions,
+    industrial_verticals: industrialVerticalOptions, // Vendor — Industrial Verticals
+    industry: industrialVerticalOptions,             // Buyer — Industry Type (same data)
+  }
+
+  // फक्त Vendor Type हा single select आहे
+  const selectOptionsMap = {
+    industry_type: industryTypeOptions,
   }
 
   const fieldDescriptions = {
     area_of_work: 'Select all regions where your company provides services.',
     industrial_verticals: 'Select all industries your company serves.',
+    industry: 'Select all industries your company serves.',
     industry_type: 'Select your primary business category.',
   }
 
   const renderField = ([key, label, kind = 'text', required = false]) => {
     const isMultiSelect = Boolean(multiSelectOptions[key])
+    const isSelect = Boolean(selectOptionsMap[key])
+    const options = multiSelectOptions[key] || selectOptionsMap[key] || []
 
-    const options =
-      multiSelectOptions[key] ||
-      (key === 'industry_type' ? industryTypeOptions : [])
+    // Vendor Type साठी white color class
+    const selectWhiteClass = key === 'industry_type' ? 'registration-select--white' : ''
 
     return (
       <div
@@ -365,7 +437,7 @@ export default function RegistrationForm({ type }) {
           key === 'address'
             ? 'field-group--wide'
             : ''
-        } ${isMultiSelect || key === 'industry_type' ? 'field-group--select' : ''}`}
+        } ${isMultiSelect || isSelect ? 'field-group--select' : ''}`}
         key={key}
       >
         <label htmlFor={key}>
@@ -502,30 +574,43 @@ export default function RegistrationForm({ type }) {
 
             <small className="select-help">{fieldDescriptions[key]}</small>
           </div>
-        ) : key === 'industry_type' ? (
+        ) : isSelect ? (
           <>
             <select
-              id={key}
-              name={key}
-              // className="registration-select"
-              value={form[key] ?? ''}
-              onChange={(e) => updateField(key, e.target.value)}
-              required={required}
-            >
-              <option value="">Select industry type</option>
-              {industryTypeOptions.map((option) => (
-                <option key={option} value={option}>
-                  {option}
-                </option>
-              ))}
-            </select>
+  id={key}
+  name={key}
+  className={`registration-select ${selectWhiteClass}`.trim()}
+  style={{
+    backgroundColor: '#ffffff',
+    color: '#000000',
+    border: '1px solid #d1d5db',
+  }}
+  value={form[key] ?? ''}
+  onChange={(e) => updateField(key, e.target.value)}
+  required={required}
+>
+  <option value="" style={{ backgroundColor: '#ffffff', color: '#000000' }}>
+    Select {label}
+  </option>
 
-            <small className="select-help">
-              {fieldDescriptions[key]}
-            </small>
+  {options.map((option) => (
+    <option
+      key={option}
+      value={option}
+      style={{ backgroundColor: '#ffffff', color: '#000000' }}
+    >
+      {option}
+    </option>
+  ))}
+</select>
+
+            {fieldDescriptions[key] && (
+              <small className="select-help">
+                {fieldDescriptions[key]}
+              </small>
+            )}
           </>
         ) : (
-          // Keep your existing input field code here unchanged
           <input
             id={key}
             name={key}
@@ -595,14 +680,12 @@ export default function RegistrationForm({ type }) {
           <form onSubmit={submit} className="modern-registration-form" noValidate>
             {/* =====================================================
                   BUYER REGISTRATION
-                  01 Account Information
-                  02 Business Information
               ===================================================== */}
 
             {isBuyer ? (
               <>
 
-                {/* SECTION 02 — BUSINESS INFORMATION */}
+                {/* SECTION 01 — BUSINESS INFORMATION */}
                 <div className="form-section-title">
                   <span>01</span>
                   Business Information
@@ -626,7 +709,7 @@ export default function RegistrationForm({ type }) {
                     .map(renderField)}
                 </div>
 
-                {/* SECTION 01 — ACCOUNT INFORMATION */}
+                {/* SECTION 02 — ACCOUNT INFORMATION */}
                 <div className="form-section-title">
                   <span>02</span>
                   Account Information
@@ -651,9 +734,6 @@ export default function RegistrationForm({ type }) {
               <>
                 {/* =================================================
                     VENDOR REGISTRATION
-                    01 Business Information
-                    02 Account Information
-                    03 TECHSPHERE Domains
                 ================================================= */}
 
                 {/* SECTION 01 — BUSINESS INFORMATION */}
@@ -669,7 +749,7 @@ export default function RegistrationForm({ type }) {
                         'company_name',
                         'industry_type',
                         'address',
-                        'industrial_verticals', // ADD THIS
+                        'industrial_verticals',
 
                         'area_of_work',
                         'experience_years',
