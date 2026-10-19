@@ -26,7 +26,7 @@ from app.core.config import settings
 
 # Each tuple: (category, sub-category, questions)
 DOMAIN_DATA = {
-    "Water & Wastewater Treatment": [
+    "WATER & WASTEWATER TREATMENT": [
         ("Primary Effluent & Sewage Treatment",
          "High-toxicity industrial effluent load (ETP)", [
              "What is the current wastewater flow rate in KLD?",
@@ -148,7 +148,7 @@ DOMAIN_DATA = {
          ]),
     ],
 
-    "Solid & Hazardous Waste": [
+    "SOLID AND HAZARDOUS WASTE": [
         ("Collection & Pre-processing",
          "Material recovery facility (MRF)", [
              "What waste types and recyclable material fractions are received?",
@@ -291,7 +291,7 @@ DOMAIN_DATA = {
          ]),
     ],
 
-    "Solar & Renewables": [
+    "SOLAR AND RENEWABLE ENERGY": [
         ("Capital Efficiency & Grid Integration (financial efficiency)",
          "CAPEX-constrained utility drag", [
              "What is the current electricity demand and monthly bill?",
@@ -434,7 +434,7 @@ DOMAIN_DATA = {
          ]),
     ],
 
-    "Carbon & ESG": [
+    "CARBON AND ESG": [
         ("Scope 1 – Direct Operational Carbon Footprint",
          "Fossil-fuel thermal emission drag", [
              "Which fossil fuels are consumed on site and in what quantities?",
@@ -577,7 +577,7 @@ DOMAIN_DATA = {
          ]),
     ],
 
-    "Air Pollution & Environmental Legal Services": [
+    "AIR POLLUTION & ENVIRONMENTAL LEGAL SERVICES": [
         ("Industrial Air Pollution Engineering (physical solutions)",
          "Fugitive particulate emission drag", [
              "Which processes generate fugitive dust and particulate emissions?",
