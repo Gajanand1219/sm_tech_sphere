@@ -338,12 +338,12 @@ export default function PanelLayout({
                   `ev-nav-item ${isActive || isViewActive(item.label) ? 'on' : ''}`
                 }
               >
-                <span>{item.icon}</span>
+                <span>{item.icon}</span><br></br>
                 {item.label}
                 {item.countKey && (role === 'buyer' || role === 'vendor') && (
                   <span className="ev-nav-count">
                     {counts[item.countKey] ?? 0}
-                  </span>
+                  </span><br></br>
                 )}
               </NavLink>
             ))}
