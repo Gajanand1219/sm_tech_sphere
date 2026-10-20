@@ -429,10 +429,23 @@ export default function PanelLayout({
                     className="ev-user-item"
                     onClick={() => {
                       setUserMenuOpen(false)
-                      navigate('/profile')
+                      navigate('/profile?mode=view')
                     }}
                   >
-                    <span>👤</span> View Profile
+                    <span>👤</span>
+                    View Profile
+                  </button>
+
+                  <button
+                    type="button"
+                    className="ev-user-item"
+                    onClick={() => {
+                      setUserMenuOpen(false)
+                      navigate('/profile?mode=edit')
+                    }}
+                  >
+                    <span>✏️</span>
+                    Edit Profile
                   </button>
 
                   <div className="ev-user-sep" />
@@ -442,7 +455,8 @@ export default function PanelLayout({
                     className="ev-user-item ev-user-item--danger"
                     onClick={handleLogout}
                   >
-                    <span>↪</span> Logout
+                    <span>↪</span>
+                    Logout
                   </button>
                 </div>
               </>
