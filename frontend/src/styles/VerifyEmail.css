@@ -776,3 +776,116 @@
     transition-duration: 0.01ms !important;
   }
 }
+
+
+
+
+/* RESEND OTP BUTTON */
+
+.ve-resend {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 7px;
+  padding: 9px 13px;
+  border: 1px solid transparent;
+  border-radius: 10px;
+  font-size: 12px;
+  font-weight: 700;
+  white-space: nowrap;
+  transition: background 0.3s ease, transform 0.3s ease,
+    box-shadow 0.3s ease;
+}
+
+.ve-resend--waiting {
+  color: #64748b;
+  background: #f1f5f9;
+  border-color: #e2e8f0;
+  cursor: not-allowed;
+}
+
+.ve-resend--active {
+  color: #fff;
+  background: linear-gradient(135deg, #0f766e, #0891b2);
+  border-color: #0f766e;
+  cursor: pointer;
+  animation: resendFloat 1.5s ease-in-out infinite;
+}
+
+.ve-resend--active:hover {
+  box-shadow: 0 6px 18px rgba(8, 145, 178, 0.25);
+}
+
+.ve-resend--active:active {
+  transform: scale(0.96);
+}
+
+.ve-resend__icon {
+  display: inline-block;
+  font-size: 17px;
+  line-height: 1;
+}
+
+.ve-resend--active .ve-resend__icon {
+  animation: resendRotate 2s linear infinite;
+}
+
+.ve-resend__clock {
+  font-size: 16px;
+  line-height: 1;
+}
+
+.ve-resend__spinner {
+  width: 13px;
+  height: 13px;
+  border: 2px solid rgba(255, 255, 255, 0.4);
+  border-top-color: currentColor;
+  border-radius: 50%;
+  animation: resendSpin 0.7s linear infinite;
+}
+
+@keyframes resendFloat {
+  0%, 100% {
+    transform: translateY(0);
+  }
+
+  50% {
+    transform: translateY(-3px);
+  }
+}
+
+@keyframes resendRotate {
+  from {
+    transform: rotate(0deg);
+  }
+
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+@keyframes resendSpin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+@media (max-width: 480px) {
+  .ve-otp__meta {
+    flex-wrap: wrap;
+    gap: 10px;
+  }
+
+  .ve-resend {
+    font-size: 11px;
+    padding: 9px 10px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .ve-resend--active,
+  .ve-resend--active .ve-resend__icon,
+  .ve-resend__spinner {
+    animation: none;
+  }
+}
