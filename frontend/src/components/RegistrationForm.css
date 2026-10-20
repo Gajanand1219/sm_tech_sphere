@@ -1417,3 +1417,220 @@
 
 
 
+/* Add this block at the END of RegistrationForm.css */
+
+/* Vendor registration: 3-step flow */
+.vendor-stepper {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 12px;
+  margin: 8px 0 28px;
+}
+
+.vendor-step {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  min-width: 0;
+  padding: 13px 14px;
+  border: 1px solid #dbe3ee;
+  border-radius: 14px;
+  background: #f8fafc;
+  color: #64748b;
+  transition: border-color .2s ease, background .2s ease, color .2s ease;
+}
+
+.vendor-step__number {
+  display: inline-flex;
+  flex: 0 0 30px;
+  width: 30px;
+  height: 30px;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  background: #e2e8f0;
+  color: #334155;
+  font-size: 13px;
+  font-weight: 800;
+}
+
+.vendor-step__title {
+  font-size: 13px;
+  font-weight: 700;
+  line-height: 1.35;
+}
+
+.vendor-step.is-active {
+  border-color: #0f766e;
+  background: #ecfdf5;
+  color: #115e59;
+  box-shadow: 0 5px 18px rgba(15, 118, 110, .08);
+}
+
+.vendor-step.is-active .vendor-step__number,
+.vendor-step.is-complete .vendor-step__number {
+  background: #0f766e;
+  color: #fff;
+}
+
+.vendor-step.is-complete {
+  border-color: #99f6e4;
+  color: #0f766e;
+}
+
+.vendor-step-actions {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  margin: 24px 0 8px;
+}
+
+.vendor-step-next,
+.vendor-step-back {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  min-height: 46px;
+  padding: 0 22px;
+  border: 0;
+  border-radius: 12px;
+  cursor: pointer;
+  font: inherit;
+  font-weight: 750;
+  transition: transform .2s ease, box-shadow .2s ease, background .2s ease;
+}
+
+.vendor-step-next {
+  margin-left: auto;
+  background: #0f766e;
+  color: #fff;
+  box-shadow: 0 8px 20px rgba(15, 118, 110, .18);
+}
+
+.vendor-step-next:hover {
+  background: #115e59;
+  transform: translateY(-1px);
+  box-shadow: 0 10px 24px rgba(15, 118, 110, .24);
+}
+
+.vendor-step-back {
+  border: 1px solid #cbd5e1;
+  background: #fff;
+  color: #334155;
+}
+
+.vendor-step-back:hover {
+  background: #f1f5f9;
+}
+
+/* Keep the address inputs in a neat two-column layout on desktop. */
+.registration-grid {
+  align-items: start;
+}
+
+.registration-grid .field-group--wide {
+  grid-column: 1 / -1;
+}
+
+.registration-grid .field-group:has(input[name="head_office_at"]),
+.registration-grid .field-group:has(input[name="head_office_subdistrict"]),
+.registration-grid .field-group:has(input[name="head_office_district"]),
+.registration-grid .field-group:has(input[name="head_office_state"]),
+.registration-grid .field-group:has(input[name="head_office_pincode"]),
+.registration-grid .field-group:has(input[name="plant_at"]),
+.registration-grid .field-group:has(input[name="plant_subdistrict"]),
+.registration-grid .field-group:has(input[name="plant_district"]),
+.registration-grid .field-group:has(input[name="plant_state"]),
+.registration-grid .field-group:has(input[name="plant_pincode"]) {
+  grid-column: span 1;
+}
+
+@media (max-width: 700px) {
+  .vendor-stepper {
+    grid-template-columns: 1fr;
+    gap: 8px;
+    margin-bottom: 22px;
+  }
+
+  .vendor-step {
+    padding: 10px 12px;
+  }
+
+  .vendor-step__number {
+    flex-basis: 28px;
+    width: 28px;
+    height: 28px;
+  }
+
+  .vendor-step__title {
+    font-size: 12px;
+  }
+
+  .vendor-step-actions {
+    margin-top: 20px;
+  }
+
+  .vendor-step-next,
+  .vendor-step-back {
+    min-height: 44px;
+    padding: 0 16px;
+  }
+}
+
+
+
+/* ================= STRUCTURED ADDRESS (side by side) ================= */
+
+.address-group .address-row {
+  display: grid;
+  grid-template-columns: repeat(5, minmax(0, 1fr));
+  gap: 12px;
+  width: 100%;
+}
+
+.address-group .address-cell {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  min-width: 0;
+  animation: addrIn 0.25s ease;
+}
+
+.address-group .address-cell-label {
+  font-size: 12px;
+  font-weight: 600;
+  color: #64748b;
+  letter-spacing: 0.2px;
+}
+
+.address-group .address-cell input {
+  width: 100%;
+  box-sizing: border-box;
+}
+
+@keyframes addrIn {
+  from {
+    opacity: 0;
+    transform: translateY(-6px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* tablet: 3 + 2 */
+@media (max-width: 1024px) {
+  .address-group .address-row {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+}
+
+/* mobile: 1 per row */
+@media (max-width: 600px) {
+  .address-group .address-row {
+    grid-template-columns: 1fr;
+  }
+}
