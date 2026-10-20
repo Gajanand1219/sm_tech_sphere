@@ -3,6 +3,8 @@ import { Link, useNavigate, useSearchParams } from 'react-router-dom'
 import API from '../services/api'
 import '../styles/BuyerDashboard.css'
 
+import { useAuth } from '../context/AuthContext'
+
 const PAGE_INFO = {
   new: { title: 'New Enquiries', description: 'Enquiries sent to you, not yet opened.' },
   current: { title: 'Current Enquiries', description: 'Opened by you, quote not yet submitted.' },
@@ -195,6 +197,7 @@ export default function VendorEnquiries() {
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState('')
   const [mobileOpen, setMobileOpen] = useState(false)
+  const { logout } = useAuth()
   const [notifOpen, setNotifOpen] = useState(false)
   const [readIds, setReadIds] = useState(() => {
     try {
@@ -556,9 +559,10 @@ export default function VendorEnquiries() {
                     <button
                       type="button"
                       className="ev-user-item ev-user-item--danger"
-                      onClick={() => {
+                     onClick={() => {
                         setUserMenuOpen(false)
-                        navigate('/logout')
+                        logout()
+                        navigate('/')
                       }}
                     >
                       <span>↪</span> Logout
