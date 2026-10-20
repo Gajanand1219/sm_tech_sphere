@@ -163,13 +163,46 @@ export default function VendorEnquiry() {
   const timer = timeRemaining(enquiry.quotation_deadline)
   const matchScore = Math.round(enquiry.match_score)
 
+    
   const statusMeta = {
-    submitted: { label: 'Awaiting Approval', cls: 've-status--submitted', icon: '📝' },
-    approved:  { label: 'Approved',          cls: 've-status--approved',  icon: '✅' },
-    rejected:  { label: 'Rejected',          cls: 've-status--rejected',  icon: '❌' },
-    quoted:    { label: 'Quoted',            cls: 've-status--quoted',    icon: '💰' },
-    closed:    { label: 'Closed',            cls: 've-status--closed',    icon: '🔒' },
-  }[enquiry.status] || { label: enquiry.status, cls: 've-status--default', icon: '•' }
+    submitted: {
+      label: 'Awaiting Approval',
+      cls: 've-status--submitted',
+      icon: '📝'
+    },
+    approved: {
+      label: 'Approved',
+      cls: 've-status--approved',
+      icon: '✅'
+    },
+    matched: {
+      label: 'Matched',
+      cls: 've-status--approved',
+      icon: '🎯'
+    },
+    rejected: {
+      label: 'Rejected',
+      cls: 've-status--rejected',
+      icon: '❌'
+    },
+    quoted: {
+      label: 'Quoted',
+      cls: 've-status--quoted',
+      icon: '💰'
+    },
+    closed: {
+      label: 'Closed',
+      cls: 've-status--closed',
+      icon: '🔒'
+    }
+  }[enquiry.status] || {
+    label: enquiry.status,
+    cls: 've-status--default',
+    icon: '•'
+  }
+
+
+  [enquiry.status] || { label: enquiry.status, cls: 've-status--default', icon: '•' }
 
   return (
     <PanelLayout role="vendor" title={`Matching Enquiry #${enquiry.id}`}>
