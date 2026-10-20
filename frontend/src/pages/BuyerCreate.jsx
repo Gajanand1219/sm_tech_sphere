@@ -2,6 +2,7 @@ import { useEffect, useMemo, useRef, useState } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
 import API from '../services/api'
 import '../styles/BuyerCreate.css'
+import { useAuth } from '../context/AuthContext'
 
 const STEPS = [
   'Domain',
@@ -60,7 +61,7 @@ export default function BuyerCreate() {
   const [domains, setDomains] = useState([])
   const [problems, setProblems] = useState([])
   const [questions, setQuestions] = useState([])
-
+const { logout } = useAuth()
   const [domainId, setDomainId] = useState('')
   const [category, setCategory] = useState('')
   const [problemId, setProblemId] = useState('')
@@ -486,7 +487,8 @@ export default function BuyerCreate() {
                       className="ev-user-item ev-user-item--danger"
                       onClick={() => {
                         setUserMenuOpen(false)
-                        navigate('/logout')
+                        logout()
+                        navigate('/')
                       }}
                     >
                       <span>↪</span> Logout
