@@ -245,11 +245,11 @@ export default function Home() {
           <div className="hero__container">
             <div className="hero__content">
               <span className="hero__label" data-reveal>
-                ⚡ Industrial B2B TECHSPHERE Network
+                ⚡ Industrial B2B Techsphere Network
               </span>
 
               <h5 className="hero__title" data-reveal>
-                SM TECHSPHERE Pvt Ltd
+                SM Techsphere Pvt. Ltd.
               </h5>
 
               <p className="hero__tagline" data-reveal>
@@ -257,9 +257,7 @@ export default function Home() {
               </p>
 
               <p className="hero__description" data-reveal>
-                We Connect Genuine Industrial Requirements with Qualified
-                Engineering, EPC and TECHSPHERE Pvt Ltd Providers Through a
-                Structured and Transparent Technical Matching Platform.
+                We connect genuine industrial requirements with qualified engineering, EPC, and technology service providers through a structured and transparent technical matching platform.
               </p>
 
               <div className="hero__buttons" data-reveal>
@@ -267,14 +265,14 @@ export default function Home() {
                   to="/register/buyer"
                   className="home-btn home-btn--primary"
                 >
-                  Register As Buyer
+                  Register as Buyer
                 </Link>
 
                 <Link
                   to="/register/vendor"
                   className="home-btn home-btn--outline"
                 >
-                  Register As Vendor
+                  Register as Vendor
                 </Link>
 
                 <Link to="/login" className="home-btn home-btn--login">
@@ -351,7 +349,7 @@ export default function Home() {
                 <div className="platform-security">
                   <span>🔒</span>
                   <p>
-                    Contact Details Remain Masked Until Mutual Acceptance.
+                    Contact details remain masked until mutual acceptance.
                   </p>
                 </div>
               </div>
@@ -383,14 +381,9 @@ export default function Home() {
           <div className="section-container">
             <div className="section-heading" data-reveal>
               <span className="section-label">ABOUT US</span>
-              <h2>WHO WE ARE</h2>
+              <h2>Who We Are</h2>
               <p>
-                SM TECHSPHERE Pvt Ltd Is An Industrial B2B
-                Platform Designed To Connect Genuine Project Requirements With
-                Relevant Engineering, EPC and TECHSPHERE Specialists. We
-                Structure Requirements, Technical Information and Matching
-                Workflows To Make Industrial Project Discovery Simpler and More
-                Organized.
+                SM Techsphere Pvt. Ltd. is an industrial B2B platform designed to connect genuine project requirements with relevant engineering, EPC, and technology specialists. We structure requirements, technical information, and matching workflows to make industrial project discovery simpler and more organized.
               </p>
             </div>
                         
@@ -469,12 +462,10 @@ export default function Home() {
               <div className="vm-card" data-reveal>
                 <div className="vm-icon">◈</div>
                 <div>
-                  <span className="vm-label">OUR VISION</span>
-                  <h3>Building A Trusted Industrial Ecosystem</h3>
+                  <span className="vm-label">Our Vision</span>
+                  <h3>Building a Trusted Industrial Ecosystem</h3>
                   <p>
-                    To Create a Trusted Engineering Ecosystem Where Genuine
-                   Industrial Requirements Can be Connected With Qualified
-                    Technical and TECHSPHERE Pvt Ltd Providers.
+                    To create a trusted engineering ecosystem where genuine industrial requirements can be connected with qualified technical and technology service providers.
                   </p>
                 </div>
               </div>
@@ -486,12 +477,10 @@ export default function Home() {
               >
                 <div className="vm-icon">◎</div>
                 <div>
-                  <span className="vm-label">OUR MISSION</span>
+                  <span className="vm-label">Our Mission</span>
                   <h3>Simplifying Industrial Project Connections</h3>
                   <p>
-                    To Simplify Requirement Discovery, Technical Matching and
-                    Quotation Workflows Through Structured Information,
-                    Verified Participants and Mutual-Consent Processes.
+                    To simplify requirement discovery, technical matching, and quotation workflows through structured information, verified participants, and mutual-consent processes.
                   </p>
                 </div>
               </div>
@@ -504,11 +493,10 @@ export default function Home() {
         <section className="partners">
           <div className="section-container">
             <div className="partners-heading" data-reveal>
-              <span className="section-label">OUR NETWORK</span>
+              <span className="section-label">Our Network</span>
               <h2>Trusted Industrial Network</h2>
               <p>
-                Connecting Verified Industrial Buyers with Approved TECHSPHERE
-                Engineering and EPC Pvt LtdProviders.
+                Connecting verified industrial buyers with approved engineering and EPC service providers through the Techsphere network.
               </p>
             </div>
 
@@ -519,7 +507,7 @@ export default function Home() {
                   <div className="partner-network-icon">⚙️</div>
                   <div>
                     <span className="partner-network-kicker">
-                      TECHNICAL NETWORK
+                      Technical Network
                     </span>
                     <h3>Approved EPC Providers</h3>
                   </div>
@@ -575,7 +563,7 @@ export default function Home() {
 
                 <div className="partner-network-footer">
                   <span className="network-status-dot" />
-                  Verified TECHSPHERE Pvt Ltd Providers
+                 Verified Techsphere Service Providers
                 </div>
               </div>
 
@@ -589,7 +577,7 @@ export default function Home() {
                   <div className="partner-network-icon">🏢</div>
                   <div>
                     <span className="partner-network-kicker">
-                      TRUSTED NETWORK
+                      Trusted Network
                     </span>
                     <h3>Verified Industrial Buyers</h3>
                   </div>
@@ -659,7 +647,7 @@ export default function Home() {
   <div className="section-container">
 
     <div className="platform-benefits-heading" data-reveal>
-      <span className="section-label">WHY  SM TECHSPHERE</span>
+      <span className="section-label">Why SM Techsphere?</span>
 
       <h2>
         Smarter Connections For
@@ -667,9 +655,7 @@ export default function Home() {
       </h2>
 
       <p>
-        A Structured B2B Platform Designed To Connect Genuine Industrial
-        Requirements with Relevant Engineering, EPC and TECHSPHERE Solution
-        Providers.
+       A structured B2B platform designed to connect genuine industrial requirements with relevant engineering, EPC, and technology solution providers.
       </p>
     </div>
 
@@ -682,8 +668,7 @@ export default function Home() {
         <div className="platform-benefit-content">
           <h3>Verified Vendor Matching</h3>
           <p>
-            Connect Your Requirement With Relevant and Approved Engineering,
-            EPC and TECHSPHERE Pvt Ltd Providers.
+            Connect your requirements with relevant and approved engineering, EPC, and technology solution providers.
           </p>
         </div>
       </article>
@@ -699,8 +684,7 @@ export default function Home() {
         <div className="platform-benefit-content">
           <h3>Structured Technical Requirements</h3>
           <p>
-            Capture Project Details, Technical Parameters and Business
-            Requirements in a Structured Format.
+            Capture project details, technical parameters, and business requirements in a structured format.
           </p>
         </div>
       </article>
@@ -716,8 +700,7 @@ export default function Home() {
         <div className="platform-benefit-content">
           <h3>Faster Project Connections</h3>
           <p>
-            Reduce Manual Vendor Discovery and Connect With Relevant Solution
-            Providers Through Technical Matching.
+            Reduce manual vendor discovery and connect with relevant solution providers through technical matching.
           </p>
         </div>
       </article>
@@ -733,8 +716,7 @@ export default function Home() {
         <div className="platform-benefit-content">
           <h3>Industrial & EPC Expertise</h3>
           <p>
-            Access Pvt LtdProviders Across Water, Waste, Renewables,
-            Carbon, ESG and Environmental Engineering Domains.
+           Access service providers across water, waste, renewable energy, carbon, ESG, and environmental engineering domains.
           </p>
         </div>
       </article>
@@ -750,8 +732,7 @@ export default function Home() {
         <div className="platform-benefit-content">
           <h3>Mutual-Consent Communication</h3>
           <p>
-            Contact Information Remains Protected Until Both Parties Accept
-            The Opportunity and Complete The Handshake.
+            Contact information remains protected until both parties accept the opportunity and complete the handshake.
           </p>
         </div>
       </article>
@@ -767,8 +748,7 @@ export default function Home() {
         <div className="platform-benefit-content">
           <h3>Trusted B2B Network</h3>
           <p>
-            Build Connections between Verified Industrial Buyers and
-            Approved Technical Pvt LtdProviders.
+           Build connections between verified industrial buyers and approved technical service providers.
           </p>
         </div>
       </article>
@@ -786,12 +766,10 @@ export default function Home() {
           <div className="section-container">
             <div className="contact-layout">
               <div className="contact-intro" data-reveal>
-                <span className="section-label">CONTACT US</span>
-                <h2>Have An Industrial Requirement?</h2>
+                <span className="section-label">Contact Us</span>
+                <h2>Have an Industrial Requirement?</h2>
                 <p>
-                  Tell Us About Your Requirement. Our Platform is Designed To
-                  Structure Your Enquiry and Connect it With Relevant Technical
-                  Pvt LtdProviders.
+                  Tell us about your requirement. Our platform is designed to structure your enquiry and connect it with relevant technical service providers.
                 </p>
 
                 <div className="contact-person-card" align="center">
@@ -799,9 +777,9 @@ export default function Home() {
                     <div className="contact-person-avatar">SM</div>
                     <div>
                       <span className="contact-person-label">
-                        DIRECT CONTACT
+                        Direct Contact
                       </span>
-                      <h3>Contact Our Team</h3>
+                      <h3>Contact our team</h3>
                     </div>
                   </div>
 
@@ -837,7 +815,7 @@ export default function Home() {
                 <div className="contact-points">
                   <div>
                     <strong>01</strong>
-                    <span>Share Your Requirement</span>
+                    <span>Share your requirement</span>
                   </div>
                   <div>
                     <strong>02</strong>
@@ -845,7 +823,7 @@ export default function Home() {
                   </div>
                   <div>
                     <strong>03</strong>
-                    <span>Connect With Relevant Specialists</span>
+                    <span>Connect with relevant specialists</span>
                   </div>
                 </div>
               </div>
@@ -855,8 +833,8 @@ export default function Home() {
                 data-reveal
                 style={{ transitionDelay: '0.12s' }}
               >
-                <h3>Send An Enquiry</h3>
-                <p>Fill In Your Details and Our Team Will Get Back To You.</p>
+                <h3>Send an Enquiry</h3>
+                <p>Fill in your details and our team will get back to you.</p>
 
                 <form
                   className="contact-form"
@@ -934,7 +912,7 @@ export default function Home() {
                   className="footer__logo-image"
                 />
 
-                <p>SM TECHSPHERE Pvt Ltd</p>
+                <p>SM Techsphere Pvt. Ltd.</p>
                 <span>Diagnose. Match. Solution.</span>
               </div>
 
@@ -948,15 +926,15 @@ export default function Home() {
 
               <div className="footer-column">
                 <h4>Join Network</h4>
-                <Link to="/register/buyer">Register As Buyer</Link>
-                <Link to="/register/vendor">Register As Vendor</Link>
+                <Link to="/register/buyer">Register as Buyer</Link>
+                <Link to="/register/vendor">Register as Vendor</Link>
                 <Link to="/login">Login</Link>
               </div>
 
               <div className="footer-column footer-contact">
                 <h4>Contact</h4>
                  <p>
-                   SM TECHSPHERE Pvt Ltd
+                   SM Techsphere Pvt. Ltd.
                 </p>
                 <p>
                   Email:{" "}
@@ -972,7 +950,7 @@ export default function Home() {
             </div>
 
             <div className="footer-bottom">
-              <span>© 2026  SM TECHSPHERE Pvt Ltd</span>
+              <span>© 2026  SM Techsphere Pvt. Ltd.</span>
               <span>Water • Waste • Solar • ESG • SPCB</span>
             </div>
           </div>
