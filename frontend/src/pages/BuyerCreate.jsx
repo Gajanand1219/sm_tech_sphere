@@ -66,7 +66,7 @@ export default function BuyerCreate() {
   const [problemId, setProblemId] = useState('')
   const [title, setTitle] = useState('')
   const [answers, setAnswers] = useState({})
-
+  const [userMenuOpen, setUserMenuOpen] = useState(false)
   const [step, setStep] = useState(0)
   const [loadingDomains, setLoadingDomains] = useState(true)
   const [loadingProblems, setLoadingProblems] = useState(false)
@@ -422,10 +422,79 @@ export default function BuyerCreate() {
           <button type="button" className="ev-back-btn" onClick={() => navigate('/buyer')} title="Back to Dashboard">← Back</button>
           <span className="ev-top-title">Create Enquiry</span>
           <span className="ev-sp" />
-          <button type="button" className="ev-chip" onClick={() => navigate('/profile')} title={companyName}>
-            <CompanyAvatar logo={companyLogo} name={companyName} />
-            <span className="ev-chip-name">{companyName}</span>
-          </button>
+          
+          <div className="ev-chip-wrap">
+              <button
+                type="button"
+                className="ev-chip"
+                onClick={() => setUserMenuOpen((open) => !open)}
+                aria-label="Open profile menu"
+                aria-expanded={userMenuOpen}
+                title={companyName}
+              >
+                <CompanyAvatar logo={companyLogo} name={companyName} />
+                <span className="ev-chip-name">{companyName}</span>
+                <span className="ev-chip-caret">▾</span>
+              </button>
+
+              {userMenuOpen && (
+                <>
+                  <div
+                    className="ev-chip-scrim"
+                    onClick={() => setUserMenuOpen(false)}
+                  />
+
+                  <div className="ev-user-menu" role="menu">
+                    <div className="ev-user-head">
+                      <CompanyAvatar
+                        logo={companyLogo}
+                        name={companyName}
+                        size="lg"
+                      />
+                      <div>
+                        <b>{companyName}</b>
+                        <small>{profile?.email || 'Buyer Account'}</small>
+                      </div>
+                    </div>
+
+                    <button
+                      type="button"
+                      className="ev-user-item"
+                      onClick={() => {
+                        setUserMenuOpen(false)
+                        navigate('/profile?mode=view')
+                      }}
+                    >
+                      <span>👤</span> View Profile
+                    </button>
+
+                    <button
+                      type="button"
+                      className="ev-user-item"
+                      onClick={() => {
+                        setUserMenuOpen(false)
+                        navigate('/profile?mode=edit')
+                      }}
+                    >
+                      <span>✏️</span> Edit Profile
+                    </button>
+
+                    <div className="ev-user-sep" />
+
+                    <button
+                      type="button"
+                      className="ev-user-item ev-user-item--danger"
+                      onClick={() => {
+                        setUserMenuOpen(false)
+                        navigate('/logout')
+                      }}
+                    >
+                      <span>↪</span> Logout
+                    </button>
+                  </div>
+                </>
+              )}
+            </div>
         </header>
 
         <main className="ev-content">
