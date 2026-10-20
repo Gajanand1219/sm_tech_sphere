@@ -3,6 +3,8 @@ import { Link, useNavigate } from 'react-router-dom'
 import API from '../services/api'
 import '../styles/BuyerDashboard.css'
 
+import { useAuth } from '../context/AuthContext'
+
 const MENU = [
   { id: 'new', l: 'New enquiry', i: '📥', d: 'Enquiries sent to you, not yet opened', to: '/vendor/enquiries?view=new', countKey: 'new' },
   { id: 'current', l: 'Current enquiry', i: '📝', d: 'Opened by you, quote not yet submitted', to: '/vendor/enquiries?view=current', countKey: 'current' },
@@ -195,6 +197,7 @@ export default function VendorDashboard() {
   const [mobileOpen, setMobileOpen] = useState(false)
   const [notifOpen, setNotifOpen] = useState(false)
   const [userMenuOpen, setUserMenuOpen] = useState(false)
+  const { logout } = useAuth()
   const [readIds, setReadIds] = useState(() => {
     try {
       return JSON.parse(localStorage.getItem('vendor_read_notifs') || '[]')
@@ -527,7 +530,8 @@ export default function VendorDashboard() {
                     className="ev-user-item ev-user-item--danger"
                     onClick={() => {
                       setUserMenuOpen(false)
-                      navigate('/logout')
+                      logout()
+                      navigate('/')
                     }}
                   >
                     <span>↪</span> Logout
