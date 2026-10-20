@@ -2192,3 +2192,18 @@
   .ev-opt { padding: 12px 14px; }
   .ev-opt.on { padding: 11px 13px; }
 }
+
+
+/* Keep enquiry navigation buttons clickable */
+.ev-actions,
+.ev-report-actions {
+  position: relative;
+  z-index: 101;
+}
+
+.ev-actions button,
+.ev-report-actions button {
+  position: relative;
+  z-index: 102;
+  pointer-events: auto;
+}
