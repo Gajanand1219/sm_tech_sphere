@@ -165,7 +165,7 @@ export default function FloatingChatButton() {
           position: fixed;
           right: 25px;
           bottom: 25px;
-          z-index: 9999;
+          z-index: 100;
 
           display: flex;
           flex-direction: column;
@@ -500,12 +500,10 @@ export default function FloatingChatButton() {
           }
 
           .sm-chat-mobile {
-            position: fixed;
-
-            right: 16px;
-            bottom: 82px;
-
-            z-index: 9999;
+             position: fixed;
+              right: 16px;
+              bottom: 82px;
+              z-index: 100;
 
             display: flex;
 
