@@ -479,3 +479,76 @@
     display: none;
   }
 }
+
+
+.ev-chip-wrap {
+  position: relative;
+}
+
+.ev-user-menu {
+  position: absolute;
+  top: calc(100% + 12px);
+  right: 0;
+  width: 270px;
+  padding: 10px;
+  background: #fff;
+  border: 1px solid #e5e7eb;
+  border-radius: 16px;
+  box-shadow: 0 18px 45px rgba(15, 23, 42, 0.16);
+  z-index: 1002;
+  animation: profileMenuIn 0.18s ease-out;
+}
+
+.ev-user-item {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  width: 100%;
+  padding: 13px 12px;
+  border: 0;
+  border-radius: 10px;
+  background: transparent;
+  color: #1e293b;
+  font-size: 14px;
+  font-weight: 600;
+  text-align: left;
+  cursor: pointer;
+  transition: background 0.2s, color 0.2s;
+}
+
+.ev-user-item:hover {
+  background: #eff6ff;
+  color: #2563eb;
+}
+
+.ev-user-item--danger {
+  color: #dc2626;
+}
+
+.ev-user-item--danger:hover {
+  background: #fef2f2;
+  color: #b91c1c;
+}
+
+.ev-user-sep {
+  height: 1px;
+  margin: 7px 4px;
+  background: #e5e7eb;
+}
+
+.ev-chip-scrim {
+  position: fixed;
+  inset: 0;
+  z-index: 1001;
+}
+
+@keyframes profileMenuIn {
+  from {
+    opacity: 0;
+    transform: translateY(-6px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
