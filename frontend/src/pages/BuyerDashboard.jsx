@@ -738,7 +738,8 @@ export default function BuyerDashboard() {
                 </div>
 
                 <div className="ev-hero-body">
-                  <p className="ev-hero-welcome">Welcome,</p>
+                 
+                   <p className="ev-hero-welcome">Welcome Back,</p>
                   <h1 className="ev-hero-company">{companyName}</h1>
                   <p className="ev-hero-to">
                     to <span className="ev-wm">ENVIQUO</span>
