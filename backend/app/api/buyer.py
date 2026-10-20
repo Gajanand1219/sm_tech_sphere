@@ -135,6 +135,7 @@ def dashboard(
     }
 
 
+
 # ============================================================
 # CREATE ENQUIRY
 # ============================================================
@@ -145,16 +146,11 @@ async def create_enquiry(
     user=Depends(require_roles("buyer")),
     db: Session = Depends(get_db),
 ):
-
-    problem = db.get(
-        Problem,
-        payload.problem_id,
-    )
-
-    domain = db.get(
-        Domain,
-        payload.domain_id,
-    )
+    # --------------------------------------------------------
+    # VALIDATE DOMAIN AND PROBLEM
+    # --------------------------------------------------------
+    problem = db.get(Problem, payload.problem_id)
+    domain = db.get(Domain, payload.domain_id)
 
     if (
         not problem
@@ -162,53 +158,42 @@ async def create_enquiry(
         or problem.domain_id != domain.id
     ):
         raise HTTPException(
-            400,
-            "Invalid domain/problem",
+            status_code=400,
+            detail="Invalid domain/problem",
         )
 
+    # --------------------------------------------------------
+    # VALIDATE REQUIRED QUESTIONS
+    # --------------------------------------------------------
     qs = (
         db.query(Question)
-        .filter(
-            Question.problem_id
-            == problem.id
-        )
+        .filter(Question.problem_id == problem.id)
         .all()
     )
+
+    answers = payload.answers or {}
 
     missing = [
         q.field_key
         for q in qs
         if q.required
-        and not str(
-            payload.answers.get(
-                q.field_key,
-                "",
-            )
-        ).strip()
+        and not str(answers.get(q.field_key, "")).strip()
     ]
 
     if missing:
         raise HTTPException(
-            422,
-            {
-                "missing_fields": missing
-            },
+            status_code=422,
+            detail={"missing_fields": missing},
         )
 
     dossier = "\n".join(
-        [
-            f"{q.question_text}: "
-            f"{payload.answers.get(q.field_key, '')}"
-            for q in qs
-        ]
+        f"{q.question_text}: {answers.get(q.field_key, '')}"
+        for q in qs
     )
 
-    # ========================================================
-    # BUYER SUBMISSION
-    # ========================================================
-    # Buyer submission does NOT go directly to vendors.
-    # It stays SUBMITTED until admin approval.
-
+    # --------------------------------------------------------
+    # CREATE ENQUIRY
+    # --------------------------------------------------------
     e = Enquiry(
         buyer_id=user.id,
         domain_id=domain.id,
@@ -221,14 +206,57 @@ async def create_enquiry(
     db.add(e)
     db.flush()
 
-    # ========================================================
-    # AUTOMATIC DOMAIN-BASED VENDOR MATCHING
-    # ========================================================
+    # --------------------------------------------------------
+    # MATCHING RULES
+    #
+    # 1. Domain match is COMPULSORY.
+    # 2. Domain + Industry/Vertical = 100 points.
+    # 3. Domain only = 60 points.
+    # 4. Industry/Vertical only = NOT eligible.
+    # 5. Maximum 10 vendors, highest score first.
+    # --------------------------------------------------------
 
-    enquiry_domain = (
-        domain.name
-        .strip()
-        .casefold()
+    
+    def normalize_values(value):
+        if value is None:
+            return set()
+
+        # JSON string किंवा comma-separated string हाताळा
+        if isinstance(value, str):
+            value = value.strip()
+
+            if not value:
+                return set()
+
+            # domains हे JSON list स्वरूपात असू शकतात
+            import json
+            try:
+                parsed = json.loads(value)
+                if isinstance(parsed, list):
+                    value = parsed
+                else:
+                    value = [value]
+            except (json.JSONDecodeError, TypeError):
+                # industrial_verticals: comma-separated string
+                value = value.split(",")
+
+        if isinstance(value, (list, tuple, set)):
+            return {
+                str(item).strip().casefold()
+                for item in value
+                if item is not None and str(item).strip()
+            }
+
+        return set()
+
+
+    enquiry_domain = (domain.name or "").strip().casefold()
+
+    # Buyer industry is taken from the buyer profile.
+    buyer_profile = getattr(user, "buyer_profile", None)
+
+    buyer_industries = normalize_values(
+        getattr(buyer_profile, "industry", None)
     )
 
     vendors = (
@@ -241,83 +269,93 @@ async def create_enquiry(
         .all()
     )
 
-    matched_vendors = []
+    vendor_scores = []
 
     for vendor in vendors:
-
-        profile = vendor.vendor_profile
+        profile = getattr(vendor, "vendor_profile", None)
 
         if not profile:
             continue
 
-        vendor_domains = {
-            str(d).strip().casefold()
-            for d in (profile.domains or [])
-            if d
-        }
+        # DOMAIN MATCH IS REQUIRED
+        vendor_domains = normalize_values(
+            getattr(profile, "domains", None)
+        )
 
-        if enquiry_domain in vendor_domains:
-            matched_vendors.append(vendor)
+        if enquiry_domain not in vendor_domains:
+            continue
 
-    # Maximum 10 matched vendors
-    matched_vendors = matched_vendors[:10]
+        # Check vendor industrial verticals against buyer industry.
+        vendor_verticals = normalize_values(
+            getattr(profile, "industrial_verticals", None)
+        )
 
+        industry_match = bool(
+            buyer_industries & vendor_verticals
+        )
 
-    # ========================================================
+        # Domain match is 60; industry/vertical match adds 40.
+        score = 100.0 if industry_match else 60.0
+
+        vendor_scores.append((vendor, score))
+
+    # Best matches first; use vendor ID as a stable tie-breaker.
+    vendor_scores.sort(
+        key=lambda item: (-item[1], item[0].id)
+    )
+
+    # Maximum 10 vendors per enquiry.
+    vendor_scores = vendor_scores[:10]
+
+    matched_vendors = []
+
+    # --------------------------------------------------------
     # CREATE MATCH RECORDS
-    # ========================================================
-
-    for vendor in matched_vendors:
+    # --------------------------------------------------------
+    for vendor, score in vendor_scores:
+        matched_vendors.append(vendor)
 
         db.add(
             EnquiryMatch(
                 enquiry_id=e.id,
                 vendor_id=vendor.id,
-                match_score=100.0,
+                match_score=score,
                 notified=False,
             )
         )
 
+    # --------------------------------------------------------
+    # SAVE QUESTION ANSWERS
+    # --------------------------------------------------------
+    for q in qs:
+        db.add(
+            QuestionAnswer(
+                enquiry_id=e.id,
+                question_id=q.id,
+                answer=str(answers.get(q.field_key, "")),
+            )
+        )
 
-    # ========================================================
-    # UPDATE ENQUIRY STATUS
-    # ========================================================
-
+    # --------------------------------------------------------
+    # UPDATE STATUS
+    # --------------------------------------------------------
     if matched_vendors:
         e.status = EnquiryStatus.MATCHED.value
     else:
         e.status = EnquiryStatus.APPROVED.value
 
-    # ========================================================
-    # SAVE QUESTION ANSWERS
-    # ========================================================
-
-    for q in qs:
-
-        db.add(
-            QuestionAnswer(
-                enquiry_id=e.id,
-                question_id=q.id,
-                answer=payload.answers.get(
-                    q.field_key,
-                    "",
-                ),
-            )
-        )
-
-    # ========================================================
+    # --------------------------------------------------------
     # CRM EVENT
-    # ========================================================
-
+    # --------------------------------------------------------
     db.add(
         CRMEvent(
             enquiry_id=e.id,
             actor_id=user.id,
             event_type="enquiry_submitted",
             note=(
-                 f"Technical enquiry submitted. "
-                f"{len(matched_vendors)} matching vendor(s) "
-                f"found automatically."
+                "Technical enquiry submitted. "
+                f"{len(matched_vendors)} domain-matched vendor(s) "
+                "selected; industry/vertical matches ranked first."
             ),
         )
     )
@@ -325,58 +363,55 @@ async def create_enquiry(
     db.commit()
     db.refresh(e)
 
-    # ========================================================
-    # EMAIL → ADMIN
-    # ========================================================
-
-    # EMAIL → ADMIN
+    # --------------------------------------------------------
+    # EMAIL: ADMIN
+    # --------------------------------------------------------
     await send_enquiry_submitted_email(
         admin_email=settings.ADMIN_EMAIL,
         enquiry=e,
         buyer=user,
     )
 
-    # EMAIL → BUYER
+    # --------------------------------------------------------
+    # EMAIL: BUYER
+    # --------------------------------------------------------
     if user.email:
         await send_buyer_enquiry_confirmation_email(
             buyer=user,
             enquiry=e,
         )
 
-
-    # ========================================================
-    # EMAIL → MATCHED VENDORS
-    # ========================================================
-
+    # --------------------------------------------------------
+    # EMAIL: MATCHED VENDORS
+    # --------------------------------------------------------
     for vendor in matched_vendors:
-        if vendor.email:
-            await send_vendor_new_enquiry_email(
-                vendor=vendor,
-                enquiry=e,
-            )
+        if not vendor.email:
+            continue
 
-            match = (
-                db.query(EnquiryMatch)
-                .filter(
-                    EnquiryMatch.enquiry_id == e.id,
-                    EnquiryMatch.vendor_id == vendor.id,
-                )
-                .first()
-            )
+        await send_vendor_new_enquiry_email(
+            vendor=vendor,
+            enquiry=e,
+        )
 
-            if match:
-                match.notified = True
+        match = (
+            db.query(EnquiryMatch)
+            .filter(
+                EnquiryMatch.enquiry_id == e.id,
+                EnquiryMatch.vendor_id == vendor.id,
+            )
+            .first()
+        )
+
+        if match:
+            match.notified = True
 
     db.commit()
 
     return {
         "message": (
-            "Enquiry submitted and "
-            "matched with suitable vendors."
+            "Enquiry submitted and matched with suitable vendors."
             if matched_vendors
-            else
-            "Enquiry submitted. "
-            "No matching vendor found yet."
+            else "Enquiry submitted. No domain-matched vendor found."
         ),
         "enquiry_id": e.id,
         "status": e.status,
