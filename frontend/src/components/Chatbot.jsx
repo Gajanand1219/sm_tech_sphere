@@ -10,7 +10,7 @@ const INITIAL_SUGGESTIONS = [
   { icon: '♻️', text: 'Solid & Hazardous Waste' },
   { icon: '☀️', text: 'Solar & Renewables' },
   { icon: '🌱', text: 'Carbon & ESG' },
-  { icon: '🏭', text: 'SPCB Consents & Air Pollution' },
+  { icon: '🏭', text: 'Air Pollution & Environmental Legal Services' },
 ]
 
 /* =========================================================
