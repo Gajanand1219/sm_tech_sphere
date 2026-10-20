@@ -19,6 +19,10 @@ export default function ProfilePage() {
   const [saving, setSaving] = useState(false)
   const [success, setSuccess] = useState('')
 
+  const [forgotLoading, setForgotLoading] = useState(false)
+  const [forgotPopup, setForgotPopup] = useState(false)
+  const [forgotError, setForgotError] = useState('')
+
   const role = profile?.role || user?.role || 'buyer'
 
   // ============================================================
@@ -63,6 +67,34 @@ export default function ProfilePage() {
   // ============================================================
   // UPDATE PROFILE
   // ============================================================
+
+
+  const handleForgotPassword = async () => {
+  const businessEmail = form.email?.trim()
+
+  if (!businessEmail) {
+    setForgotError('Business email not found.')
+    return
+  }
+
+  try {
+    setForgotLoading(true)
+    setForgotError('')
+
+    await API.post('/auth/forgot-password', {
+      email: businessEmail,
+    })
+
+    setForgotPopup(true)
+  } catch (err) {
+    setForgotError(
+      err?.response?.data?.detail ||
+        'Unable to submit the request. Please try again.'
+    )
+  } finally {
+    setForgotLoading(false)
+  }
+}
 
 const handleUpdate = async () => {
   const changingPassword =
@@ -1374,9 +1406,37 @@ const handleUpdate = async () => {
                 />
               </div>
               <small className="profile-password-help">
-                Enter your current password to set a new password. If you don't know your current password, click **Forgot Password?** to reset it.<br></br>
-                Leave all password fields empty to update profile details only.
-              </small>
+                  Enter your current password to set a new password. If you don't know
+                  your current password, click{' '}
+
+                  <button
+                    type="button"
+                    onClick={handleForgotPassword}
+                    disabled={forgotLoading}
+                    style={{
+                      color: '#dc2626',
+                      background: 'none',
+                      border: 'none',
+                      padding: 0,
+                      font: 'inherit',
+                      fontWeight: 700,
+                      textDecoration: 'underline',
+                      cursor: forgotLoading ? 'wait' : 'pointer',
+                    }}
+                  >
+                    {forgotLoading ? 'Sending...' : 'Forgot Password?'}
+                  </button>
+
+                  {' '}to reset it.
+                  <br />
+                  Leave all password fields empty to update profile details only.
+
+                  {forgotError && (
+                    <span style={{ display: 'block', color: '#dc2626', marginTop: 6 }}>
+                      {forgotError}
+                    </span>
+                  )}
+                </small>
             </div>
           )}
 
@@ -1431,6 +1491,37 @@ const handleUpdate = async () => {
               </button>
             </div>
           )}
+
+          {forgotPopup && (
+              <div className="forgot-modal-overlay">
+                <div
+                  className="forgot-modal"
+                  role="dialog"
+                  aria-modal="true"
+                  aria-labelledby="forgot-modal-title"
+                >
+                  <div className="forgot-modal-icon">✉️</div>
+
+                  <h3 id="forgot-modal-title">Request Submitted!</h3>
+
+                  <p>
+                    If this business email is registered, you will receive a
+                    password reset email shortly.
+                  </p>
+
+                  <p className="forgot-modal-email">
+                    {form.email}
+                  </p>
+
+                  <button
+                    type="button"
+                    onClick={() => setForgotPopup(false)}
+                  >
+                    Got it
+                  </button>
+                </div>
+              </div>
+            )}
 
         </div>
 
