@@ -342,6 +342,7 @@ export default function RegistrationForm({ type }) {
         // ✅ दोन्ही multi-select arrays ला comma-separated string करा
         payload.area_of_work = (form.area_of_work || []).join(', ')
         payload.industrial_verticals = (form.industrial_verticals || []).join(', ')
+        payload.industry_type = (form.industry_type || []).join(', ')
       } else {
         // ✅ Buyer चा industry सुद्धा multi-select -> string
         payload.industry = (form.industry || []).join(', ')
@@ -407,12 +408,12 @@ export default function RegistrationForm({ type }) {
     area_of_work: geographicalTerritories,
     industrial_verticals: industrialVerticalOptions, // Vendor — Industrial Verticals
     industry: industrialVerticalOptions,             // Buyer — Industry Type (same data)
-     industry_type: industryTypeOptions,
+    industry_type: industryTypeOptions,
   }
 
   // फक्त Vendor Type हा single select आहे
   const selectOptionsMap = {
-    industry_type: industryTypeOptions,
+    // industry_type: industryTypeOptions,
   }
 
   const fieldDescriptions = {
