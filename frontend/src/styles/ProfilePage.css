@@ -205,6 +205,114 @@
 
 
 /* =========================================================
+   MODE BANNER
+   ========================================================= */
+
+.profile-mode-banner {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  flex-wrap: wrap;
+
+  padding: 18px 30px;
+
+  border-bottom: 1px solid rgba(15, 23, 42, 0.06);
+
+  background:
+    linear-gradient(
+      135deg,
+      rgba(240, 253, 244, 0.8),
+      rgba(239, 246, 255, 0.6)
+    );
+}
+
+.profile-mode-banner strong {
+  font-size: 15px;
+  font-weight: 800;
+  color: #0f172a;
+  letter-spacing: -0.01em;
+}
+
+.profile-mode-banner p {
+  margin: 0;
+  font-size: 12px;
+  color: #64748b;
+  font-weight: 500;
+}
+
+.profile-mode-banner--edit {
+  background:
+    linear-gradient(
+      135deg,
+      rgba(254, 252, 232, 0.9),
+      rgba(255, 247, 237, 0.7)
+    );
+}
+
+.profile-mode-banner--edit strong {
+  color: #b45309;
+}
+
+.profile-mode-banner--edit p {
+  color: #92400e;
+}
+
+.profile-mode-banner--view strong {
+  color: #166534;
+}
+
+.profile-mode-banner--view p {
+  color: #15803d;
+}
+
+.profile-mode-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+
+  padding: 6px 12px;
+
+  border-radius: 999px;
+
+  font-size: 11px;
+  font-weight: 800;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+
+  white-space: nowrap;
+}
+
+.profile-mode-badge--view {
+  background: #ecfdf5;
+  border: 1px solid #bbf7d0;
+  color: #15803d;
+}
+
+.profile-mode-badge--edit {
+  background: #fef3c7;
+  border: 1px solid #fde68a;
+  color: #b45309;
+}
+
+.profile-mode-badge::before {
+  content: "";
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: currentColor;
+}
+
+.profile-mode-badge--view::before {
+  background: #22c55e;
+}
+
+.profile-mode-badge--edit::before {
+  background: #f59e0b;
+}
+
+
+/* =========================================================
    SECTION TITLE
    ========================================================= */
 
@@ -377,6 +485,86 @@
   font-size: 11px;
 
   color: #94a3b8;
+}
+
+
+/* =========================================================
+   VIEW MODE - READ ONLY DISPLAY
+   ========================================================= */
+
+.profile-view-value {
+  width: 100%;
+  min-height: 46px;
+
+  display: flex;
+  align-items: center;
+
+  padding: 10px 14px;
+
+  border: 1px solid #e8edf3;
+  border-radius: 11px;
+
+  background: #f8fafc;
+
+  color: #0f172a;
+
+  font-size: 13px;
+  font-weight: 500;
+  line-height: 1.5;
+
+  box-sizing: border-box;
+
+  word-break: break-word;
+}
+
+.profile-view-value--empty {
+  color: #94a3b8;
+  font-style: italic;
+}
+
+.profile-view-value--email {
+  color: #1e40af;
+  font-weight: 600;
+}
+
+.profile-view-value--phone {
+  letter-spacing: 0.02em;
+}
+
+.profile-view-value--url {
+  color: #0d9488;
+  font-weight: 600;
+}
+
+.profile-view-label {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+
+  margin-bottom: 8px;
+
+  font-size: 12px;
+  font-weight: 700;
+
+  color: #64748b;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+}
+
+.profile-view-label span {
+  width: 25px;
+  height: 25px;
+
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+
+  border-radius: 7px;
+
+  background: #f1f5f9;
+
+  font-size: 13px;
+  text-transform: none;
 }
 
 
@@ -628,6 +816,8 @@
       #f8fbff,
       #eff6ff
     );
+
+  box-sizing: border-box;
 }
 
 
@@ -670,6 +860,83 @@
   color: #64748b;
 }
 
+.profile-security-note code {
+  display: inline-block;
+  margin-top: 6px;
+  padding: 5px 10px;
+  border-radius: 7px;
+  background: #eff6ff;
+  color: #1d4ed8;
+  font-size: 13px;
+  letter-spacing: 2px;
+}
+
+.profile-password-display {
+  font-size: 15px !important;
+  font-weight: 700 !important;
+  color: #0f172a !important;
+  letter-spacing: 0.15em;
+  margin: 4px 0 !important;
+}
+
+
+/* =========================================================
+   PASSWORD GRID (EDIT MODE)
+   ========================================================= */
+
+.profile-password-grid {
+  padding-top: 18px;
+}
+
+.profile-password-help {
+  grid-column: 1 / -1;
+  margin-top: 4px;
+  font-size: 11px;
+  color: #94a3b8;
+  line-height: 1.5;
+}
+
+.profile-password-field {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  min-width: 0;
+}
+
+.profile-password-field label {
+  font-size: 12px;
+  font-weight: 700;
+  color: #334155;
+}
+
+.profile-password-field input {
+  width: 100%;
+  height: 46px;
+  padding: 0 14px;
+  box-sizing: border-box;
+  border: 1px solid #dbe2ea;
+  border-radius: 11px;
+  background: #fff;
+  color: #0f172a;
+  font: inherit;
+  font-size: 13px;
+  outline: none;
+  transition: border-color 0.2s ease,
+              box-shadow 0.2s ease;
+}
+
+.profile-password-field input:focus {
+  border-color: #22c55e;
+  box-shadow: 0 0 0 4px rgba(34, 197, 94, 0.1);
+}
+
+.profile-password-field input:disabled {
+  background: #f8fafc;
+  border-color: #e2e8f0;
+  color: #64748b;
+}
+
 
 /* =========================================================
    ACTION AREA
@@ -686,6 +953,8 @@
   border-top: 1px solid #eef2f7;
 
   background: #fbfdff;
+
+  flex-wrap: wrap;
 }
 
 
@@ -762,6 +1031,11 @@
   box-shadow: none;
 }
 
+.profile-update-btn:focus-visible {
+  outline: 3px solid rgba(34, 197, 94, 0.3);
+  outline-offset: 3px;
+}
+
 
 /* =========================================================
    SUCCESS / ERROR
@@ -782,6 +1056,8 @@
 
   font-size: 12px;
   font-weight: 700;
+
+  line-height: 1.5;
 }
 
 
@@ -800,6 +1076,8 @@
 
   font-size: 12px;
   font-weight: 700;
+
+  line-height: 1.5;
 }
 
 
@@ -929,6 +1207,10 @@
     padding-right: 22px;
   }
 
+  .profile-mode-banner {
+    padding: 16px 22px;
+  }
+
 }
 
 
@@ -988,6 +1270,26 @@
     border-radius: 18px;
   }
 
+  .profile-mode-banner {
+    padding: 14px 17px;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 8px;
+  }
+
+  .profile-mode-banner strong {
+    font-size: 14px;
+  }
+
+  .profile-mode-banner p {
+    font-size: 11px;
+  }
+
+  .profile-mode-badge {
+    font-size: 10px;
+    padding: 5px 10px;
+  }
+
 
   .profile-section-title {
     padding: 17px 17px 13px;
@@ -1013,6 +1315,11 @@
 
   .profile-field input {
     height: 44px;
+  }
+
+  .profile-view-value {
+    min-height: 44px;
+    font-size: 13px;
   }
 
 
@@ -1062,6 +1369,10 @@
     box-sizing: border-box;
 
     margin: 0;
+  }
+
+  .profile-password-field input {
+    height: 44px;
   }
 
 }
