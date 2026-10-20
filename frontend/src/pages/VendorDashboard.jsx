@@ -485,7 +485,8 @@ export default function VendorDashboard() {
               </svg>
             </div>
             <div className="ev-hero-body">
-              <p className="ev-hero-welcome">Welcome,</p>
+             
+              <p className="ev-hero-welcome">Welcome Back,</p>
               <h1 className="ev-hero-company">
                 {companyName || 'Vendor'}
               </h1>
