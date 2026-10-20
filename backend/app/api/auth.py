@@ -6,6 +6,7 @@ from sqlalchemy.orm import Session
 from app.dependencies import require_roles
 from app.db import get_db
 import secrets
+from pydantic import BaseModel, Field, model_validator
 
 from app.models import (
     User,
@@ -48,6 +49,25 @@ router = APIRouter(
     prefix="/auth",
     tags=["Authentication"],
 )
+
+
+
+
+class ChangePasswordRequest(BaseModel):
+    current_password: str
+    new_password: str = Field(min_length=8, max_length=128)
+    confirm_password: str
+
+    @model_validator(mode="after")
+    def validate_passwords(self):
+        if self.new_password != self.confirm_password:
+            raise ValueError("New password and confirm password do not match.")
+
+        if self.current_password == self.new_password:
+            raise ValueError("New password must be different from the current password.")
+
+        return self
+
 
 
 # ============================================================
@@ -1175,6 +1195,45 @@ def update_my_profile(
             status_code=500,
             detail="Failed to update profile",
         )
+
+
+
+
+
+
+
+@router.post("/change-password")
+def change_password(
+    payload: ChangePasswordRequest,
+    user=Depends(require_roles("buyer", "vendor", "admin")),
+    db: Session = Depends(get_db),
+):
+    # Verify the current password
+    if not verify_password(
+        payload.current_password,
+        user.password_hash,
+    ):
+        raise HTTPException(
+            status_code=400,
+            detail="Current password is incorrect.",
+        )
+
+    # Hash the new password before saving
+    user.password_hash = hash_password(payload.new_password)
+
+    try:
+        db.commit()
+    except Exception as exc:
+        db.rollback()
+        print(f"[CHANGE PASSWORD ERROR] user={user.id}, error={exc}")
+        raise HTTPException(
+            status_code=500,
+            detail="Unable to update password.",
+        )
+
+    return {
+        "message": "Password updated successfully."
+    }
 
 
     
