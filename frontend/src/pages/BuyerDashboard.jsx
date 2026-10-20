@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react'
 import { Link, useNavigate, useSearchParams } from 'react-router-dom'
 import API from '../services/api'
 import '../styles/BuyerDashboard.css'
-
+import { useAuth } from '../context/AuthContext'
 /* =========================================================
    DOMAIN DATA
    ========================================================= */
@@ -229,6 +229,7 @@ export default function BuyerDashboard() {
   const [mobileOpen, setMobileOpen] = useState(false)
   const [notifOpen, setNotifOpen] = useState(false)
   const [userMenuOpen, setUserMenuOpen] = useState(false)
+  const { logout } = useAuth()
   const [readIds, setReadIds] = useState(() => {
     try {
       return JSON.parse(localStorage.getItem('buyer_read_notifs') || '[]')
@@ -696,7 +697,8 @@ export default function BuyerDashboard() {
                       className="ev-user-item ev-user-item--danger"
                       onClick={() => {
                         setUserMenuOpen(false)
-                        navigate('/logout')
+                        logout()
+                        navigate('/')
                       }}
                     >
                       <span>↪</span>
