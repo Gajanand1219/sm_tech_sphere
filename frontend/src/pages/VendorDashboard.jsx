@@ -3,7 +3,6 @@ import { Link, useNavigate } from 'react-router-dom'
 import API from '../services/api'
 import '../styles/BuyerDashboard.css'
 
-
 const MENU = [
   { id: 'new', l: 'New enquiry', i: '📥', d: 'Enquiries sent to you, not yet opened', to: '/vendor/enquiries?view=new', countKey: 'new' },
   { id: 'current', l: 'Current enquiry', i: '📝', d: 'Opened by you, quote not yet submitted', to: '/vendor/enquiries?view=current', countKey: 'current' },
@@ -195,6 +194,7 @@ export default function VendorDashboard() {
   const [loading, setLoading] = useState(true)
   const [mobileOpen, setMobileOpen] = useState(false)
   const [notifOpen, setNotifOpen] = useState(false)
+  const [userMenuOpen, setUserMenuOpen] = useState(false)
   const [readIds, setReadIds] = useState(() => {
     try {
       return JSON.parse(localStorage.getItem('vendor_read_notifs') || '[]')
@@ -462,17 +462,80 @@ export default function VendorDashboard() {
           </div>
 
           {/* 🖼️ COMPANY CHIP */}
-          <button
-            type="button"
-            className="ev-chip"
-            onClick={() => navigate('/profile')}
-            title={companyName || 'My Profile'}
-          >
-            <CompanyAvatar logo={companyLogo} name={companyName} />
-            {companyName && (
-              <span className="ev-chip-name">{companyName}</span>
+          <div className="ev-chip-wrap">
+            <button
+              type="button"
+              className="ev-chip"
+              onClick={() => setUserMenuOpen((open) => !open)}
+              aria-label="Open profile menu"
+              aria-expanded={userMenuOpen}
+              title={companyName || 'My Profile'}
+            >
+              <CompanyAvatar logo={companyLogo} name={companyName} />
+              {companyName && (
+                <span className="ev-chip-name">{companyName}</span>
+              )}
+              <span className="ev-chip-caret">▾</span>
+            </button>
+
+            {userMenuOpen && (
+              <>
+                <div
+                  className="ev-chip-scrim"
+                  onClick={() => setUserMenuOpen(false)}
+                />
+
+                <div className="ev-user-menu" role="menu">
+                  <div className="ev-user-head">
+                    <CompanyAvatar
+                      logo={companyLogo}
+                      name={companyName}
+                      size="lg"
+                    />
+                    <div>
+                      <b>{companyName || 'Vendor Account'}</b>
+                      <small>{profile?.email || 'Vendor Account'}</small>
+                    </div>
+                  </div>
+
+                  <button
+                    type="button"
+                    className="ev-user-item"
+                    onClick={() => {
+                      setUserMenuOpen(false)
+                      navigate('/profile?mode=view')
+                    }}
+                  >
+                    <span>👤</span> View Profile
+                  </button>
+
+                  <button
+                    type="button"
+                    className="ev-user-item"
+                    onClick={() => {
+                      setUserMenuOpen(false)
+                      navigate('/profile?mode=edit')
+                    }}
+                  >
+                    <span>✏️</span> Edit Profile
+                  </button>
+
+                  <div className="ev-user-sep" />
+
+                  <button
+                    type="button"
+                    className="ev-user-item ev-user-item--danger"
+                    onClick={() => {
+                      setUserMenuOpen(false)
+                      navigate('/logout')
+                    }}
+                  >
+                    <span>↪</span> Logout
+                  </button>
+                </div>
+              </>
             )}
-          </button>
+          </div>
         </header>
 
         <main className="ev-content">
@@ -485,7 +548,6 @@ export default function VendorDashboard() {
               </svg>
             </div>
             <div className="ev-hero-body">
-             
               <p className="ev-hero-welcome">Welcome Back,</p>
               <h1 className="ev-hero-company">
                 {companyName || 'Vendor'}
