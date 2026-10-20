@@ -331,21 +331,22 @@ export default function PanelLayout({
             .filter((item) => !item.end && item.label !== 'Dashboard')
             .map((item) => (
               <NavLink
-                key={item.label}
-                to={item.countKey ? `${item.to}?view=${item.countKey}` : item.to}
-                onClick={closeMobile}
-                className={({ isActive }) =>
-                  `ev-nav-item ${isActive || isViewActive(item.label) ? 'on' : ''}`
-                }
-              >
-                <span>{item.icon}</span><br></br>
-                {item.label}
-                {item.countKey && (role === 'buyer' || role === 'vendor') && (
-                  <span className="ev-nav-count">
-                    {counts[item.countKey] ?? 0}
-                  </span><br></br>
-                )}
-              </NavLink>
+  key={item.label}
+  to={item.countKey ? `${item.to}?view=${item.countKey}` : item.to}
+  onClick={closeMobile}
+  style={{ marginBottom: '8px' }}
+  className={({ isActive }) =>
+    `ev-nav-item ${isActive || isViewActive(item.label) ? 'on' : ''}`
+  }
+>
+  <span>{item.icon}</span>
+  {item.label}
+  {item.countKey && (role === 'buyer' || role === 'vendor') && (
+    <span className="ev-nav-count">
+      {counts[item.countKey] ?? 0}
+    </span>
+  )}
+</NavLink>
             ))}
         </nav>
 
