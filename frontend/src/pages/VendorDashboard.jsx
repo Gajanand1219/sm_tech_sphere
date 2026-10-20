@@ -318,7 +318,9 @@ export default function VendorDashboard() {
     } catch {}
   }
 
-  const handleBack = () => navigate('/vendor')
+  const handleBack = () => {
+    navigate('/')
+  }
 
   return (
     <div className="enviquo-dash">
