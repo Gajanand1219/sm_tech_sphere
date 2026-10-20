@@ -228,6 +228,7 @@ export default function BuyerDashboard() {
   const [error, setError] = useState('')
   const [mobileOpen, setMobileOpen] = useState(false)
   const [notifOpen, setNotifOpen] = useState(false)
+  const [userMenuOpen, setUserMenuOpen] = useState(false)
   const [readIds, setReadIds] = useState(() => {
     try {
       return JSON.parse(localStorage.getItem('buyer_read_notifs') || '[]')
@@ -629,15 +630,83 @@ export default function BuyerDashboard() {
             )}
           </div>
 
-          <button
-            type="button"
-            className="ev-chip"
-            onClick={() => navigate('/profile')}
-            title={companyName}
-          >
-            <CompanyAvatar logo={companyLogo} name={companyName} />
-            <span className="ev-chip-name">{companyName}</span>
-          </button>
+          
+            <div className="ev-chip-wrap">
+              <button
+                type="button"
+                className="ev-chip"
+                onClick={() => setUserMenuOpen((open) => !open)}
+                aria-label="Open profile menu"
+                aria-expanded={userMenuOpen}
+                title="My Profile"
+              >
+                <CompanyAvatar logo={companyLogo} name={companyName} />
+                <span className="ev-chip-name">{companyName}</span>
+                <span className="ev-chip-caret">▾</span>
+              </button>
+
+              {userMenuOpen && (
+                <>
+                  <div
+                    className="ev-chip-scrim"
+                    onClick={() => setUserMenuOpen(false)}
+                  />
+
+                  <div className="ev-user-menu" role="menu">
+                    <div className="ev-user-head">
+                      <CompanyAvatar
+                        logo={companyLogo}
+                        name={companyName}
+                        size="lg"
+                      />
+                      <div>
+                        <b>{companyName}</b>
+                        <small>{profile?.email || 'Buyer Account'}</small>
+                      </div>
+                    </div>
+
+                    <button
+                      type="button"
+                      className="ev-user-item"
+                      onClick={() => {
+                        setUserMenuOpen(false)
+                        navigate('/profile?mode=view')
+                      }}
+                    >
+                      <span>👤</span>
+                      View Profile
+                    </button>
+
+                    <button
+                      type="button"
+                      className="ev-user-item"
+                      onClick={() => {
+                        setUserMenuOpen(false)
+                        navigate('/profile?mode=edit')
+                      }}
+                    >
+                      <span>✏️</span>
+                      Edit Profile
+                    </button>
+
+                    <div className="ev-user-sep" />
+
+                    <button
+                      type="button"
+                      className="ev-user-item ev-user-item--danger"
+                      onClick={() => {
+                        setUserMenuOpen(false)
+                        navigate('/logout')
+                      }}
+                    >
+                      <span>↪</span>
+                      Logout
+                    </button>
+                  </div>
+                </>
+              )}
+            </div>
+
         </header>
 
         <main className="ev-content">
@@ -738,8 +807,7 @@ export default function BuyerDashboard() {
                 </div>
 
                 <div className="ev-hero-body">
-                 
-                   <p className="ev-hero-welcome">Welcome Back,</p>
+                  <p className="ev-hero-welcome">Welcome Back,</p>
                   <h1 className="ev-hero-company">{companyName}</h1>
                   <p className="ev-hero-to">
                     to <span className="ev-wm">ENVIQUO</span>
