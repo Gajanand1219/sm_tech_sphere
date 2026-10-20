@@ -1,3 +1,4 @@
+
 import { useState, useEffect, useRef } from 'react'
 import { useSearchParams, useNavigate } from 'react-router-dom'
 import API from '../services/api'
@@ -6,6 +7,9 @@ import '../styles/VerifyEmail.css'
 
 export default function VerifyEmail() {
   const [params] = useSearchParams()
+  const nav = useNavigate()
+  const { saveAuth } = useAuth()
+  const inputsRef = useRef([])
 
   const [email, setEmail] = useState(params.get('email') || '')
   const [digits, setDigits] = useState(['', '', '', '', '', ''])
@@ -13,77 +17,107 @@ export default function VerifyEmail() {
   const [msgType, setMsgType] = useState('success')
   const [error, setError] = useState('')
   const [loading, setLoading] = useState(false)
-  const [resendCooldown, setResendCooldown] = useState(0)
+  const [resendCooldown, setResendCooldown] = useState(
+    params.get('email') ? 60 : 0
+  )
   const [resending, setResending] = useState(false)
 
-  const nav = useNavigate()
-  const { saveAuth } = useAuth()
-  const inputsRef = useRef([])
+  const code = digits.join('')
+  const isComplete = digits.every((digit) => digit !== '')
 
-  /* AUTO-FOCUS FIRST BOX */
+  // Auto-focus first OTP box
   useEffect(() => {
-    if (email) inputsRef.current[0]?.focus()
+    if (email) {
+      inputsRef.current[0]?.focus()
+    }
   }, [email])
 
-  /* COUNTDOWN */
+  // 60-second countdown
   useEffect(() => {
     if (resendCooldown <= 0) return
-    const t = setTimeout(() => setResendCooldown((c) => c - 1), 1000)
-    return () => clearTimeout(t)
+
+    const timer = setTimeout(() => {
+      setResendCooldown((current) => Math.max(0, current - 1))
+    }, 1000)
+
+    return () => clearTimeout(timer)
   }, [resendCooldown])
 
-  const code = digits.join('')
-  const isComplete = code.length === 6 && digits.every((d) => d !== '')
-
-  /* HANDLE DIGIT INPUT */
+  // Handle OTP digit input
   const handleDigit = (index, value) => {
-    const v = value.replace(/\D/g, '').slice(-1)
+    const cleaned = value.replace(/\D/g, '')
+    const digit = cleaned.slice(-1)
+
     const next = [...digits]
-    next[index] = v
+    next[index] = digit
+
     setDigits(next)
-    setError('')
-
-    if (v && index < 5) {
-      inputsRef.current[index + 1]?.focus()
-    }
-  }
-
-  /* HANDLE KEY NAVIGATION */
-  const handleKeyDown = (index, e) => {
-    if (e.key === 'Backspace' && !digits[index] && index > 0) {
-      inputsRef.current[index - 1]?.focus()
-    }
-    if (e.key === 'ArrowLeft' && index > 0) {
-      inputsRef.current[index - 1]?.focus()
-    }
-    if (e.key === 'ArrowRight' && index < 5) {
-      inputsRef.current[index + 1]?.focus()
-    }
-  }
-
-  /* HANDLE PASTE */
-  const handlePaste = (e) => {
-    e.preventDefault()
-    const pasted = e.clipboardData
-      .getData('text')
-      .replace(/\D/g, '')
-      .slice(0, 6)
-    if (!pasted) return
-    const next = ['', '', '', '', '', '']
-    pasted.split('').forEach((ch, i) => (next[i] = ch))
-    setDigits(next)
-    const focusIdx = Math.min(pasted.length, 5)
-    inputsRef.current[focusIdx]?.focus()
-  }
-
-  /* SUBMIT */
-  const submit = async (e) => {
-    e.preventDefault()
     setError('')
     setMsg('')
 
+    if (digit && index < 5) {
+      inputsRef.current[index + 1]?.focus()
+    }
+  }
+
+  // Keyboard navigation
+  const handleKeyDown = (index, event) => {
+    if (
+      event.key === 'Backspace' &&
+      !digits[index] &&
+      index > 0
+    ) {
+      inputsRef.current[index - 1]?.focus()
+    }
+
+    if (event.key === 'ArrowLeft' && index > 0) {
+      inputsRef.current[index - 1]?.focus()
+    }
+
+    if (event.key === 'ArrowRight' && index < 5) {
+      inputsRef.current[index + 1]?.focus()
+    }
+  }
+
+  // Paste complete OTP
+  const handlePaste = (event) => {
+    event.preventDefault()
+
+    const pasted = event.clipboardData
+      .getData('text')
+      .replace(/\D/g, '')
+      .slice(0, 6)
+
+    if (!pasted) return
+
+    const next = ['', '', '', '', '', '']
+
+    pasted.split('').forEach((digit, index) => {
+      next[index] = digit
+    })
+
+    setDigits(next)
+    setError('')
+    setMsg('')
+
+    const focusIndex = Math.min(pasted.length, 5)
+    inputsRef.current[focusIndex]?.focus()
+  }
+
+  // Verify OTP
+  const submit = async (event) => {
+    event.preventDefault()
+
+    setError('')
+    setMsg('')
+
+    if (!email.trim()) {
+      setError('Please enter your email address.')
+      return
+    }
+
     if (!isComplete) {
-      setError('Please enter the complete 6-digit code.')
+      setError('Please enter the complete 6-digit OTP.')
       return
     }
 
@@ -91,65 +125,97 @@ export default function VerifyEmail() {
 
     try {
       const { data } = await API.post('/auth/verify-email', {
-        email,
-        code
+        email: email.trim(),
+        code,
       })
 
       saveAuth(data)
-      setMsg('Email verified successfully. Redirecting to dashboard…')
+
+      setMsg('Email verified successfully. Redirecting to dashboard...')
       setMsgType('success')
 
       setTimeout(() => {
-        if (data.role === 'admin') nav('/admin')
-        else if (data.role === 'buyer') nav('/buyer')
-        else if (data.role === 'vendor') nav('/vendor')
+        if (data.role === 'admin') {
+          nav('/admin')
+        } else if (data.role === 'buyer') {
+          nav('/buyer')
+        } else if (data.role === 'vendor') {
+          nav('/vendor')
+        } else {
+          nav('/login')
+        }
       }, 900)
     } catch (err) {
       setError(
-        err.response?.data?.detail || 'Verification failed. Please try again.'
+        err.response?.data?.detail ||
+          'Verification failed. Please try again.'
       )
+
       setDigits(['', '', '', '', '', ''])
-      inputsRef.current[0]?.focus()
+
+      setTimeout(() => {
+        inputsRef.current[0]?.focus()
+      }, 0)
     } finally {
       setLoading(false)
     }
   }
 
-  /* RESEND */
+  // Resend OTP
   const resend = async () => {
-    if (resendCooldown > 0 || resending) return
+    if (resendCooldown > 0 || resending || !email.trim()) {
+      return
+    }
+
     setResending(true)
     setError('')
     setMsg('')
 
     try {
-      await API.post('/auth/resend-verification', { email })
+      // Backend expects email as a query parameter
+      await API.post(
+        `/auth/resend-verification?email=${encodeURIComponent(
+          email.trim()
+        )}`
+      )
+
+      setDigits(['', '', '', '', '', ''])
+      setResendCooldown(60)
+
       setMsg('A new OTP has been sent to your email.')
       setMsgType('success')
-      setResendCooldown(60)
+
+      setTimeout(() => {
+        inputsRef.current[0]?.focus()
+      }, 0)
     } catch (err) {
-      setError(err.response?.data?.detail || 'Unable to resend code.')
+      setError(
+        err.response?.data?.detail ||
+          'Unable to resend OTP. Please try again.'
+      )
     } finally {
       setResending(false)
     }
   }
 
+  const formattedTime = `00:${String(resendCooldown).padStart(2, '0')}`
+
   return (
     <div className="ve-page">
-      {/* Background orbs */}
+      {/* Animated background */}
       <div className="ve-bg ve-bg--one" />
       <div className="ve-bg ve-bg--two" />
 
-      {/* ================= TOP BAR ================= */}
-
+      {/* Top bar */}
       <header className="ve-topbar">
         <div className="ve-brand">
           <div className="ve-brand__logo">
-            <img src="/logo2.jpeg" alt="SM Clean Tech" />
+            <img src="/logo2.jpeg" alt="SM TechSphere logo" />
           </div>
+
           <div>
-            <strong>SM Clean Tech</strong>
-            <span>Engineering Solutions</span>
+            <strong>SM TechSphere Pvt. Ltd.</strong>
+            {/* <span>Engineering Solutions</span> */}
           </div>
         </div>
 
@@ -163,86 +229,135 @@ export default function VerifyEmail() {
         </button>
       </header>
 
-      {/* ================= MAIN — CENTERED FORM ================= */}
-
+      {/* Verification card */}
       <main className="ve-main">
         <section className="ve-card">
           <div className="ve-card__header">
             <div className="ve-card__icon">✉️</div>
+
             <div>
               <span className="ve-kicker">Email Verification</span>
               <h2>Check your inbox</h2>
+
               <p className="ve-card__sub">
-                We sent a 6-digit code to your registered email.
+                We sent a 6-digit verification code to your email.
               </p>
             </div>
           </div>
 
-          <form onSubmit={submit} className="ve-form" noValidate>
-            {/* EMAIL */}
+          <form
+            onSubmit={submit}
+            className="ve-form"
+            noValidate
+          >
+            {/* Email */}
             <div className="ve-field">
-              <label>
+              <label htmlFor="verify-email">
                 <span className="ve-field__icon">📧</span>
                 Email address
               </label>
+
               <input
+                id="verify-email"
                 type="email"
                 value={email}
-                onChange={(e) => setEmail(e.target.value)}
+                onChange={(event) => {
+                  setEmail(event.target.value)
+                  setError('')
+                }}
                 placeholder="you@company.com"
                 autoComplete="email"
                 required
               />
             </div>
 
-            {/* OTP */}
+            {/* OTP inputs */}
             <div className="ve-otp">
               <label className="ve-otp__label">
                 <span className="ve-field__icon">🔐</span>
                 Verification code
               </label>
 
-              <div className="ve-otp__boxes" onPaste={handlePaste}>
-                {digits.map((d, i) => (
+              <div
+                className="ve-otp__boxes"
+                onPaste={handlePaste}
+              >
+                {digits.map((digit, index) => (
                   <input
-                    key={i}
-                    ref={(el) => (inputsRef.current[i] = el)}
+                    key={index}
+                    ref={(element) => {
+                      inputsRef.current[index] = element
+                    }}
                     type="text"
                     inputMode="numeric"
-                    maxLength={1}
-                    value={d}
-                    onChange={(e) => handleDigit(i, e.target.value)}
-                    onKeyDown={(e) => handleKeyDown(i, e)}
-                    onFocus={(e) => e.target.select()}
-                    className={`ve-otp__box ${d ? 'is-filled' : ''}`}
-                    aria-label={`Digit ${i + 1}`}
+                    autoComplete={
+                      index === 0 ? 'one-time-code' : 'off'
+                    }
+                    maxLength={6}
+                    value={digit}
+                    onChange={(event) =>
+                      handleDigit(index, event.target.value)
+                    }
+                    onKeyDown={(event) =>
+                      handleKeyDown(index, event)
+                    }
+                    onFocus={(event) => event.target.select()}
+                    className={`ve-otp__box ${
+                      digit ? 'is-filled' : ''
+                    }`}
+                    aria-label={`OTP digit ${index + 1}`}
                   />
                 ))}
               </div>
 
+              {/* OTP status and resend */}
               <div className="ve-otp__meta">
                 <span className="ve-otp__hint">
-                  {isComplete ? '✓ Code ready' : `${code.length}/6 digits`}
+                  {isComplete
+                    ? '✓ Code ready'
+                    : `${code.length}/6 digits`}
                 </span>
 
                 <button
                   type="button"
-                  className="ve-resend"
+                  className={`ve-resend ${
+                    resendCooldown === 0 && !resending
+                      ? 've-resend--active'
+                      : 've-resend--waiting'
+                  }`}
                   onClick={resend}
-                  disabled={resendCooldown > 0 || resending}
+                  disabled={
+                    resendCooldown > 0 ||
+                    resending ||
+                    !email.trim()
+                  }
                 >
-                  {resending
-                    ? 'Sending…'
-                    : resendCooldown > 0
-                    ? `Resend in ${resendCooldown}s`
-                    : 'Resend code'}
+                  {resending ? (
+                    <>
+                      <span className="ve-resend__spinner" />
+                      Sending OTP...
+                    </>
+                  ) : resendCooldown > 0 ? (
+                    <>
+                      <span className="ve-resend__clock">◷</span>
+                      Resend OTP in {formattedTime}
+                    </>
+                  ) : (
+                    <>
+                      <span className="ve-resend__icon">↻</span>
+                      Resend OTP
+                    </>
+                  )}
                 </button>
               </div>
             </div>
 
-            {/* MESSAGES */}
+            {/* Success message */}
             {msg && (
-              <div className={`ve-msg ve-msg--${msgType}`}>
+              <div
+                className={`ve-msg ve-msg--${msgType}`}
+                role="status"
+              >
                 <span className="ve-msg__icon">
                   {msgType === 'success' ? '✓' : '!'}
                 </span>
@@ -250,14 +365,18 @@ export default function VerifyEmail() {
               </div>
             )}
 
+            {/* Error message */}
             {error && (
-              <div className="ve-msg ve-msg--error">
+              <div
+                className="ve-msg ve-msg--error"
+                role="alert"
+              >
                 <span className="ve-msg__icon">!</span>
                 <span>{error}</span>
               </div>
             )}
 
-            {/* SUBMIT */}
+            {/* Verify button */}
             <button
               type="submit"
               className="ve-submit"
@@ -266,7 +385,7 @@ export default function VerifyEmail() {
               {loading ? (
                 <>
                   <span className="spinner" />
-                  Verifying…
+                  Verifying...
                 </>
               ) : (
                 <>
@@ -277,9 +396,10 @@ export default function VerifyEmail() {
               )}
             </button>
 
-            {/* FOOTER */}
+            {/* Footer */}
             <div className="ve-footer">
               <span>Wrong email?</span>
+
               <button
                 type="button"
                 onClick={() => nav('/register/buyer')}
