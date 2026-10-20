@@ -9,6 +9,7 @@ import ProtectedRoute from './components/ProtectedRoute'
 
 import Chatbot from './components/Chatbot'
 import FloatingChatButton from './components/FloatingChatButton'
+import LanguageToggle from './components/LanguageToggle'
 import ScrollToTop from './components/ScrollToTop'
 
 // Public pages
@@ -43,6 +44,7 @@ export default function App() {
     <AuthProvider>
       <BrowserRouter>
         <ScrollToTop />
+        <LanguageToggle />
         <Routes>
           {/* ============ PUBLIC ROUTES ============ */}
           <Route path="/" element={<Home />} />
