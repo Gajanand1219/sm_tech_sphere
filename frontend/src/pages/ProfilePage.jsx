@@ -41,9 +41,9 @@ export default function ProfilePage() {
       setProfile(data)
       setForm({
         ...data,
-        password: data.password || '',
         new_password: '',
         confirm_password: '',
+        current_password: '',
         domains: Array.isArray(data.domains)
           ? data.domains
           : [],
@@ -64,61 +64,104 @@ export default function ProfilePage() {
   // UPDATE PROFILE
   // ============================================================
 
-  const handleUpdate = async () => {
-    if (form.new_password || form.confirm_password) {
-      setError('Password update is not connected yet. Add a secure password-update endpoint to enable this feature.');
-      setSuccess('');
-      return;
-    }
+const handleUpdate = async () => {
+  const changingPassword =
+    Boolean(form.current_password) ||
+    Boolean(form.new_password) ||
+    Boolean(form.confirm_password)
 
-    try {
-      setSaving(true)
-      setError('')
+  if (changingPassword) {
+    if (
+      !form.current_password ||
+      !form.new_password ||
+      !form.confirm_password
+    ) {
+      setError('Fill all three password fields.')
       setSuccess('')
-
-      const payload = { ...form }
-
-      delete payload.id
-      delete payload.role
-      delete payload.email
-      delete payload.admin
-      delete payload.password
-      delete payload.new_password
-      delete payload.confirm_password
-
-      if (role === 'vendor') {
-        payload.domains = Array.isArray(payload.domains)
-          ? payload.domains
-          : []
-      }
-
-      if (payload.experience_years !== undefined) {
-        payload.experience_years =
-          payload.experience_years === ''
-            ? null
-            : Number(payload.experience_years)
-      }
-
-      await API.put('/auth/profile', payload)
-
-      setSuccess('Profile updated successfully!')
-
-      await loadProfile()
-
-      // Return to view mode after successful save
-      setTimeout(() => {
-        navigate('/profile', { replace: true })
-      }, 1200)
-    } catch (err) {
-      console.error('Profile update error:', err)
-
-      setError(
-        err?.response?.data?.detail ||
-        'Failed to update profile.'
-      )
-    } finally {
-      setSaving(false)
+      return
     }
+
+    if (form.new_password.length < 8) {
+      setError('New password must be at least 8 characters.')
+      setSuccess('')
+      return
+    }
+
+    if (form.new_password !== form.confirm_password) {
+      setError('New password and confirm password do not match.')
+      setSuccess('')
+      return
+    }
+
+    if (form.current_password === form.new_password) {
+      setError('New password must differ from current password.')
+      setSuccess('')
+      return
+    }
+  }
+
+  try {
+    setSaving(true)
+    setError('')
+    setSuccess('')
+
+    // Update profile details
+    const payload = { ...form }
+
+    delete payload.id
+    delete payload.role
+    delete payload.email
+    delete payload.admin
+    delete payload.password
+    delete payload.current_password
+    delete payload.new_password
+    delete payload.confirm_password
+
+    if (role === 'vendor') {
+      payload.domains = Array.isArray(payload.domains)
+        ? payload.domains
+        : []
+    }
+
+    if (payload.experience_years !== undefined) {
+      payload.experience_years =
+        payload.experience_years === ''
+          ? null
+          : Number(payload.experience_years)
+    }
+
+    await API.put('/auth/profile', payload)
+
+    // Change password only when password fields are filled
+    if (changingPassword) {
+      await API.post('/auth/change-password', {
+        current_password: form.current_password,
+        new_password: form.new_password,
+        confirm_password: form.confirm_password,
+      })
+    }
+
+    setSuccess(
+      changingPassword
+        ? 'Profile and password updated successfully!'
+        : 'Profile updated successfully!'
+    )
+
+    await loadProfile()
+
+    setTimeout(() => {
+      navigate('/profile', { replace: true })
+    }, 1200)
+  } catch (err) {
+    console.error('Profile update error:', err)
+
+    setError(
+      err?.response?.data?.detail ||
+      'Failed to update profile or password.'
+    )
+  } finally {
+    setSaving(false)
+  }
   }
 
   // ============================================================
@@ -1295,6 +1338,18 @@ export default function ProfilePage() {
           ) : (
             <div className="profile-grid profile-password-grid">
               <div className="profile-field">
+              <label>Current Password</label>
+              <input
+                type="password"
+                autoComplete="current-password"
+                value={form.current_password || ''}
+                onChange={(e) =>
+                  updateField('current_password', e.target.value)
+                }
+                placeholder="Enter current password"
+              />
+            </div>
+              <div className="profile-field">
                 <label>New Password</label>
                 <input
                   type="password"
@@ -1319,8 +1374,8 @@ export default function ProfilePage() {
                 />
               </div>
               <small className="profile-password-help">
-                Password changes will work after the backend password-update
-                logic is added.
+                Enter your current password to set a new password. If you don't know your current password, click **Forgot Password?** to reset it.<br></br>
+                Leave all password fields empty to update profile details only.
               </small>
             </div>
           )}
