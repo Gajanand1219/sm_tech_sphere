@@ -1414,3 +1414,86 @@
   }
 
 }
+
+
+
+
+.forgot-modal-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 9999;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+  background: rgba(15, 23, 42, 0.6);
+  backdrop-filter: blur(5px);
+}
+
+.forgot-modal {
+  width: 100%;
+  max-width: 420px;
+  padding: 30px 24px;
+  border-radius: 18px;
+  background: #fff;
+  text-align: center;
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.2);
+  animation: forgotPopupIn 0.2s ease-out;
+}
+
+.forgot-modal-icon {
+  width: 64px;
+  height: 64px;
+  margin: 0 auto 16px;
+  display: grid;
+  place-items: center;
+  border-radius: 50%;
+  background: #dcfce7;
+  font-size: 30px;
+}
+
+.forgot-modal h3 {
+  margin: 0 0 12px;
+  color: #0f172a;
+  font-size: 23px;
+}
+
+.forgot-modal p {
+  color: #64748b;
+  font-size: 14px;
+  line-height: 1.7;
+}
+
+.forgot-modal .forgot-modal-email {
+  color: #334155;
+  font-weight: 700;
+  overflow-wrap: anywhere;
+}
+
+.forgot-modal button {
+  width: 100%;
+  margin-top: 12px;
+  padding: 12px 18px;
+  border: none;
+  border-radius: 9px;
+  background: #16a34a;
+  color: #fff;
+  font-size: 15px;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.forgot-modal button:hover {
+  background: #15803d;
+}
+
+@keyframes forgotPopupIn {
+  from {
+    opacity: 0;
+    transform: translateY(10px) scale(0.98);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
