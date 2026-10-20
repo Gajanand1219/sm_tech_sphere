@@ -10,14 +10,14 @@ import './RegistrationForm.css'
 
 const buyerFields = [
   ['company_name', 'Company Name', 'text', true],
-  ['director_email', 'Director Email', 'email', true],
+  ['director_email', 'Permanent Email', 'email', true],
   ['industry', 'Industry Type', 'text', true],
   ['gst_number', 'GST Number', 'text', false],
   ['website', 'Website', 'url', true],
   ['head_office_contact', 'Head Office Contact', 'tel', false],
-  ['ehs_contact', 'EHS/EHS Head Contact', 'tel', false],
-  ['registered_address', 'Registered Address', 'text', true],
-  ['plant_location', 'Plant Location', 'text', true],
+  ['ehs_contact', 'EHS Head Contact', 'tel', false],
+  ['registered_address', 'Head Office Address', 'text', true],
+  ['plant_location', 'Plant Address', 'text', true],
 
   ['full_name', 'Full Name', 'text', true],
   ['email', 'Business Email', 'email', true],
@@ -28,13 +28,9 @@ const buyerFields = [
 
 const vendorFields = [
   ['company_name', 'Company Name', 'text', true],
-
   ['area_of_work', 'Geographical Territories', 'text', true],
-
   ['industrial_verticals', 'Industrial Verticals', 'text', true],
-
   ['industry_type', 'Vendor Type', 'text', true],
-
   ['experience_years', 'Experience (Years)', 'number', true],
   ['capacity', 'Capacity', 'text', false],
   ['specialization', 'Specialization', 'text', true],
@@ -53,31 +49,88 @@ const vendorFields = [
   ['confirm_password', 'Re-enter Password', 'password', true],
 ]
 
+/* =========================================================
+   STRUCTURED ADDRESS (Buyer + Vendor)
+   UI madhe 5 separate input, pan backend la ek string jate.
+   ========================================================= */
+
+const buyerAddressKeys = ['registered_address', 'plant_location']
+const vendorAddressKeys = ['address']
+
+const addressLabels = {
+  registered_address: 'Head Office Address',
+  plant_location: 'Plant Address',
+  address: 'Address',
+}
+
+// [part, label, placeholder]
+const addressParts = [
+  ['at', 'At', 'Village / Area'],
+  ['subdist', 'Sub-District', 'Taluka / Mandal'],
+  ['district', 'District', 'District'],
+  ['state', 'State', 'State'],
+  ['pincode', 'Pincode', '6-digit'],
+]
+
+const addressPartKey = (key, part) => `${key}__${part}`
+
+const buildAddressString = (form, key) =>
+  addressParts
+    .map(([part, label]) => `${label}: ${(form[addressPartKey(key, part)] || '').trim()}`)
+    .join(', ')
+
 const domains = [
   'Water & Wastewater Treatment',
   'Solid & Hazardous Waste',
   'Solar & Renewables',
   'Carbon & ESG',
-  'SPCB Consents & Air Pollution'
+  'Air Pollution & Environmental Legal Services',
 ]
 
 const geographicalTerritories = [
   'Pan India',
-  'Maharashtra',
-  'Telangana',
-  'Karnataka',
-  'Gujarat',
-  'Tamil Nadu',
+
+  // 28 States
   'Andhra Pradesh',
-  'Madhya Pradesh',
-  'Rajasthan',
-  'Delhi NCR',
-  'Uttar Pradesh',
-  'West Bengal',
-  'Kerala',
+  'Arunachal Pradesh',
+  'Assam',
+  'Bihar',
+  'Chhattisgarh',
+  'Goa',
+  'Gujarat',
   'Haryana',
+  'Himachal Pradesh',
+  'Jharkhand',
+  'Karnataka',
+  'Kerala',
+  'Madhya Pradesh',
+  'Maharashtra',
+  'Manipur',
+  'Meghalaya',
+  'Mizoram',
+  'Nagaland',
+  'Odisha',
   'Punjab',
-  'Other States / Union Territories',
+  'Rajasthan',
+  'Sikkim',
+  'Tamil Nadu',
+  'Telangana',
+  'Tripura',
+  'Uttar Pradesh',
+  'Uttarakhand',
+  'West Bengal',
+
+  // 8 Union Territories
+  'Andaman and Nicobar Islands',
+  'Chandigarh',
+  'Dadra and Nagar Haveli and Daman and Diu',
+  'Delhi (NCT)',
+  'Jammu and Kashmir',
+  'Ladakh',
+  'Lakshadweep',
+  'Puducherry',
+
+  // International
   'International',
 ]
 
@@ -132,8 +185,7 @@ const industrialVerticalOptions = [
   'Semiconductor & Advanced Materials',
   'Cold Storage & Food Warehousing',
   'Other Industries',
-];
-
+]
 
 const industryTypeOptions = [
   'Original Equipment Manufacturer (OEM)',
@@ -170,7 +222,7 @@ const industryTypeOptions = [
   'Project Management Consultant (PMC)',
   'Research & Development (R&D) Provider',
   'Other',
-];
+]
 
 /* =========================================================
    ERROR HELPER
@@ -208,7 +260,8 @@ function getErrorMessage(error) {
 
 export default function RegistrationForm({ type }) {
   const isBuyer = type === 'buyer'
-  const fields = isBuyer ? buyerFields : vendorFields
+
+  const structuredAddressKeys = isBuyer ? buyerAddressKeys : vendorAddressKeys
 
   const [form, setForm] = useState({})
   const [selected, setSelected] = useState([])
@@ -216,14 +269,17 @@ export default function RegistrationForm({ type }) {
   const [msgType, setMsgType] = useState('')
   const [loading, setLoading] = useState(false)
   const [showSuccess, setShowSuccess] = useState(false)
-  const [openMultiSelect, setOpenMultiSelect] = useState('');
+  const [openMultiSelect, setOpenMultiSelect] = useState('')
 
-  // ✅ multiSearch मध्ये आता तिन्ही multi-select keys
+  // kontya address madhe kiti fields dakhvli ahet (0 = fakt "At")
+  const [addrStep, setAddrStep] = useState({})
+
   const [multiSearch, setMultiSearch] = useState({
     area_of_work: '',
     industrial_verticals: '',
     industry: '',
-  });
+    industry_type: '',
+  })
 
   const nav = useNavigate()
 
@@ -254,25 +310,25 @@ export default function RegistrationForm({ type }) {
       'phone',
       'password',
       'company_name',
-      'website'
+      'website',
     ]
 
     if (!isBuyer) {
       requiredFields.push(
         'industry_type',
-        'address',
         'area_of_work',
         'industrial_verticals',
         'experience_years',
         'specialization'
       )
     } else {
-      requiredFields.push('industry', 'registered_address', 'plant_location')
+      requiredFields.push('industry')
     }
 
     for (const field of requiredFields) {
-      // ✅ multi-select fields साठी array length तपासा
-      if (['area_of_work', 'industrial_verticals', 'industry'].includes(field)) {
+      if (
+        ['area_of_work', 'industrial_verticals', 'industry', 'industry_type'].includes(field)
+      ) {
         const value = form[field]
         if (!Array.isArray(value) || value.length === 0) {
           return `Please select at least one ${field.replaceAll('_', ' ')}.`
@@ -283,6 +339,23 @@ export default function RegistrationForm({ type }) {
       if (!String(form[field] ?? '').trim()) {
         return `Please enter ${field.replaceAll('_', ' ')}.`
       }
+    }
+
+    // Structured address validation (buyer + vendor)
+    for (const key of structuredAddressKeys) {
+      const groupLabel = addressLabels[key]
+
+      for (const [part, partLabel] of addressParts) {
+        const value = String(form[addressPartKey(key, part)] ?? '').trim()
+        if (!value) {
+          // sagle fields dakhva mhanje user la kay baki ahe te disel
+          setAddrStep((prev) => ({ ...prev, [key]: addressParts.length - 1 }))
+          return `Please enter ${partLabel} in ${groupLabel}.`
+        }
+      }
+
+      const pin = String(form[addressPartKey(key, 'pincode')]).trim()
+      if (!/^\d{6}$/.test(pin)) return `Please enter a valid 6-digit pincode in ${groupLabel}.`
     }
 
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
@@ -335,17 +408,26 @@ export default function RegistrationForm({ type }) {
     try {
       const payload = { ...form }
 
+      // Temporary address part keys kadha — backend la disu naye
+      Object.keys(payload).forEach((k) => {
+        if (k.includes('__')) delete payload[k]
+      })
+
       if (!isBuyer) {
         payload.experience_years = Number(form.experience_years)
         payload.domains = selected
 
-        // ✅ दोन्ही multi-select arrays ला comma-separated string करा
         payload.area_of_work = (form.area_of_work || []).join(', ')
         payload.industrial_verticals = (form.industrial_verticals || []).join(', ')
         payload.industry_type = (form.industry_type || []).join(', ')
+
+        // single string, same key -> backend unchanged
+        payload.address = buildAddressString(form, 'address')
       } else {
-        // ✅ Buyer चा industry सुद्धा multi-select -> string
         payload.industry = (form.industry || []).join(', ')
+
+        payload.registered_address = buildAddressString(form, 'registered_address')
+        payload.plant_location = buildAddressString(form, 'plant_location')
       }
 
       const response = await API.post(`/auth/register/${type}`, payload)
@@ -357,10 +439,8 @@ export default function RegistrationForm({ type }) {
       setMsg(successMessage)
       setMsgType('success')
 
-      /* SHOW SUCCESS POPUP */
       setShowSuccess(true)
 
-      /* AUTO-REDIRECT AFTER 3 SEC */
       setTimeout(() => {
         nav(`/verify-email?email=${encodeURIComponent(form.email.trim())}`)
       }, 3000)
@@ -378,7 +458,9 @@ export default function RegistrationForm({ type }) {
     const icons = {
       full_name: '👤',
       email: '✉️',
+      director_email: '✉️',
       phone: '📱',
+      contact_2: '📱',
       password: '🔐',
       confirm_password: '🔐',
       company_name: '🏢',
@@ -396,25 +478,21 @@ export default function RegistrationForm({ type }) {
       experience_years: '📊',
       capacity: '⚡',
       specialization: '🎯',
-      msme_number: '📄'
+      msme_number: '📄',
     }
     return icons[key] || '•'
   }
 
   /* ================= RENDER FIELD ================= */
 
-  // ✅ आता तिन्ही keys multi-select आहेत — समान data
   const multiSelectOptions = {
     area_of_work: geographicalTerritories,
-    industrial_verticals: industrialVerticalOptions, // Vendor — Industrial Verticals
-    industry: industrialVerticalOptions,             // Buyer — Industry Type (same data)
+    industrial_verticals: industrialVerticalOptions,
+    industry: industrialVerticalOptions,
     industry_type: industryTypeOptions,
   }
 
-  // फक्त Vendor Type हा single select आहे
-  const selectOptionsMap = {
-    // industry_type: industryTypeOptions,
-  }
+  const selectOptionsMap = {}
 
   const fieldDescriptions = {
     area_of_work: 'Select all regions where your company provides services.',
@@ -423,23 +501,88 @@ export default function RegistrationForm({ type }) {
     industry_type: 'Select your primary business category.',
   }
 
-  const renderField = ([key, label, kind = 'text', required = false]) => {
+  /* ---------- Structured address: At -> Enter -> Sub-District -> ... ---------- */
+
+  const renderAddressField = ([key, label, , required]) => {
+    const step = addrStep[key] ?? 0 // last visible index
+
+    return (
+      <div className="field-group field-group--wide address-group" key={key}>
+        <label>
+          <span className="field-icon">{getIcon(key)}</span>
+          {label}
+          {required && <span className="required-star">*</span>}
+        </label>
+
+        <div className="address-row">
+          {addressParts.map(([part, partLabel, placeholder], idx) => {
+            if (idx > step) return null
+
+            const fieldKey = addressPartKey(key, part)
+            const isPin = part === 'pincode'
+            const value = form[fieldKey] ?? ''
+
+            return (
+              <div className="address-cell" key={fieldKey}>
+                <span className="address-cell-label">{partLabel}</span>
+                <input
+                  id={fieldKey}
+                  name={fieldKey}
+                  type="text"
+                  inputMode={isPin ? 'numeric' : 'text'}
+                  maxLength={isPin ? 6 : undefined}
+                  autoFocus={idx > 0}
+                  value={value}
+                  onChange={(e) =>
+                    updateField(
+                      fieldKey,
+                      isPin ? e.target.value.replace(/\D/g, '') : e.target.value
+                    )
+                  }
+                  onKeyDown={(e) => {
+                    if (e.key !== 'Enter') return
+                    e.preventDefault() // form submit hou naye
+                    if (!String(value).trim()) return
+                    if (idx < addressParts.length - 1) {
+                      setAddrStep((prev) => ({
+                        ...prev,
+                        [key]: Math.max(prev[key] ?? 0, idx + 1),
+                      }))
+                    }
+                  }}
+                  placeholder={placeholder}
+                />
+              </div>
+            )
+          })}
+        </div>
+
+        {step < addressParts.length - 1 && (
+          <small className="select-help">
+            Fill the field and press Enter to add the next one.
+          </small>
+        )}
+      </div>
+    )
+  }
+
+  const renderField = (fieldDef) => {
+    const [key, label, kind = 'text', required = false] = fieldDef
+
+    // Buyer: Head Office Address & Plant Address | Vendor: Address
+    if (structuredAddressKeys.includes(key)) {
+      return renderAddressField(fieldDef)
+    }
+
     const isMultiSelect = Boolean(multiSelectOptions[key])
     const isSelect = Boolean(selectOptionsMap[key])
     const options = multiSelectOptions[key] || selectOptionsMap[key] || []
 
-    // Vendor Type साठी white color class
     const selectWhiteClass = key === 'industry_type' ? 'registration-select--white' : ''
 
     return (
       <div
-        className={`field-group ${
-          key === 'registered_address' ||
-          key === 'plant_location' ||
-          key === 'address'
-            ? 'field-group--wide'
-            : ''
-        } ${isMultiSelect || isSelect ? 'field-group--select' : ''}`}
+        className={`field-group ${isMultiSelect || isSelect ? 'field-group--select' : ''}`}
         key={key}
       >
         <label htmlFor={key}>
@@ -452,24 +595,18 @@ export default function RegistrationForm({ type }) {
           <div className="multi-select-wrap">
             <button
               type="button"
-              className={`multi-select-trigger ${
-                openMultiSelect === key ? 'is-open' : ''
-              }`}
+              className={`multi-select-trigger ${openMultiSelect === key ? 'is-open' : ''}`}
               aria-expanded={openMultiSelect === key}
               onClick={() => {
-                setOpenMultiSelect((prev) => (prev === key ? '' : key));
-                setMultiSearch((prev) => ({ ...prev, [key]: '' }));
+                setOpenMultiSelect((prev) => (prev === key ? '' : key))
+                setMultiSearch((prev) => ({ ...prev, [key]: '' }))
               }}
             >
               <span className="multi-select-trigger-content">
                 {Array.isArray(form[key]) && form[key].length > 0 ? (
-                  <span className="multi-select-summary">
-                    {form[key].length} selected
-                  </span>
+                  <span className="multi-select-summary">{form[key].length} selected</span>
                 ) : (
-                  <span className="multi-select-placeholder">
-                    Select {label}
-                  </span>
+                  <span className="multi-select-placeholder">Select {label}</span>
                 )}
               </span>
 
@@ -516,58 +653,45 @@ export default function RegistrationForm({ type }) {
                 <div className="multi-select-options">
                   {options
                     .filter((option) =>
-                      option
-                        .toLowerCase()
-                        .includes((multiSearch[key] || '').toLowerCase())
+                      option.toLowerCase().includes((multiSearch[key] || '').toLowerCase())
                     )
                     .map((option) => {
-                      const checked = (form[key] || []).includes(option);
+                      const checked = (form[key] || []).includes(option)
 
                       return (
                         <label
                           key={option}
-                          className={`multi-select-option ${
-                            checked ? 'is-selected' : ''
-                          }`}
+                          className={`multi-select-option ${checked ? 'is-selected' : ''}`}
                         >
                           <input
                             type="checkbox"
                             checked={checked}
                             onChange={() => {
-                              const current = form[key] || [];
+                              const current = form[key] || []
 
                               updateField(
                                 key,
                                 checked
                                   ? current.filter((item) => item !== option)
                                   : [...current, option]
-                              );
+                              )
                             }}
                           />
 
                           <span>{option}</span>
-                          {checked && (
-                            <span className="multi-select-check">✓</span>
-                          )}
+                          {checked && <span className="multi-select-check">✓</span>}
                         </label>
-                      );
+                      )
                     })}
 
                   {options.filter((option) =>
-                    option
-                      .toLowerCase()
-                      .includes((multiSearch[key] || '').toLowerCase())
-                  ).length === 0 && (
-                    <p className="multi-select-empty">No options found.</p>
-                  )}
+                    option.toLowerCase().includes((multiSearch[key] || '').toLowerCase())
+                  ).length === 0 && <p className="multi-select-empty">No options found.</p>}
                 </div>
 
                 <div className="multi-select-footer">
                   <span>{(form[key] || []).length} selected</span>
-                  <button
-                    type="button"
-                    onClick={() => setOpenMultiSelect('')}
-                  >
+                  <button type="button" onClick={() => setOpenMultiSelect('')}>
                     Done
                   </button>
                 </div>
@@ -579,37 +703,35 @@ export default function RegistrationForm({ type }) {
         ) : isSelect ? (
           <>
             <select
-  id={key}
-  name={key}
-  className={`registration-select ${selectWhiteClass}`.trim()}
-  style={{
-    backgroundColor: '#ffffff',
-    color: '#000000',
-    border: '1px solid #d1d5db',
-  }}
-  value={form[key] ?? ''}
-  onChange={(e) => updateField(key, e.target.value)}
-  required={required}
->
-  <option value="" style={{ backgroundColor: '#ffffff', color: '#000000' }}>
-    Select {label}
-  </option>
+              id={key}
+              name={key}
+              className={`registration-select ${selectWhiteClass}`.trim()}
+              style={{
+                backgroundColor: '#ffffff',
+                color: '#000000',
+                border: '1px solid #d1d5db',
+              }}
+              value={form[key] ?? ''}
+              onChange={(e) => updateField(key, e.target.value)}
+              required={required}
+            >
+              <option value="" style={{ backgroundColor: '#ffffff', color: '#000000' }}>
+                Select {label}
+              </option>
 
-  {options.map((option) => (
-    <option
-      key={option}
-      value={option}
-      style={{ backgroundColor: '#ffffff', color: '#000000' }}
-    >
-      {option}
-    </option>
-  ))}
-</select>
+              {options.map((option) => (
+                <option
+                  key={option}
+                  value={option}
+                  style={{ backgroundColor: '#ffffff', color: '#000000' }}
+                >
+                  {option}
+                </option>
+              ))}
+            </select>
 
             {fieldDescriptions[key] && (
-              <small className="select-help">
-                {fieldDescriptions[key]}
-              </small>
+              <small className="select-help">{fieldDescriptions[key]}</small>
             )}
           </>
         ) : (
@@ -629,6 +751,7 @@ export default function RegistrationForm({ type }) {
       </div>
     )
   }
+
   /* ================= RENDER ================= */
 
   return (
@@ -645,11 +768,10 @@ export default function RegistrationForm({ type }) {
       <div className="registration-topbar">
         <div className="registration-brand">
           <div className="registration-brand-logo">
-            <img src="/logo2.jpeg" alt="SM Clean Tech" />
+            <img src="/logo2.jpeg" alt="SM TechSphere Pvt. Ltd." />
           </div>
           <div>
-            <strong>SM Clean Tech</strong>
-            <span>Engineering Solutions</span>
+            <strong>SM TechSphere Pvt. Ltd.</strong>
           </div>
         </div>
 
@@ -659,7 +781,7 @@ export default function RegistrationForm({ type }) {
         </button>
       </div>
 
-      {/* ================= MAIN — CENTERED FORM ================= */}
+      {/* ================= MAIN ================= */}
 
       <main className="registration-main registration-main--centered">
         <section className="registration-card">
@@ -670,8 +792,7 @@ export default function RegistrationForm({ type }) {
                 {isBuyer ? 'BUYER REGISTRATION' : 'VENDOR REGISTRATION'}
               </span>
               <h2>Create Your {isBuyer ? 'Buyer' : 'Vendor'} Account</h2>
-              <p>                Fill In Your Business Information To Get Started.
-              </p>
+              <p>Fill In Your Business Information To Get Started.</p>
             </div>
 
             <div className={`role-icon ${isBuyer ? 'role-icon--buyer' : 'role-icon--vendor'}`}>
@@ -680,13 +801,8 @@ export default function RegistrationForm({ type }) {
           </div>
 
           <form onSubmit={submit} className="modern-registration-form" noValidate>
-            {/* =====================================================
-                  BUYER REGISTRATION
-              ===================================================== */}
-
             {isBuyer ? (
               <>
-
                 {/* SECTION 01 — BUSINESS INFORMATION */}
                 <div className="form-section-title">
                   <span>01</span>
@@ -705,7 +821,7 @@ export default function RegistrationForm({ type }) {
                         'gst_number',
                         'website',
                         'head_office_contact',
-                        'ehs_contact'
+                        'ehs_contact',
                       ].includes(key)
                     )
                     .map(renderField)}
@@ -720,24 +836,13 @@ export default function RegistrationForm({ type }) {
                 <div className="registration-grid">
                   {buyerFields
                     .filter(([key]) =>
-                      [
-                        'full_name',
-                        'email',
-                        'phone',
-                        'password',
-                        'confirm_password'
-                      ].includes(key)
+                      ['full_name', 'email', 'phone', 'password', 'confirm_password'].includes(key)
                     )
                     .map(renderField)}
                 </div>
-
               </>
             ) : (
               <>
-                {/* =================================================
-                    VENDOR REGISTRATION
-                ================================================= */}
-
                 {/* SECTION 01 — BUSINESS INFORMATION */}
                 <div className="form-section-title">
                   <span>01</span>
@@ -752,7 +857,6 @@ export default function RegistrationForm({ type }) {
                         'industry_type',
                         'address',
                         'industrial_verticals',
-
                         'area_of_work',
                         'experience_years',
                         'capacity',
@@ -761,36 +865,16 @@ export default function RegistrationForm({ type }) {
                         'msme_number',
                         'website',
                         'contact_2',
-                        'director_email'
+                        'director_email',
                       ].includes(key)
                     )
                     .map(renderField)}
                 </div>
 
-                {/* SECTION 02 — ACCOUNT INFORMATION */}
-                <div className="form-section-title">
-                  <span>02</span>
-                  Account Information
-                </div>
-
-                <div className="registration-grid">
-                  {vendorFields
-                    .filter(([key]) =>
-                      [
-                        'full_name',
-                        'email',
-                        'phone',
-                        'password',
-                        'confirm_password'
-                      ].includes(key)
-                    )
-                    .map(renderField)}
-                </div><br />
-
-                {/* SECTION 03 — TECHSPHERE DOMAINS */}
+                {/* SECTION 02 — TECHSPHERE DOMAINS */}
                 <div className="domain-section">
                   <div className="form-section-title">
-                    <span>03</span>
+                    <span>02</span>
                     TECHSPHERE Domains
                     <span className="required-star">*</span>
                   </div>
@@ -807,20 +891,29 @@ export default function RegistrationForm({ type }) {
                         <button
                           type="button"
                           key={domain}
-                          className={`domain-card ${
-                            active ? 'domain-card--active' : ''
-                          }`}
+                          className={`domain-card ${active ? 'domain-card--active' : ''}`}
                           onClick={() => toggleDomain(domain)}
                         >
-                          <span className="domain-check">
-                            {active ? '✓' : '+'}
-                          </span>
-
+                          <span className="domain-check">{active ? '✓' : '+'}</span>
                           <span>{domain}</span>
                         </button>
                       )
                     })}
                   </div>
+                </div>
+
+                {/* SECTION 03 — ACCOUNT INFORMATION */}
+                <div className="form-section-title">
+                  <span>03</span>
+                  Account Information
+                </div>
+
+                <div className="registration-grid">
+                  {vendorFields
+                    .filter(([key]) =>
+                      ['full_name', 'email', 'phone', 'password', 'confirm_password'].includes(key)
+                    )
+                    .map(renderField)}
                 </div>
               </>
             )}
@@ -902,9 +995,7 @@ export default function RegistrationForm({ type }) {
               <strong>{form.email}</strong>
             </p>
 
-            <p className="success-modal__hint">
-              Redirecting you to verify your email...
-            </p>
+            <p className="success-modal__hint">Redirecting you to verify your email...</p>
 
             <div className="success-modal__progress">
               <div className="success-modal__bar" />
