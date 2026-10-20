@@ -544,15 +544,15 @@ export default function BuyerDashboard() {
           <button
             type="button"
             className="ev-back-btn"
-            onClick={() => navigate('/buyer')}
-            title="Back to Dashboard"
-          >
+            onClick={() => navigate(isListingView ? '/buyer' : '/')}
+            title={isListingView ? 'Back to Dashboard' : 'Back to Home'}
+            >
             ← Back
-          </button>
+            </button>
 
-          <span className="ev-top-title">
+            <span className="ev-top-title">
             {isListingView ? heading.title : 'Dashboard'}
-          </span>
+            </span>
 
           <span className="ev-sp" />
 
