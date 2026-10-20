@@ -496,7 +496,7 @@ export default function Home() {
               <span className="section-label">Our Network</span>
               <h2>Trusted Industrial Network</h2>
               <p>
-                Connecting verified industrial buyers with approved engineering and EPC service providers through the Techsphere network.
+                Connecting verified industrial buyers with approved engineering and EPC service providers through the SM Techsphere Pvt. Ltd. network.
               </p>
             </div>
 
@@ -563,7 +563,7 @@ export default function Home() {
 
                 <div className="partner-network-footer">
                   <span className="network-status-dot" />
-                 Verified Techsphere Service Providers
+                 Verified SM Techsphere Pvt. Ltd. Service Providers
                 </div>
               </div>
 
