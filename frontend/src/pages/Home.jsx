@@ -257,7 +257,7 @@ export default function Home() {
               </p>
 
               <p className="hero__description" data-reveal>
-                We connect genuine industrial requirements with qualified engineering, EPC, and technology service providers through a structured and transparent technical matching platform.
+                We connect genuine industrial requirements with qualified  EPC, and technology service providers through a structured and transparent technical matching platform.
               </p>
 
               <div className="hero__buttons" data-reveal>
