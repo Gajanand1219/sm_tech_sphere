@@ -44,7 +44,7 @@ export default function App() {
     <AuthProvider>
       <BrowserRouter>
         <ScrollToTop />
-        <LanguageToggle />
+       
         <Routes>
           {/* ============ PUBLIC ROUTES ============ */}
           <Route path="/" element={<Home />} />
