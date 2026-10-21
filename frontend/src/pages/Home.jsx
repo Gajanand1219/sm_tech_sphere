@@ -380,7 +380,7 @@ export default function Home() {
         <section className="about" id="about">
           <div className="section-container">
             <div className="section-heading" data-reveal>
-              <span className="section-label">ABOUT US</span>
+              <span className="section-label">About Us</span>
               <h2>Who We Are</h2>
               <p>
                 SM Techsphere Pvt. Ltd. is an industrial B2B platform designed to connect genuine project requirements with relevant engineering, EPC, and technology specialists. We structure requirements, technical information, and matching workflows to make industrial project discovery simpler and more organized.
@@ -454,7 +454,7 @@ export default function Home() {
         <section className="vision-mission">
           <div className="section-container">
             <div className="section-heading center" data-reveal>
-              <span className="section-label">OUR PURPOSE</span>
+              <span className="section-label">Our Purpose</span>
               <h2>VISION &amp; MISSION</h2>
             </div>
 
