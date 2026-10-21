@@ -249,7 +249,7 @@ export default function Home() {
               </span>
 
               <h5 className="hero__title" data-reveal>
-                SM Techsphere Pvt. Ltd.
+                SM TechSphere Pvt. Ltd.
               </h5>
 
               <p className="hero__tagline" data-reveal>
@@ -383,7 +383,7 @@ export default function Home() {
               <span className="section-label">About Us</span>
               <h2>Who We Are</h2>
               <p>
-                SM Techsphere Pvt. Ltd. is an industrial B2B platform designed to connect genuine project requirements with relevant engineering, EPC, and technology specialists. We structure requirements, technical information, and matching workflows to make industrial project discovery simpler and more organized.
+                SM TechSphere Pvt. Ltd. is an industrial B2B platform designed to connect genuine project requirements with relevant engineering, EPC, and technology specialists. We structure requirements, technical information, and matching workflows to make industrial project discovery simpler and more organized.
               </p>
             </div>
                         
@@ -496,7 +496,7 @@ export default function Home() {
               <span className="section-label">Our Network</span>
               <h2>Trusted Industrial Network</h2>
               <p>
-                Connecting verified industrial buyers with approved engineering and EPC service providers through the SM Techsphere Pvt. Ltd. network.
+                Connecting verified industrial buyers with approved engineering and EPC service providers through the SM TechSphere Pvt. Ltd. network.
               </p>
             </div>
 
@@ -563,7 +563,7 @@ export default function Home() {
 
                 <div className="partner-network-footer">
                   <span className="network-status-dot" />
-                 Verified SM Techsphere Pvt. Ltd. Service Providers
+                 Verified SM TechSphere Pvt. Ltd. Service Providers
                 </div>
               </div>
 
@@ -912,7 +912,7 @@ export default function Home() {
                   className="footer__logo-image"
                 />
 
-                <p>SM Techsphere Pvt. Ltd.</p>
+                <p>SM TechSphere Pvt. Ltd.</p>
                 <span>Diagnose. Match. Solution.</span>
               </div>
 
@@ -934,7 +934,7 @@ export default function Home() {
               <div className="footer-column footer-contact">
                 <h4>Contact</h4>
                  <p>
-                   SM Techsphere Pvt. Ltd.
+                   SM TechSphere Pvt. Ltd.
                 </p>
                 <p>
                   Email:{" "}
@@ -950,7 +950,7 @@ export default function Home() {
             </div>
 
             <div className="footer-bottom">
-              <span>© 2026  SM Techsphere Pvt. Ltd.</span>
+              <span>© 2026  SM TechSphere Pvt. Ltd.</span>
               <span>Water • Waste • Solar • ESG • SPCB</span>
             </div>
           </div>
