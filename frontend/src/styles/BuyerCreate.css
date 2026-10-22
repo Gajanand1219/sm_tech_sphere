@@ -2193,7 +2193,6 @@
   .ev-opt.on { padding: 11px 13px; }
 }
 
-
 /* Keep enquiry navigation buttons clickable */
 .ev-actions,
 .ev-report-actions {
@@ -2206,4 +2205,212 @@
   position: relative;
   z-index: 102;
   pointer-events: auto;
+}
+
+
+.ev-special-note {
+  margin-top: 24px;
+  padding: 20px;
+  border: 1px solid #dce6f0;
+  border-radius: 12px;
+  background: #f8fbff;
+}
+
+.ev-special-note textarea {
+  width: 100%;
+  min-height: 100px;
+  margin-top: 12px;
+  padding: 12px 14px;
+  border: 1px solid #cbd8e6;
+  border-radius: 8px;
+  font: inherit;
+  resize: vertical;
+  box-sizing: border-box;
+}
+
+.ev-special-note textarea:focus {
+  outline: none;
+  border-color: #1e9bc9;
+  box-shadow: 0 0 0 3px rgba(30, 155, 201, 0.12);
+}
+
+.ev-special-note-review {
+  margin-top: 20px;
+  padding: 16px;
+  border: 1px solid #dce6f0;
+  border-radius: 10px;
+  overflow-wrap: anywhere;
+}
+
+.ev-special-note-review p {
+  white-space: pre-wrap;
+  color: #183958;
+  line-height: 1.6;
+}
+
+
+/* ===== Technical Report Upload ===== */
+
+.ev-panel .ev-question input[type="file"] {
+  display: block;
+  width: 100%;
+  margin-top: 10px;
+  padding: 14px;
+  border: 1.5px dashed #94a3b8;
+  border-radius: 12px;
+  background: #f8fafc;
+  color: #334155;
+  font-size: 14px;
+  cursor: pointer;
+  transition: border-color 0.2s ease, background 0.2s ease;
+  box-sizing: border-box;
+}
+
+.ev-panel .ev-question input[type="file"]:hover {
+  border-color: #2563eb;
+  background: #eff6ff;
+}
+
+.ev-panel .ev-question input[type="file"]::file-selector-button {
+  margin-right: 14px;
+  padding: 9px 14px;
+  border: none;
+  border-radius: 8px;
+  background: #2563eb;
+  color: #ffffff;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.2s ease;
+}
+
+.ev-panel .ev-question input[type="file"]::file-selector-button:hover {
+  background: #1d4ed8;
+}
+
+.ev-panel .ev-question small {
+  display: block;
+  margin-top: 9px;
+  color: #64748b;
+  font-size: 12px;
+  line-height: 1.6;
+}
+
+/* Selected report preview */
+
+.ev-panel .ev-sum {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 12px;
+  margin-top: 16px;
+  padding: 14px 16px;
+  border: 1px solid #bfdbfe;
+  border-radius: 12px;
+  background: #eff6ff;
+  color: #1e40af;
+  overflow-wrap: anywhere;
+}
+
+.ev-panel .ev-sum span {
+  flex: 1;
+  min-width: 0;
+  font-size: 13px;
+  line-height: 1.6;
+}
+
+.ev-panel .ev-sum button {
+  flex-shrink: 0;
+  padding: 8px 13px;
+  border: 1px solid #fecaca;
+  border-radius: 8px;
+  background: #ffffff;
+  color: #dc2626;
+  font-size: 12px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.2s ease, color 0.2s ease;
+}
+
+.ev-panel .ev-sum button:hover {
+  background: #dc2626;
+  color: #ffffff;
+}
+
+/* Report section heading */
+
+.ev-panel .ev-panel-head p {
+  color: #64748b;
+  font-size: 14px;
+  line-height: 1.7;
+}
+
+/* Report details on Review step */
+
+.ev-special-note-review {
+  margin-top: 20px;
+  padding: 18px;
+  border: 1px solid #e2e8f0;
+  border-radius: 12px;
+  background: #f8fafc;
+}
+
+.ev-special-note-review .ev-report-sub {
+  margin: 0 0 10px;
+  color: #0f172a;
+  font-size: 15px;
+  font-weight: 700;
+}
+
+.ev-special-note-review p {
+  margin: 0 0 14px;
+  color: #475569;
+  font-size: 13px;
+  line-height: 1.7;
+  overflow-wrap: anywhere;
+}
+
+.ev-special-note-review .ev-btn {
+  padding: 9px 15px;
+  border: 1px solid #cbd5e1;
+  border-radius: 8px;
+  background: #ffffff;
+  color: #1d4ed8;
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.2s ease;
+}
+
+.ev-special-note-review .ev-btn:hover {
+  background: #eff6ff;
+}
+
+/* Mobile responsive */
+
+@media (max-width: 600px) {
+  .ev-panel .ev-question input[type="file"] {
+    padding: 12px;
+    font-size: 12px;
+  }
+
+  .ev-panel .ev-question input[type="file"]::file-selector-button {
+    display: block;
+    margin: 0 0 10px;
+    padding: 9px 12px;
+  }
+
+  .ev-panel .ev-sum {
+    align-items: flex-start;
+    flex-direction: column;
+    padding: 12px;
+  }
+
+  .ev-panel .ev-sum button {
+    align-self: flex-start;
+  }
+
+  .ev-special-note-review {
+    padding: 14px;
+  }
 }
