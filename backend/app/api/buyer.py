@@ -1,10 +1,11 @@
 from datetime import datetime
-
-from fastapi import APIRouter, Depends, HTTPException
+import uuid
+from fastapi import APIRouter, Depends, HTTPException, UploadFile, File
 from sqlalchemy.orm import Session
-
+from fastapi.responses import FileResponse
 from app.db import get_db
 from app.dependencies import require_roles
+from pathlib import Path
 
 from app.models import (
     User,
@@ -20,6 +21,7 @@ from app.models import (
     EnquiryStatus,
     QuotationStatus,
     HandshakeStatus,
+    EnquiryReport,
 )
 
 from app.schemas.enquiry import (
@@ -201,6 +203,7 @@ async def create_enquiry(
         title=payload.title,
         status=EnquiryStatus.APPROVED.value,
         dossier=dossier,
+        special_note=(payload.special_note or "").strip() or None,
     )
 
     db.add(e)
@@ -488,6 +491,7 @@ def enquiry(
         },
 
         "dossier": e.dossier,
+        "special_note": e.special_note,
 
         "matches": [
             {
@@ -850,3 +854,96 @@ def crm(
 
         for ev, e in rows
     ]
+
+
+
+
+REPORTS_DIR = Path(__file__).resolve().parents[2] / "uploads" / "enquiry_reports"
+REPORTS_DIR.mkdir(parents=True, exist_ok=True)
+
+
+@router.post("/enquiries/{enquiry_id}/reports")
+async def upload_enquiry_report(
+    enquiry_id: int,
+    file: UploadFile = File(...),
+    db: Session = Depends(get_db),
+    user: User = Depends(require_roles("buyer")),
+):
+    enquiry = (
+        db.query(Enquiry)
+        .filter(
+            Enquiry.id == enquiry_id,
+            Enquiry.buyer_id == user.id,
+        )
+        .first()
+    )
+
+    if not enquiry:
+        raise HTTPException(
+            status_code=404,
+            detail="Enquiry not found or access denied",
+        )
+
+    original_filename = Path(file.filename or "report").name
+    extension = Path(original_filename).suffix.lower()
+
+    allowed_extensions = {".pdf", ".doc", ".docx", ".xls", ".xlsx", ".csv"}
+
+    if extension not in allowed_extensions:
+        raise HTTPException(
+            status_code=400,
+            detail="Unsupported file type",
+        )
+
+    stored_filename = f"{uuid.uuid4().hex}{extension}"
+    file_path = REPORTS_DIR / stored_filename
+
+    max_size = 10 * 1024 * 1024
+    size = 0
+
+    try:
+        with file_path.open("wb") as destination:
+            while True:
+                chunk = await file.read(1024 * 1024)
+
+                if not chunk:
+                    break
+
+                size += len(chunk)
+
+                if size > max_size:
+                    raise HTTPException(
+                        status_code=413,
+                        detail="File size must not exceed 10 MB",
+                    )
+
+                destination.write(chunk)
+
+        report = EnquiryReport(
+            enquiry_id=enquiry.id,
+            original_filename=original_filename,
+            stored_filename=stored_filename,
+            file_path=str(file_path),
+            content_type=file.content_type,
+        )
+
+        db.add(report)
+        db.commit()
+        db.refresh(report)
+
+        return {
+            "message": "Report uploaded successfully",
+            "report_id": report.id,
+            "enquiry_id": report.enquiry_id,
+            "filename": report.original_filename,
+        }
+
+    except Exception:
+        if file_path.exists():
+            file_path.unlink(missing_ok=True)
+
+        db.rollback()
+        raise
+
+    finally:
+        await file.close()
