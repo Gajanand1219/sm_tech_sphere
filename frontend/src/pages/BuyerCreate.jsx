@@ -9,6 +9,7 @@ const STEPS = [
   'Category',
   'Sub-category',
   'Questionnaire',
+  'Upload Report',
   'Review',
   'Submit',
 ]
@@ -61,7 +62,9 @@ export default function BuyerCreate() {
   const [domains, setDomains] = useState([])
   const [problems, setProblems] = useState([])
   const [questions, setQuestions] = useState([])
-const { logout } = useAuth()
+  const { logout } = useAuth()
+  const [specialNote, setSpecialNote] = useState('')
+  const [reportFile, setReportFile] = useState(null)
   const [domainId, setDomainId] = useState('')
   const [category, setCategory] = useState('')
   const [problemId, setProblemId] = useState('')
@@ -286,7 +289,7 @@ const { logout } = useAuth()
 
     const html = `<!DOCTYPE html>
 <html><head><meta charset="utf-8"/>
-<title>Enquiry Review — SM Techsphere</title>
+<title>Enquiry Review — SM TechSphere</title>
 <style>
   *{box-sizing:border-box}
   body{font-family:system-ui,-apple-system,Segoe UI,Roboto,sans-serif;color:#0f2a4a;margin:0;padding:32px;background:#f3f6fa}
@@ -329,7 +332,7 @@ const { logout } = useAuth()
       <tbody>${rows || '<tr><td colspan="2">No questions configured.</td></tr>'}</tbody>
     </table>
 
-    <div class="foot">Generated on ${new Date().toLocaleString()} · SM Techsphere Pvt Ltd</div>
+    <div class="foot">Generated on ${new Date().toLocaleString()} · SM TechSphere Pvt Ltd</div>
   </div>
 </body></html>`
 
@@ -348,43 +351,98 @@ const { logout } = useAuth()
     }[c]))
   }
 
-  async function submitEnquiry(event) {
-    event.preventDefault()
-    setMessage('')
-    if (!domainId || !category || !problemId || !title.trim()) {
-      notify('Please complete the domain, category, sub-category and title.')
-      return
+
+    async function submitEnquiry(event) {
+      event.preventDefault()
+      setMessage('')
+
+      if (!domainId || !category || !problemId || !title.trim()) {
+        notify('Please complete the domain, category, sub-category and title.')
+        return
+      }
+
+      if (!requiredQuestionsComplete) {
+        notify('Please answer all required questions.')
+        goToStep(3)
+        return
+      }
+
+      setSubmitting(true)
+
+      try {
+        // 1. Create the enquiry first
+        const response = await API.post('/buyer/enquiries', {
+          domain_id: Number(domainId),
+          problem_id: Number(problemId),
+          title: title.trim(),
+          answers,
+          special_note: specialNote.trim() || null,
+        })
+
+        const enquiryId = response.data?.enquiry_id
+
+        if (!enquiryId) {
+          throw new Error('Enquiry created, but enquiry ID was not returned.')
+        }
+
+        // 2. Upload the selected technical report
+        if (reportFile) {
+          try {
+            const formData = new FormData()
+            formData.append('file', reportFile)
+
+            await API.post(
+              `/buyer/enquiries/${enquiryId}/reports`,
+              formData,
+              {
+                headers: {
+                  'Content-Type': undefined,
+                },
+              }
+              )
+
+            notify('Enquiry and technical report uploaded successfully.', 'success')
+          } catch (uploadError) {
+            console.error(
+              'PDF upload failed:',
+              uploadError.response?.status,
+              uploadError.response?.data || uploadError.message
+            )
+
+            const detail = uploadError.response?.data?.detail
+
+            notify(
+              typeof detail === 'string'
+                ? detail
+                : JSON.stringify(detail || uploadError.message),
+              'error'
+            )
+
+            return
+          }
+        } else {
+          notify('Enquiry submitted successfully.', 'success')
+        }
+
+        // 3. Open the created enquiry
+        window.setTimeout(() => {
+          navigate(`/buyer/enquiries/${enquiryId}`)
+        }, 1000)
+
+      } catch (error) {
+        const detail = error.response?.data?.detail
+
+        notify(
+          typeof detail === 'string'
+            ? detail
+            : error.message ||
+              'Unable to submit the enquiry. Please try again.'
+        )
+      } finally {
+        setSubmitting(false)
+      }
     }
-    if (!requiredQuestionsComplete) {
-      notify('Please answer all required questions.')
-      goToStep(3)
-      return
-    }
-    setSubmitting(true)
-    try {
-      const response = await API.post('/buyer/enquiries', {
-        domain_id: Number(domainId),
-        problem_id: Number(problemId),
-        title: title.trim(),
-        answers,
-      })
-      notify('Enquiry submitted successfully.', 'success')
-      const enquiryId = response.data?.enquiry_id
-      window.setTimeout(() => {
-        if (enquiryId) navigate(`/buyer/enquiries/${enquiryId}`)
-        else navigate('/buyer')
-      }, 700)
-    } catch (error) {
-      const detail = error.response?.data?.detail
-      notify(
-        typeof detail === 'string'
-          ? detail
-          : 'Unable to submit the enquiry. Please check the required fields and try again.'
-      )
-    } finally {
-      setSubmitting(false)
-    }
-  }
+
 
   /* ======================================================
      RENDER
@@ -395,7 +453,7 @@ const { logout } = useAuth()
       <aside className={`ev-side ${mobileOpen ? 'open' : ''}`}>
         <div className="ev-brand">
           <div className="ev-logo"><img src="/logo2.jpeg" alt="ENVIQUO" /></div>
-          <div><b>ENVIQUO</b><small>by SM Techsphere Pvt Ltd</small></div>
+          <div><b>ENVIQUO</b><small>by SM TechSphere Pvt Ltd</small></div>
         </div>
         <nav className="ev-nav">
           <Link to="/" className="ev-nav-item" title="Go to Home Page"><span>🏠</span> Home</Link>
@@ -409,7 +467,7 @@ const { logout } = useAuth()
           ))}
         </nav>
         <div className="ev-side-foot">
-          <b>SM Techsphere Pvt Ltd.</b>
+          <b>SM TechSphere Pvt Ltd.</b>
           Buyer workspace
         </div>
       </aside>
@@ -645,28 +703,135 @@ const { logout } = useAuth()
                 {loadingQuestions ? (
                   <div className="ev-loading">Loading questionnaire...</div>
                 ) : questions.length === 0 ? (
-                  <div className="ev-empty-sm">No questions configured for this sub-category. You can still enter the title and continue.</div>
+                  <div className="ev-empty-sm">
+                    No questions configured for this sub-category. You can still enter the title and continue.
+                  </div>
                 ) : (
                   <div className="ev-questions">
                     {questions.map((question, index) => (
                       <div className="ev-question" key={question.id}>
                         <label htmlFor={`ev-q-${question.id}`}>
-                          <span className="ev-q-num">{String(index + 1).padStart(2, '0')}</span>
-                          <span>{question.question_text}{question.required && <em> *</em>}</span>
+                          <span className="ev-q-num">
+                            {String(index + 1).padStart(2, '0')}
+                          </span>
+                          <span>
+                            {question.question_text}
+                            {question.required && <em> *</em>}
+                          </span>
                         </label>
-                        <textarea id={`ev-q-${question.id}`} rows={3} required={Boolean(question.required)}
+
+                        <textarea
+                          id={`ev-q-${question.id}`}
+                          rows={3}
+                          required={Boolean(question.required)}
                           value={answers[question.field_key] || ''}
-                          onChange={(e) => setAnswers((prev) => ({ ...prev, [question.field_key]: e.target.value }))}
-                          placeholder="Enter Your Answer" />
+                          onChange={(e) =>
+                            setAnswers((prev) => ({
+                              ...prev,
+                              [question.field_key]: e.target.value,
+                            }))
+                          }
+                          placeholder="Enter Your Answer"
+                        />
                       </div>
                     ))}
                   </div>
                 )}
+
+                {/* Special Note for Vendor — keep OUTSIDE the conditional above */}
+                <div className="ev-question ev-special-note">
+                  <label htmlFor="ev-special-note">
+                    <span className="ev-q-num">✎</span>
+                    <span>
+                      Special Note for Vendor
+                      <small>
+                        Optional — share any additional instructions or requirements.
+                      </small>
+                    </span>
+                  </label>
+
+                  <textarea
+                    id="ev-special-note"
+                    rows={4}
+                    value={specialNote}
+                    onChange={(e) => setSpecialNote(e.target.value)}
+                    placeholder="Enter any additional note for the matched vendor..."
+                    maxLength={2000}
+                  />
+
+                  <small>{specialNote.length}/2000 characters</small>
+                </div>
+              
+              </section>
+            )}
+
+
+            {/* STEP 5: UPLOAD TECHNICAL REPORT */}
+            {step === 4 && (
+              <section className="ev-panel">
+                <div className="ev-panel-head">
+                  <h2>Upload Technical Report</h2>
+                  <p>
+                    Upload a supporting technical report for your enquiry.
+                    This step is optional.
+                  </p>
+                </div>
+
+                <div className="ev-question">
+                  <label htmlFor="ev-report-upload">
+                    Technical Report
+                  </label>
+
+                  <input
+                    id="ev-report-upload"
+                    type="file"
+                    accept=".pdf,.doc,.docx,.xls,.xlsx"
+                    onChange={(e) => {
+                      const file = e.target.files?.[0] || null
+
+                      if (file && file.size > 10 * 1024 * 1024) {
+                        notify('File size must be 10 MB or less.')
+                        e.target.value = ''
+                        setReportFile(null)
+                        return
+                      }
+
+                      setMessage('')
+                      setReportFile(file)
+                    }}
+                  />
+
+                  <small>
+                    Allowed formats: PDF, DOC, DOCX, XLS, XLSX.
+                    Maximum size: 10 MB.
+                  </small>
+
+                  {reportFile && (
+                    <div className="ev-sum">
+                      <span>
+                        📄 {reportFile.name}
+                        {' · '}
+                        {(reportFile.size / (1024 * 1024)).toFixed(2)} MB
+                      </span>
+
+                      <button
+                        type="button"
+                        onClick={() => {
+                          setReportFile(null)
+                          const input = document.getElementById('ev-report-upload')
+                          if (input) input.value = ''
+                        }}
+                      >
+                        Remove
+                      </button>
+                    </div>
+                  )}
+                </div>
               </section>
             )}
 
             {/* STEP 5: REVIEW — ✅ NEW attractive report UI */}
-            {step === 4 && (
+            {step === 5 && (
               <section className="ev-panel ev-report-panel">
                 <div className="ev-panel-head">
                   <h2>Review Your Enquiry</h2>
@@ -710,8 +875,39 @@ const { logout } = useAuth()
                     </tbody>
                   </table>
 
+                <div className="ev-special-note-review">
+                  <h4 className="ev-report-sub">Special Note for Vendor</h4>
+                  <p>
+                    {specialNote.trim() || 'No additional note provided.'}
+                  </p>
+                  <button
+                    type="button"
+                    className="ev-btn"
+                    onClick={() => goToStep(3)}
+                  >
+                    Edit Note
+                  </button>
+                </div>
+                <div className="ev-special-note-review">
+                  <h4 className="ev-report-sub">Uploaded Technical Report</h4>
+
+                  <p>
+                    {reportFile
+                      ? `${reportFile.name} (${(reportFile.size / (1024 * 1024)).toFixed(2)} MB)`
+                      : 'No report uploaded.'}
+                  </p>
+
+                  <button
+                    type="button"
+                    className="ev-btn"
+                    onClick={() => goToStep(4)}
+                  >
+                    {reportFile ? 'Change Report' : 'Upload Report'}
+                  </button>
+                </div>
+
                   <div className="ev-report-foot">
-                    Generated on {new Date().toLocaleString()} · SM Techsphere Pvt Ltd
+                    Generated on {new Date().toLocaleString()} · SM TechSphere Pvt Ltd
                   </div>
                 </div>
 
@@ -724,11 +920,11 @@ const { logout } = useAuth()
             )}
 
             {/* STEP 6: SUBMIT */}
-            {step === 5 && (
+            {step === 6 && (
               <section className="ev-panel ev-submit-panel">
                 <span className="ev-submit-icon">✓</span>
                 <h2>Ready To Submit?</h2>
-                <p>Your enquiry will be created using the existing SM TECHSPHERE backend workflow.</p>
+                <p>Your enquiry will be created using the existing SM TechSphere backend workflow.</p>
                 <div className="ev-submit-summary">
                   <span>{selectedDomain?.name}</span>
                   <strong>{title}</strong>
