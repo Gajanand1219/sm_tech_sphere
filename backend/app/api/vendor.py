@@ -1,6 +1,8 @@
+from pathlib import Path
 from datetime import datetime, timedelta
 
 from fastapi import APIRouter, Depends, HTTPException
+from starlette.responses import FileResponse
 from sqlalchemy.orm import Session
 
 from app.db import get_db
@@ -16,6 +18,7 @@ from app.models import (
     QuotationStatus,
     HandshakeStatus,
     CRMEvent,
+    EnquiryReport,
 )
 
 from app.schemas.enquiry import QuotationCreate, HandshakeAction
@@ -271,6 +274,7 @@ def view_enquiry(
         "problem": e.problem.name,
         "status": e.status,
         "dossier": e.dossier,
+        "special_note": e.special_note,
 
         "match_score": match.match_score,
 
@@ -563,3 +567,124 @@ def crm(
         }
         for ev, e in rows
     ]
+
+
+
+
+# ============================================================
+# VIEW / DOWNLOAD MATCHED ENQUIRY REPORTS
+# ============================================================
+
+@router.get("/enquiries/{enquiry_id}/reports")
+def get_enquiry_reports(
+    enquiry_id: int,
+    user=Depends(require_roles("vendor")),
+    db: Session = Depends(get_db),
+):
+    match = (
+        db.query(EnquiryMatch)
+        .filter(
+            EnquiryMatch.enquiry_id == enquiry_id,
+            EnquiryMatch.vendor_id == user.id,
+        )
+        .first()
+    )
+
+    if not match:
+        raise HTTPException(
+            status_code=403,
+            detail="This enquiry is not assigned to you",
+        )
+
+    enquiry = db.query(Enquiry).filter(
+        Enquiry.id == enquiry_id
+    ).first()
+
+    if not enquiry or enquiry.status not in [
+        EnquiryStatus.APPROVED.value,
+        EnquiryStatus.MATCHED.value,
+        EnquiryStatus.QUOTATION.value,
+        EnquiryStatus.ACCEPTED.value,
+        EnquiryStatus.CLOSED.value,
+    ]:
+        raise HTTPException(
+            status_code=403,
+            detail="This enquiry is not approved for vendors",
+        )
+
+    reports = (
+        db.query(EnquiryReport)
+        .filter(EnquiryReport.enquiry_id == enquiry_id)
+        .order_by(EnquiryReport.id.desc())
+        .all()
+    )
+
+    return {
+        "enquiry_id": enquiry_id,
+        "reports": [
+            {
+                "id": report.id,
+                "filename": report.original_filename,
+                "download_url": (
+                    f"/vendor/enquiries/{enquiry_id}/reports/"
+                    f"{report.id}/download"
+                ),
+                "uploaded_at": report.uploaded_at,
+            }
+            for report in reports
+        ],
+    }
+
+
+@router.get(
+    "/enquiries/{enquiry_id}/reports/{report_id}/download"
+)
+def download_enquiry_report(
+    enquiry_id: int,
+    report_id: int,
+    user=Depends(require_roles("vendor")),
+    db: Session = Depends(get_db),
+):
+    match = (
+        db.query(EnquiryMatch)
+        .filter(
+            EnquiryMatch.enquiry_id == enquiry_id,
+            EnquiryMatch.vendor_id == user.id,
+        )
+        .first()
+    )
+
+    if not match:
+        raise HTTPException(
+            status_code=403,
+            detail="This enquiry is not assigned to you",
+        )
+
+    report = (
+        db.query(EnquiryReport)
+        .filter(
+            EnquiryReport.id == report_id,
+            EnquiryReport.enquiry_id == enquiry_id,
+        )
+        .first()
+    )
+
+    if not report:
+        raise HTTPException(
+            status_code=404,
+            detail="Report not found",
+        )
+
+    file_path = Path(report.file_path)
+
+    if not file_path.is_file():
+        raise HTTPException(
+            status_code=404,
+            detail="Report file is missing from storage",
+        )
+
+    return FileResponse(
+        path=str(file_path),
+        filename=report.original_filename,
+        media_type="application/octet-stream",
+    )
