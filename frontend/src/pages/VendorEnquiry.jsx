@@ -48,16 +48,63 @@ export default function VendorEnquiry() {
   const [msgType, setMsgType] = useState('info')
   const [busy, setBusy] = useState(false)
   const [loading, setLoading] = useState(true)
+  const [reports, setReports] = useState([])
+  const [reportsError, setReportsError] = useState('')
 
-  const load = async () => {
-    setLoading(true)
+  
+const load = async () => {
+  setLoading(true)
+
+  try {
+    const r = await API.get(`/vendor/enquiries/${id}`)
+    setEnquiry(r.data)
+
     try {
-      const r = await API.get(`/vendor/enquiries/${id}`)
-      setEnquiry(r.data)
-    } finally {
-      setLoading(false)
+      const reportsResponse = await API.get(
+        `/vendor/enquiries/${id}/reports`
+      )
+      setReports(reportsResponse.data.reports || [])
+      setReportsError('')
+    } catch (error) {
+      setReports([])
+      setReportsError(
+        error.response?.data?.detail || 'Unable to load reports.'
+      )
     }
+  } catch (error) {
+    setEnquiry(null)
+  } finally {
+    setLoading(false)
   }
+}
+
+
+
+const downloadReport = async (report) => {
+  try {
+    const response = await API.get(report.download_url, {
+      responseType: 'blob',
+    })
+
+    const url = window.URL.createObjectURL(
+      new Blob([response.data])
+    )
+
+    const link = document.createElement('a')
+    link.href = url
+    link.download = report.filename
+    document.body.appendChild(link)
+    link.click()
+    link.remove()
+
+    window.URL.revokeObjectURL(url)
+  } catch (error) {
+    setMsg('Unable to download report. Please try again.')
+    setMsgType('error')
+  }
+}
+
+
 
   useEffect(() => {
     load()
@@ -291,6 +338,73 @@ export default function VendorEnquiry() {
           </div>
           <pre className="dossier">{enquiry.dossier}</pre>
         </div>
+
+        {/* ============ BUYER SPECIAL NOTE ============ */}
+          {enquiry.special_note?.trim() && (
+            <div className="panel-card ve-special-note">
+              <div className="ve-section-head">
+                <div className="ve-section-head__icon">📝</div>
+                <div>
+                  <h3>Special Note from Buyer</h3>
+                  <p className="muted">
+                    Additional instructions provided by the buyer
+                  </p>
+                </div>
+              </div>
+
+              <div className="ve-special-note__content">
+                {enquiry.special_note}
+              </div>
+            </div>
+          )}
+
+          
+{/* ============ TECHNICAL REPORTS ============ */}
+<div className="panel-card ve-reports">
+  <div className="ve-section-head">
+    <div className="ve-section-head__icon">📎</div>
+    <div>
+      <h3>Technical Reports & Documents</h3>
+      <p className="muted">
+        Reports uploaded by the buyer for this enquiry
+      </p>
+    </div>
+  </div>
+
+  {reportsError ? (
+    <p className="muted">{reportsError}</p>
+  ) : reports.length === 0 ? (
+    <p className="muted">
+      No technical reports uploaded for this enquiry.
+    </p>
+  ) : (
+    <div className="ve-reports__list">
+      {reports.map((report) => (
+        <div className="ve-reports__item" key={report.id}>
+          <div className="ve-reports__file-icon">📄</div>
+
+          <div className="ve-reports__details">
+            <strong>{report.filename}</strong>
+            <span>
+              {report.uploaded_at
+                ? `Uploaded ${formatDeadline(report.uploaded_at)}`
+                : 'Technical document'}
+            </span>
+          </div>
+
+          <button
+            type="button"
+            className="ve-reports__download"
+            onClick={() => downloadReport(report)}
+          >
+            ⬇ Download
+          </button>
+        </div>
+      ))}
+    </div>
+  )}
+</div>
+
 
         {/* ============ QUOTATION FORM ============ */}
         {!enquiry.quotation_exists && (
