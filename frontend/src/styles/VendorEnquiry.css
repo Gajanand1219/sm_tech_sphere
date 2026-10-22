@@ -1325,3 +1325,102 @@
     transition-duration: 0.01ms !important;
   }
 }
+
+
+.ve-special-note {
+  margin-top: 20px;
+  border-left: 4px solid #e9a23b;
+}
+
+.ve-special-note__content {
+  margin-top: 12px;
+  padding: 14px 16px;
+  background: #fffaf0;
+  border: 1px solid #f3dfb8;
+  border-radius: 8px;
+  color: #493718;
+  font-size: 14px;
+  line-height: 1.7;
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+}
+
+
+/* Technical reports */
+.ve-reports__list {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  margin-top: 18px;
+}
+
+.ve-reports__item {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  padding: 16px;
+  border: 1px solid #e5e7eb;
+  border-radius: 12px;
+  background: #fafbfc;
+}
+
+.ve-reports__file-icon {
+  display: grid;
+  place-items: center;
+  width: 44px;
+  height: 44px;
+  flex-shrink: 0;
+  border-radius: 10px;
+  background: #eaf2ff;
+  font-size: 22px;
+}
+
+.ve-reports__details {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  gap: 5px;
+  min-width: 0;
+}
+
+.ve-reports__details strong {
+  overflow-wrap: anywhere;
+  color: #1f2937;
+  font-size: 14px;
+}
+
+.ve-reports__details span {
+  color: #6b7280;
+  font-size: 12px;
+}
+
+.ve-reports__download {
+  flex-shrink: 0;
+  padding: 9px 13px;
+  border: 1px solid #2563eb;
+  border-radius: 8px;
+  background: #fff;
+  color: #2563eb;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.ve-reports__download:hover {
+  background: #2563eb;
+  color: #fff;
+}
+
+@media (max-width: 520px) {
+  .ve-reports__item {
+    align-items: flex-start;
+    flex-wrap: wrap;
+  }
+
+  .ve-reports__details {
+    flex-basis: calc(100% - 60px);
+  }
+
+  .ve-reports__download {
+    margin-left: 58px;
+  }
+}
