@@ -5,6 +5,7 @@ class EnquiryCreate(BaseModel):
     problem_id: int
     title: str = Field(min_length=3, max_length=255)
     answers: dict[str, str]
+    special_note: str | None = None
 
 class QuotationCreate(BaseModel):
     enquiry_id: int
