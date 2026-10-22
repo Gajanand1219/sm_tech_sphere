@@ -22,8 +22,8 @@ app.add_middleware(
 
     allow_origins=[
         settings.FRONTEND_URL,
-        "https://smtechsphere.vercel.app",
-        "https://smtechsphere.vercel.app",
+        "https://smtechsphere-virid.vercel.app",
+        "https://smtechsphere-virid.vercel.app",
     ],
     allow_credentials=True,
     allow_methods=["*"],
