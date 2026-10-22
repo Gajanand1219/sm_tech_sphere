@@ -105,6 +105,12 @@ class Enquiry(Base):
     matches = relationship("EnquiryMatch", back_populates="enquiry", cascade="all, delete-orphan")
     quotations = relationship("Quotation", back_populates="enquiry", cascade="all, delete-orphan")
     handshake = relationship("Handshake", back_populates="enquiry", uselist=False, cascade="all, delete-orphan")
+    special_note: Mapped[str | None] = mapped_column(Text, nullable=True)
+    reports = relationship(
+    "EnquiryReport",
+    back_populates="enquiry",
+    cascade="all, delete-orphan",
+)
 
 class QuestionAnswer(Base):
     __tablename__ = "question_answers"
@@ -204,4 +210,49 @@ class LoginEvent(Base):
     user = relationship(
         "User",
         backref="login_events"
+    )
+
+
+
+class EnquiryReport(Base):
+    __tablename__ = "enquiry_reports"
+
+    id: Mapped[int] = mapped_column(Integer, primary_key=True)
+
+    enquiry_id: Mapped[int] = mapped_column(
+        ForeignKey("enquiries.id", ondelete="CASCADE"),
+        nullable=False,
+        index=True,
+    )
+
+    original_filename: Mapped[str] = mapped_column(
+        String(255),
+        nullable=False,
+    )
+
+    stored_filename: Mapped[str] = mapped_column(
+        String(255),
+        nullable=False,
+        unique=True,
+    )
+
+    file_path: Mapped[str] = mapped_column(
+        Text,
+        nullable=False,
+    )
+
+    content_type: Mapped[str | None] = mapped_column(
+        String(150),
+        nullable=True,
+    )
+
+    uploaded_at: Mapped[datetime] = mapped_column(
+        DateTime,
+        server_default=func.now(),
+        nullable=False,
+    )
+
+    enquiry = relationship(
+        "Enquiry",
+        back_populates="reports",
     )
