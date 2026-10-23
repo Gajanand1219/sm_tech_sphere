@@ -336,7 +336,58 @@ const downloadReport = async (report) => {
               <p className="muted">Structured requirements & answers from the buyer</p>
             </div>
           </div>
-          <pre className="dossier">{enquiry.dossier}</pre>
+          {/* <pre className="dossier">{enquiry.dossier}</pre> */}
+                    
+          <div className="ve-dossier__questions">
+            {(() => {
+              const raw = String(enquiry.dossier || '')
+                .replace(/<div id="ev-questionnaire">/g, '')
+                .trim()
+
+              const lines = raw
+                .split(/\n/)
+                .map((line) => line.trim())
+                .filter(Boolean)
+
+              const items = []
+
+              for (const line of lines) {
+                const cleaned = line.replace(/^\d+[\.\)]\s*/, '')
+
+                const match = cleaned.match(
+                  /^(?:Question\s*\d*:\s*)?(.+?)\s*(?:\n|:\s+|-\s+)\s*(?:Answer:\s*)?(.+)$/
+                )
+
+                if (match) {
+                  items.push({
+                    question: match[1].trim(),
+                    answer: match[2].trim(),
+                  })
+                } else {
+                  items.push({
+                    question: cleaned,
+                    answer: '',
+                  })
+                }
+              }
+
+              return items.slice(0, 4).map((item, index) => (
+                <div className="ve-dossier__question" key={index}>
+                  <div className="ve-dossier__number">
+                    {String(index + 1).padStart(2, '0')}
+                  </div>
+
+                  <div className="ve-dossier__content">
+                    <h4>{item.question}</h4>
+                    <p>
+                      {item.answer || 'Answer not available in dossier'}
+                    </p>
+                  </div>
+                </div>
+              ))
+            })()}
+          </div>
+
         </div>
 
         {/* ============ BUYER SPECIAL NOTE ============ */}
