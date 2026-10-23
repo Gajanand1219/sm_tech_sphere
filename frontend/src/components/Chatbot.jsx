@@ -1,29 +1,9 @@
 import { useEffect, useRef, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
-
-/* =========================================================
-   INITIAL SUGGESTIONS
-   ========================================================= */
-
-const INITIAL_SUGGESTIONS = [
-  { icon: '💧', text: 'Water & Wastewater Treatment' },
-  { icon: '♻️', text: 'Solid & Hazardous Waste' },
-  { icon: '☀️', text: 'Solar & Renewables' },
-  { icon: '🌱', text: 'Carbon & ESG' },
-  { icon: '🏭', text: 'Air Pollution & Environmental Legal Services' },
-]
+import { useLanguage } from '../context/LanguageContext'
 
 /* =========================================================
    FORMAT BOT ANSWER
-   - Converts markdown-ish text into structured blocks
-   - **Heading**  -> <h4>
-   - ## Heading   -> <h3>
-   - ### Heading  -> <h4>
-   - - item       -> <li>
-   - * item       -> <li>
-   - 1. item      -> <li>
-   - | a | b |    -> <table>
-   - Plain text   -> <p>
    ========================================================= */
 
 function formatAnswer(raw) {
@@ -58,8 +38,7 @@ function formatAnswer(raw) {
     tableBuffer = []
   }
 
-  const isTableRow = (line) =>
-    /^\s*\|.*\|\s*$/.test(line)
+  const isTableRow = (line) => /^\s*\|.*\|\s*$/.test(line)
 
   const parseTableRow = (line) =>
     line
@@ -80,7 +59,6 @@ function formatAnswer(raw) {
 
     /* ------- TABLE ROW ------- */
     if (isTableRow(line)) {
-      // Separator row |---|---|
       if (/^\s*\|[\s\-:|]+\|\s*$/.test(line)) {
         return
       }
@@ -133,7 +111,6 @@ function formatAnswer(raw) {
     }
 
     /* ------- BOLD / BULLET-PREFIX HEADING ------- */
-    // **Heading**
     const boldMatch = line.match(/^\*\*(.+?)\*\*$/)
     if (boldMatch) {
       flushList()
@@ -145,12 +122,7 @@ function formatAnswer(raw) {
       return
     }
 
-    // Heading: "Something:" (end with colon, short line)
-    if (
-      line.length < 80 &&
-      /:$/.test(line) &&
-      !/\*\*/.test(line)
-    ) {
+    if (line.length < 80 && /:$/.test(line) && !/\*\*/.test(line)) {
       flushList()
       flushTable()
       blocks.push({
@@ -176,7 +148,7 @@ function formatAnswer(raw) {
 }
 
 /* =========================================================
-   RENDER INLINE BOLD (**bold**) inside paragraphs / lists
+   RENDER INLINE BOLD
    ========================================================= */
 
 function renderInline(text) {
@@ -202,7 +174,6 @@ function AnswerBlock({ blocks }) {
   return (
     <div className="ans">
       {blocks.map((block, i) => {
-        /* ---------- HEADING (H3) ---------- */
         if (block.type === 'h3') {
           return (
             <h3 key={i} className="ans__h3">
@@ -211,7 +182,6 @@ function AnswerBlock({ blocks }) {
           )
         }
 
-        /* ---------- HEADING (H4) ---------- */
         if (block.type === 'h4') {
           return (
             <h4 key={i} className="ans__h4">
@@ -221,7 +191,6 @@ function AnswerBlock({ blocks }) {
           )
         }
 
-        /* ---------- LIST ---------- */
         if (block.type === 'list') {
           return (
             <ul key={i} className="ans__list">
@@ -235,7 +204,6 @@ function AnswerBlock({ blocks }) {
           )
         }
 
-        /* ---------- TABLE ---------- */
         if (block.type === 'table') {
           const [head, ...rows] = block.rows
           return (
@@ -262,7 +230,6 @@ function AnswerBlock({ blocks }) {
           )
         }
 
-        /* ---------- PARAGRAPH ---------- */
         return (
           <p key={i} className="ans__p">
             {renderInline(block.text)}
@@ -279,14 +246,23 @@ function AnswerBlock({ blocks }) {
 
 export default function Chatbot() {
   const navigate = useNavigate()
+  const { t } = useLanguage()
+
+  /* Suggestions — built from t() so they follow language */
+  const buildSuggestions = () => [
+    { icon: '💧', text: t('cbSuggWater') },
+    { icon: '♻️', text: t('cbSuggSolid') },
+    { icon: '☀️', text: t('cbSuggSolar') },
+    { icon: '🌱', text: t('cbSuggCarbon') },
+    { icon: '🏭', text: t('cbSuggAir') },
+  ]
 
   const [messages, setMessages] = useState([
     {
       id: 'welcome',
       role: 'assistant',
-      content:
-        'Hello 👋 Welcome to SM TECHSPHERE Assistant.\n\nAsk about our SM TECHSPHERE Pvt Ltd, buyer/vendor registration, vendor matching, or the project workflow.',
-      suggestions: INITIAL_SUGGESTIONS,
+      content: t('cbWelcomeMsg'),
+      suggestions: buildSuggestions(),
     },
   ])
 
@@ -294,6 +270,25 @@ export default function Chatbot() {
   const [loading, setLoading] = useState(false)
   const messagesEndRef = useRef(null)
   const textareaRef = useRef(null)
+
+  /* =====================================================
+     KEEP WELCOME IN SYNC WITH LANGUAGE
+     ===================================================== */
+  useEffect(() => {
+    setMessages((prev) => {
+      if (prev.length === 1 && prev[0].id === 'welcome') {
+        return [
+          {
+            ...prev[0],
+            content: t('cbWelcomeMsg'),
+            suggestions: buildSuggestions(),
+          },
+        ]
+      }
+      return prev
+    })
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [t])
 
   /* =====================================================
      AUTO SCROLL
@@ -336,9 +331,8 @@ export default function Chatbot() {
 
     try {
       const response = await fetch(
-        
-         'https://sm-tech-sphere-mem9.onrender.com/api/chat',
-         
+        'http://127.0.0.1:8000/api/chat',
+        // 'https://sm-cleantech-platform.onrender.com/api/chat',
         {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
@@ -349,9 +343,7 @@ export default function Chatbot() {
       const data = await response.json()
 
       if (!response.ok) {
-        throw new Error(
-          data?.detail || 'Unable to get response from AI.'
-        )
+        throw new Error(data?.detail || t('cbApiFail'))
       }
 
       setMessages((prev) => [
@@ -359,9 +351,7 @@ export default function Chatbot() {
         {
           id: `bot-${Date.now()}`,
           role: 'assistant',
-          content:
-            data?.answer ||
-            'Sorry, I could not generate an answer.',
+          content: data?.answer || t('cbEmptyAnswer'),
           suggestions: [],
         },
       ])
@@ -372,8 +362,7 @@ export default function Chatbot() {
         {
           id: `error-${Date.now()}`,
           role: 'assistant',
-          content:
-            '⚠️ Sorry, I am unable to connect to the AI service right now. Please make sure the SM TECHSPHERE backend is running.',
+          content: t('cbErrorReply'),
           suggestions: [],
           isError: true,
         },
@@ -391,9 +380,8 @@ export default function Chatbot() {
       {
         id: `welcome-${Date.now()}`,
         role: 'assistant',
-        content:
-          'Chat cleared. How can I help you with SM TECHSPHERE?',
-        suggestions: INITIAL_SUGGESTIONS,
+        content: t('cbClearedMsg'),
+        suggestions: buildSuggestions(),
       },
     ])
     setInput('')
@@ -421,7 +409,7 @@ export default function Chatbot() {
             type="button"
             className="cb-back"
             onClick={() => navigate(-1)}
-            title="Back"
+            title={t('cbBack')}
           >
             ←
           </button>
@@ -429,21 +417,21 @@ export default function Chatbot() {
           <div className="cb-header__icon">🤖</div>
 
           <div className="cb-header__info">
-            <h1>SM TECHSPHERE Assistant</h1>
-            <p>SM TECHSPHERE Pvt Ltd · Platform Support</p>
+            <h1>{t('cbHeaderTitle')}</h1>
+            <p>{t('cbHeaderSub')}</p>
           </div>
 
           <div className="cb-header__right">
             <span className="cb-status">
               <span className="cb-status__dot" />
-              Online
+              {t('cbOnline')}
             </span>
 
             <button
               type="button"
               className="cb-clear"
               onClick={clearChat}
-              title="Clear chat"
+              title={t('cbClear')}
             >
               🗑
             </button>
@@ -469,13 +457,11 @@ export default function Chatbot() {
                     isUser ? 'cb-row--user' : ''
                   }`}
                 >
-                  {!isUser && (
-                    <div className="cb-avatar">🤖</div>
-                  )}
+                  {!isUser && <div className="cb-avatar">🤖</div>}
 
                   <div className="cb-bubble-wrap">
                     <div className="cb-bubble-label">
-                      {isUser ? 'You' : 'Assistant'}
+                      {isUser ? t('cbYou') : t('cbAssistant')}
                     </div>
 
                     <div
@@ -488,9 +474,7 @@ export default function Chatbot() {
                       }`}
                     >
                       {isUser || message.isError ? (
-                        <p className="ans__p">
-                          {message.content}
-                        </p>
+                        <p className="ans__p">{message.content}</p>
                       ) : (
                         <AnswerBlock blocks={blocks} />
                       )}
@@ -500,22 +484,18 @@ export default function Chatbot() {
                     {!isUser &&
                       message.suggestions?.length > 0 && (
                         <div className="cb-suggestions">
-                          {message.suggestions.map(
-                            (s, i) => (
-                              <button
-                                key={i}
-                                type="button"
-                                onClick={() =>
-                                  sendMessage(s.text)
-                                }
-                              >
-                                <span className="cb-suggestions__icon">
-                                  {s.icon}
-                                </span>
-                                {s.text}
-                              </button>
-                            )
-                          )}
+                          {message.suggestions.map((s, i) => (
+                            <button
+                              key={i}
+                              type="button"
+                              onClick={() => sendMessage(s.text)}
+                            >
+                              <span className="cb-suggestions__icon">
+                                {s.icon}
+                              </span>
+                              {s.text}
+                            </button>
+                          ))}
                         </div>
                       )}
                   </div>
@@ -529,7 +509,7 @@ export default function Chatbot() {
                 <div className="cb-avatar">🤖</div>
                 <div className="cb-bubble-wrap">
                   <div className="cb-bubble-label">
-                    Assistant
+                    {t('cbAssistant')}
                   </div>
                   <div className="cb-bubble cb-bubble--bot">
                     <div className="cb-typing">
@@ -554,7 +534,7 @@ export default function Chatbot() {
               value={input}
               onChange={(e) => setInput(e.target.value)}
               onKeyDown={handleKeyDown}
-              placeholder="Ask about SM TECHSPHERE Pvt Ltd, registration, matching…"
+              placeholder={t('cbInputPlaceholder')}
               rows={1}
             />
 
@@ -563,15 +543,13 @@ export default function Chatbot() {
               onClick={() => sendMessage()}
               disabled={loading || !input.trim()}
               className="cb-send"
-              title="Send message"
+              title={t('cbSendTitle')}
             >
               ➤
             </button>
           </div>
 
-          <div className="cb-input-hint">
-            Press Enter to send · Shift + Enter for new line
-          </div>
+          <div className="cb-input-hint">{t('cbInputHint')}</div>
         </div>
       </main>
 
