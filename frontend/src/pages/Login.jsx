@@ -1,38 +1,9 @@
-import { useState, useEffect } from 'react'
+import { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { useAuth } from '../context/AuthContext'
+import { useLanguage } from '../context/LanguageContext'
 import './Login.css'
 import API from '../services/api'
-
-/* =========================================================
-   ERROR MESSAGE
-   ========================================================= */
-
-function getErrorMessage(error) {
-  const detail = error?.response?.data?.detail
-
-  if (Array.isArray(detail)) {
-    return detail
-      .map((item) => {
-        if (typeof item === 'string') return item
-        if (item?.msg) {
-          const location = Array.isArray(item.loc)
-            ? item.loc.filter((part) => part !== 'body').join(' → ')
-            : ''
-          return location ? `${location}: ${item.msg}` : item.msg
-        }
-        return 'Invalid Request'
-      })
-      .join(', ')
-  }
-
-  if (typeof detail === 'string') return detail
-  if (typeof error?.response?.data?.message === 'string')
-    return error.response.data.message
-  if (typeof error?.message === 'string') return error.message
-
-  return 'Login Failed. Please Try Again.'
-}
 
 /* =========================================================
    CAPTCHA GENERATOR — 6 chars
@@ -52,83 +23,91 @@ function generateCaptcha() {
    ========================================================= */
 
 export default function Login() {
+  const { t } = useLanguage()
+
+  /* ================= ERROR MESSAGE HELPER ================= */
+
+  const getErrorMessage = (error) => {
+    const detail = error?.response?.data?.detail
+
+    if (Array.isArray(detail)) {
+      return detail
+        .map((item) => {
+          if (typeof item === 'string') return item
+          if (item?.msg) {
+            const location = Array.isArray(item.loc)
+              ? item.loc.filter((part) => part !== 'body').join(' → ')
+              : ''
+            return location ? `${location}: ${item.msg}` : item.msg
+          }
+          return t('invalidRequestErr')
+        })
+        .join(', ')
+    }
+
+    if (typeof detail === 'string') return detail
+    if (typeof error?.response?.data?.message === 'string')
+      return error.response.data.message
+    if (typeof error?.message === 'string') return error.message
+
+    return t('loginFailErr')
+  }
+
+  /* ================= STATE ================= */
+
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
-  const [confirmPassword, setConfirmPassword] = useState('')
   const [showPassword, setShowPassword] = useState(false)
+
   const [showForgotPassword, setShowForgotPassword] = useState(false)
-  const [forgotEmail, setForgotEmail] = useState(email)
+  const [forgotEmail, setForgotEmail] = useState('')
   const [forgotLoading, setForgotLoading] = useState(false)
   const [forgotMessage, setForgotMessage] = useState('')
   const [forgotError, setForgotError] = useState('')
-  const [showConfirmPassword, setShowConfirmPassword] = useState(false)
+
   const [error, setError] = useState('')
   const [loading, setLoading] = useState(false)
-
-  /* ================= CAPTCHA STATE ================= */
 
   const [captchaText, setCaptchaText] = useState(() => generateCaptcha())
   const [captchaInput, setCaptchaInput] = useState('')
   const [captchaError, setCaptchaError] = useState('')
-
-  /* ================= REGISTER POPUP STATE ================= */
 
   const [showRegisterChoice, setShowRegisterChoice] = useState(false)
 
   const { login } = useAuth()
   const navigate = useNavigate()
 
-  /* ================= handleForgotPassword ================= */
-const handleForgotPassword = async () => {
-  console.log('========== FORGOT PASSWORD ==========')
-  console.log('Email:', forgotEmail)
-  console.log('API Base URL:', API.defaults.baseURL)
-  console.log(
-    'Full URL:',
-    `${API.defaults.baseURL}/auth/forgot-password`
-  )
+  /* ================= FORGOT PASSWORD ================= */
 
-  setForgotError('')
-  setForgotMessage('')
+  const handleForgotPassword = async () => {
+    setForgotError('')
+    setForgotMessage('')
 
-  if (!forgotEmail.trim()) {
-    setForgotError('Please Enter Your Email Address.')
-    return
-  }
+    if (!forgotEmail.trim()) {
+      setForgotError(t('forgotEmptyErr'))
+      return
+    }
 
-  setForgotLoading(true)
+    setForgotLoading(true)
 
-  try {
-    const response = await API.post(
-      '/auth/forgot-password',
-      {
+    try {
+      const response = await API.post('/auth/forgot-password', {
         email: forgotEmail.trim(),
-      }
-    )
+      })
 
-    console.log('SUCCESS:', response.status)
-    console.log('RESPONSE:', response.data)
-
-    setForgotMessage(
-      response.data?.message ||
-      'If This Email Is Registered, A Password Reset Link Has Been Sent.'
-    )
-  } catch (error) {
-    console.error('FORGOT PASSWORD ERROR:', error)
-    console.error('STATUS:', error?.response?.status)
-    console.error('DATA:', error?.response?.data)
-    console.error('URL:', error?.config?.url)
-    console.error('BASE URL:', error?.config?.baseURL)
-
-    setForgotError(
-      error?.response?.data?.detail ||
-      error?.message ||
-      'Unable To Send Password Reset Email.'
-    )
-  } finally {
-    setForgotLoading(false)
+      setForgotMessage(
+        response.data?.message || t('forgotSuccessMsg')
+      )
+    } catch (error) {
+      setForgotError(
+        error?.response?.data?.detail ||
+          error?.message ||
+          t('forgotFailMsg')
+      )
+    } finally {
+      setForgotLoading(false)
+    }
   }
-}
 
   /* ================= REFRESH CAPTCHA ================= */
 
@@ -152,38 +131,16 @@ const handleForgotPassword = async () => {
     setError('')
     setCaptchaError('')
 
-    /* ---- CAPTCHA VALIDATION ---- */
-
     if (!captchaInput.trim()) {
-      setCaptchaError('Please Enter The Captcha Code.')
+      setCaptchaError(t('captchaEmptyErr'))
       return
     }
 
     if (captchaInput.trim().toUpperCase() !== captchaText.toUpperCase()) {
-      setCaptchaError('Incorrect Captcha. Please Try Again.')
+      setCaptchaError(t('captchaWrongErr'))
       refreshCaptcha()
       return
     }
-
-    /* ---- PASSWORD CONFIRMATION ---- */
-
-      // if (!password.trim()) {
-      //   setError('Please enter your password.')
-      //   return
-      // }
-
-      // if (!confirmPassword.trim()) {
-      //   setError('Please re-enter your password.')
-      //   return
-      // }
-
-      // if (password !== confirmPassword) {
-      //   setError('Passwords do not match. Please enter the same password.')
-      //   return
-      // }
-
-
-    /* ---- LOGIN ---- */
 
     setLoading(true)
 
@@ -196,9 +153,8 @@ const handleForgotPassword = async () => {
       if (data.role === 'admin') navigate('/admin', { replace: true })
       else if (data.role === 'buyer') navigate('/buyer', { replace: true })
       else if (data.role === 'vendor') navigate('/vendor', { replace: true })
-      else setError('Unknown User Role.')
+      else setError(t('unknownRoleErr'))
     } catch (err) {
-      console.error('Login error:', err)
       setError(getErrorMessage(err))
       refreshCaptcha()
     } finally {
@@ -216,11 +172,11 @@ const handleForgotPassword = async () => {
       <div className="login-topbar">
         <div className="login-brand">
           <div className="login-brand-logo">
-            <img src="/logo2.jpeg" alt="SM TECHSPHERE Pvt Ltd" />
+            <img src="/logo2.jpeg" alt={t('loginBrandName')} />
           </div>
           <div>
-            <strong>SM TECHSPHERE Pvt Ltd</strong>
-            <span>Engineering Solutions</span>
+            <strong>{t('loginBrandName')}</strong>
+            <span>{t('loginBrandSub')}</span>
           </div>
         </div>
 
@@ -230,7 +186,7 @@ const handleForgotPassword = async () => {
           onClick={() => navigate('/')}
         >
           <span>←</span>
-          Back
+          {t('backBtn')}
         </button>
       </div>
 
@@ -240,9 +196,9 @@ const handleForgotPassword = async () => {
         <section className="login-card">
           <div className="login-card-header">
             <div>
-              <span className="form-kicker">SECURE ACCESS</span>
-              <h2>Welcome Back</h2>
-              <p>Sign In To Access Your Dashboard.</p>
+              <span className="form-kicker">{t('secureAccessLabel')}</span>
+              <h2>{t('welcomeBack')}</h2>
+              <p>{t('signInSub')}</p>
             </div>
 
             <div className="role-icon">🔐</div>
@@ -254,13 +210,13 @@ const handleForgotPassword = async () => {
             <div className="field-group">
               <label>
                 <span className="field-icon">✉️</span>
-                Email
+                {t('emailLabel')}
               </label>
               <input
                 type="email"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
-                placeholder="Enter Your Email"
+                placeholder={t('emailPlaceholder')}
                 autoComplete="email"
                 required
               />
@@ -271,14 +227,14 @@ const handleForgotPassword = async () => {
             <div className="field-group">
               <label>
                 <span className="field-icon">🔐</span>
-                Password
+                {t('passwordLabel')}
               </label>
               <div className="password-wrap">
                 <input
                   type={showPassword ? 'text' : 'password'}
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
-                  placeholder="Enter Your Password"
+                  placeholder={t('passwordPlaceholder')}
                   autoComplete="current-password"
                   required
                 />
@@ -286,62 +242,13 @@ const handleForgotPassword = async () => {
                   type="button"
                   className="password-toggle"
                   onClick={() => setShowPassword((v) => !v)}
-                  aria-label={showPassword ? 'Hide Password' : 'Show Password'}
+                  aria-label={
+                    showPassword ? t('hidePassword') : t('showPassword')
+                  }
                 >
                   {showPassword ? '🙈' : '👁️'}
                 </button>
               </div>
-            </div>
-
-            {/* RE-ENTER PASSWORD */}
-
-            <div className="field-group">
-              
-
-              <div className="password-wrap">
-                {/* <input
-                  type={showConfirmPassword ? 'text' : 'password'}
-                  value={confirmPassword}
-                  onChange={(e) => {
-                    setConfirmPassword(e.target.value)
-                    setError('')
-                  }}
-                  placeholder="Re-enter your password"
-                  autoComplete="new-password"
-                  required
-                /> */}
-
-                {/* <button
-                  type="button"
-                  className="password-toggle"
-                  onClick={() =>
-                    setShowConfirmPassword((v) => !v)
-                  }
-                  aria-label={
-                    showConfirmPassword
-                      ? 'Hide password'
-                      : 'Show password'
-                  }
-                >
-                  {showConfirmPassword ? '🙈' : '👁️'}
-                </button> */}
-              </div>
-
-              {confirmPassword && (
-                <div
-                  className={
-                    `password-match ${
-                      password === confirmPassword
-                        ? 'password-match--success'
-                        : 'password-match--error'
-                    }`
-                  }
-                >
-                  {password === confirmPassword
-                    ? '✓ Passwords Match'
-                    : '✕ Passwords Do Not Match'}
-                </div>
-              )}
             </div>
 
             {/* CAPTCHA */}
@@ -349,7 +256,7 @@ const handleForgotPassword = async () => {
             <div className="field-group captcha-group">
               <label>
                 <span className="field-icon">🛡️</span>
-                Captcha Verification
+                {t('captchaLabel')}
               </label>
 
               <div className="captcha-row">
@@ -359,8 +266,8 @@ const handleForgotPassword = async () => {
                     type="button"
                     className="captcha-refresh"
                     onClick={refreshCaptcha}
-                    aria-label="Refresh Captcha"
-                    title="Refresh Captcha"
+                    aria-label={t('captchaRefresh')}
+                    title={t('captchaRefresh')}
                   >
                     ↻
                   </button>
@@ -374,7 +281,7 @@ const handleForgotPassword = async () => {
                     setCaptchaInput(e.target.value.toUpperCase())
                     setCaptchaError('')
                   }}
-                  placeholder="Enter Code"
+                  placeholder={t('captchaPlaceholder')}
                   maxLength={6}
                   autoComplete="off"
                   spellCheck="false"
@@ -386,38 +293,36 @@ const handleForgotPassword = async () => {
               )}
             </div>
 
-            {/* REMEMBER */}
+            {/* REMEMBER + FORGOT */}
 
             <div className="login-row">
               <label className="remember">
                 <input type="checkbox" />
-                <span>Remember Me</span>
+                <span>{t('rememberMe')}</span>
               </label>
 
               <label className="Forgat_link">
                 <button
-  type="button"
-  onClick={() => {
-    setForgotEmail(email)
-    setForgotError('')
-    setForgotMessage('')
-    setShowForgotPassword(true)
-  }}
-  style={{
-    border: 'none',
-    background: 'transparent',
-    padding: 0,
-    color: '#16a34a',
-    fontWeight: 700,
-    cursor: 'pointer',
-  }}
->
-  Forgot Password?
-</button>
+                  type="button"
+                  onClick={() => {
+                    setForgotEmail(email)
+                    setForgotError('')
+                    setForgotMessage('')
+                    setShowForgotPassword(true)
+                  }}
+                  style={{
+                    border: 'none',
+                    background: 'transparent',
+                    padding: 0,
+                    color: '#16a34a',
+                    fontWeight: 700,
+                    cursor: 'pointer',
+                  }}
+                >
+                  {t('forgotPassword')}
+                </button>
               </label>
-
             </div>
-            
 
             {/* ERROR */}
 
@@ -441,11 +346,11 @@ const handleForgotPassword = async () => {
               {loading ? (
                 <>
                   <span className="spinner" />
-                  Signing In...
+                  {t('signingIn')}
                 </>
               ) : (
                 <>
-                  Login
+                  {t('loginBtn')}
                   <span>→</span>
                 </>
               )}
@@ -454,29 +359,27 @@ const handleForgotPassword = async () => {
             {/* FOOTER */}
 
             <div className="login-footer">
-              <span>New To SM TECHSPHERE Pvt Ltd </span>
+              <span>{t('newToPlatform')} </span>
               <button
                 type="button"
                 onClick={() => setShowRegisterChoice(true)}
               >
-                Create Account
+                {t('createAccount')}
               </button>
             </div>
 
-            <div className="secure-note">
-              🔒 Your Information Is Protected And Securely Processed.
-            </div>
+            <div className="secure-note">{t('secureNote')}</div>
           </form>
 
           {/* DEMO BOX */}
 
-          {/* <div className="demo-box">
+          <div className="demo-box">
             <span className="demo-dot" />
             <div>
-              <strong>Demo Admin</strong>
+              <strong>{t('demoAdminLabel')}</strong>
               <span>admin@smcleantech.com · Admin@12345</span>
             </div>
-          </div> */}
+          </div>
         </section>
       </main>
 
@@ -502,29 +405,25 @@ const handleForgotPassword = async () => {
               ×
             </button>
 
-            <span className="register-modal__label">JOIN THE NETWORK</span>
-            <h2>Create Your Account</h2>
-            <p>Choose How You Want To Register</p>
+            <span className="register-modal__label">
+              {t('joinNetworkLabel')}
+            </span>
+            <h2>{t('createYourAccount')}</h2>
+            <p>{t('chooseRegister')}</p>
 
             <div className="register-modal__options">
-              {/* BUYER */}
-
               <button
                 type="button"
                 className="register-option register-option--buyer"
                 onClick={() => goToRegister('buyer')}
               >
                 <div className="register-option__icon">🏢</div>
-
                 <div className="register-option__text">
-                  <strong>Register As Buyer</strong>
-                  <span>Post Industrial Requirements</span>
+                  <strong>{t('registerAsBuyer')}</strong>
+                  <span>{t('registerAsBuyerSub')}</span>
                 </div>
-
                 <div className="register-option__arrow">→</div>
               </button>
-
-              {/* VENDOR */}
 
               <button
                 type="button"
@@ -532,12 +431,10 @@ const handleForgotPassword = async () => {
                 onClick={() => goToRegister('vendor')}
               >
                 <div className="register-option__icon">⚙️</div>
-
                 <div className="register-option__text">
-                  <strong>Register As Vendor</strong>
-                  <span>Offer EPC & TECHSPHERE Pvt Ltd</span>
+                  <strong>{t('registerAsVendor')}</strong>
+                  <span>{t('registerAsVendorSub')}</span>
                 </div>
-
                 <div className="register-option__arrow">→</div>
               </button>
             </div>
@@ -545,169 +442,170 @@ const handleForgotPassword = async () => {
         </div>
       )}
 
+      {/* FORGOT PASSWORD MODAL */}
+
       {showForgotPassword && (
-  <div
-    style={{
-      position: 'fixed',
-      inset: 0,
-      background: 'rgba(15, 23, 42, 0.55)',
-      backdropFilter: 'blur(6px)',
-      display: 'flex',
-      alignItems: 'center',
-      justifyContent: 'center',
-      padding: '20px',
-      zIndex: 9999,
-    }}
-  >
-    <div
-      style={{
-        width: '100%',
-        maxWidth: '430px',
-        background: '#ffffff',
-        borderRadius: '22px',
-        padding: '30px',
-        boxShadow: '0 25px 70px rgba(0,0,0,0.22)',
-      }}
-    >
-      <div
-        style={{
-          width: '52px',
-          height: '52px',
-          borderRadius: '15px',
-          background: '#ecfdf5',
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'center',
-          fontSize: '24px',
-          marginBottom: '18px',
-        }}
-      >
-        🔐
-      </div>
-
-      <h2
-        style={{
-          margin: '0 0 8px',
-          color: '#0f172a',
-          fontSize: '24px',
-          fontWeight: 800,
-        }}
-      >
-        Forgot Password?
-      </h2>
-
-      <p
-        style={{
-          margin: '0 0 22px',
-          color: '#64748b',
-          fontSize: '13px',
-          lineHeight: 1.6,
-        }}
-      >
-        Enter Your Registered Email Address And We Will
-        Send You A Secure Password Reset Link.
-      </p>
-
-      <input
-        type="email"
-        value={forgotEmail}
-        onChange={(e) => setForgotEmail(e.target.value)}
-        placeholder="Enter Your Email"
-        style={{
-          width: '100%',
-          height: '48px',
-          padding: '0 14px',
-          border: '1px solid #dbe2ea',
-          borderRadius: '11px',
-          outline: 'none',
-          fontSize: '14px',
-          boxSizing: 'border-box',
-        }}
-      />
-
-      {forgotError && (
         <div
           style={{
-            marginTop: '12px',
-            padding: '10px 12px',
-            borderRadius: '9px',
-            background: '#fef2f2',
-            color: '#dc2626',
-            fontSize: '12px',
-            fontWeight: 600,
+            position: 'fixed',
+            inset: 0,
+            background: 'rgba(15, 23, 42, 0.55)',
+            backdropFilter: 'blur(6px)',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            padding: '20px',
+            zIndex: 9999,
           }}
         >
-          {forgotError}
+          <div
+            style={{
+              width: '100%',
+              maxWidth: '430px',
+              background: '#ffffff',
+              borderRadius: '22px',
+              padding: '30px',
+              boxShadow: '0 25px 70px rgba(0,0,0,0.22)',
+            }}
+          >
+            <div
+              style={{
+                width: '52px',
+                height: '52px',
+                borderRadius: '15px',
+                background: '#ecfdf5',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                fontSize: '24px',
+                marginBottom: '18px',
+              }}
+            >
+              🔐
+            </div>
+
+            <h2
+              style={{
+                margin: '0 0 8px',
+                color: '#0f172a',
+                fontSize: '24px',
+                fontWeight: 800,
+              }}
+            >
+              {t('forgotTitle')}
+            </h2>
+
+            <p
+              style={{
+                margin: '0 0 22px',
+                color: '#64748b',
+                fontSize: '13px',
+                lineHeight: 1.6,
+              }}
+            >
+              {t('forgotDesc')}
+            </p>
+
+            <input
+              type="email"
+              value={forgotEmail}
+              onChange={(e) => setForgotEmail(e.target.value)}
+              placeholder={t('emailPlaceholder')}
+              style={{
+                width: '100%',
+                height: '48px',
+                padding: '0 14px',
+                border: '1px solid #dbe2ea',
+                borderRadius: '11px',
+                outline: 'none',
+                fontSize: '14px',
+                boxSizing: 'border-box',
+              }}
+            />
+
+            {forgotError && (
+              <div
+                style={{
+                  marginTop: '12px',
+                  padding: '10px 12px',
+                  borderRadius: '9px',
+                  background: '#fef2f2',
+                  color: '#dc2626',
+                  fontSize: '12px',
+                  fontWeight: 600,
+                }}
+              >
+                {forgotError}
+              </div>
+            )}
+
+            {forgotMessage && (
+              <div
+                style={{
+                  marginTop: '12px',
+                  padding: '10px 12px',
+                  borderRadius: '9px',
+                  background: '#ecfdf5',
+                  color: '#15803d',
+                  fontSize: '12px',
+                  fontWeight: 600,
+                }}
+              >
+                {forgotMessage}
+              </div>
+            )}
+
+            <div
+              style={{
+                display: 'flex',
+                gap: '10px',
+                marginTop: '20px',
+              }}
+            >
+              <button
+                type="button"
+                onClick={() => {
+                  setShowForgotPassword(false)
+                  setForgotError('')
+                  setForgotMessage('')
+                }}
+                style={{
+                  flex: 1,
+                  height: '46px',
+                  border: '1px solid #dbe2ea',
+                  borderRadius: '11px',
+                  background: '#ffffff',
+                  color: '#475569',
+                  fontWeight: 700,
+                  cursor: 'pointer',
+                }}
+              >
+                {t('forgotCancel')}
+              </button>
+
+              <button
+                type="button"
+                onClick={handleForgotPassword}
+                disabled={forgotLoading}
+                style={{
+                  flex: 1,
+                  height: '46px',
+                  border: 'none',
+                  borderRadius: '11px',
+                  background:
+                    'linear-gradient(135deg,#15803d,#22c55e)',
+                  color: '#ffffff',
+                  fontWeight: 800,
+                  cursor: forgotLoading ? 'not-allowed' : 'pointer',
+                  opacity: forgotLoading ? 0.7 : 1,
+                }}
+              >
+                {forgotLoading ? t('forgotSending') : t('forgotSend')}
+              </button>
+            </div>
+          </div>
         </div>
       )}
-
-      {forgotMessage && (
-        <div
-          style={{
-            marginTop: '12px',
-            padding: '10px 12px',
-            borderRadius: '9px',
-            background: '#ecfdf5',
-            color: '#15803d',
-            fontSize: '12px',
-            fontWeight: 600,
-          }}
-        >
-          {forgotMessage}
-        </div>
-      )}
-
-      <div
-        style={{
-          display: 'flex',
-          gap: '10px',
-          marginTop: '20px',
-        }}
-      >
-        <button
-          type="button"
-          onClick={() => {
-            setShowForgotPassword(false)
-            setForgotError('')
-            setForgotMessage('')
-          }}
-          style={{
-            flex: 1,
-            height: '46px',
-            border: '1px solid #dbe2ea',
-            borderRadius: '11px',
-            background: '#ffffff',
-            color: '#475569',
-            fontWeight: 700,
-            cursor: 'pointer',
-          }}
-        >
-          Cancel
-        </button>
-
-        <button
-          type="button"
-          onClick={handleForgotPassword}
-          disabled={forgotLoading}
-          style={{
-            flex: 1,
-            height: '46px',
-            border: 'none',
-            borderRadius: '11px',
-            background: 'linear-gradient(135deg,#15803d,#22c55e)',
-            color: '#ffffff',
-            fontWeight: 800,
-            cursor: forgotLoading ? 'not-allowed' : 'pointer',
-            opacity: forgotLoading ? 0.7 : 1,
-          }}
-        >
-          {forgotLoading ? 'Sending...' : 'Send Reset Link'}
-        </button>
-      </div>
-    </div>
-  </div>
-)}
-
     </div>
   )
-} 
+}
