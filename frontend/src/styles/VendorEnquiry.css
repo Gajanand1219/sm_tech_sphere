@@ -1424,3 +1424,103 @@
     margin-left: 58px;
   }
 }
+
+
+
+/* Technical Dossier - Question & Answer Cards */
+.ve-dossier__questions {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 16px;
+  margin-top: 22px;
+}
+
+.ve-dossier__question {
+  display: flex;
+  align-items: flex-start;
+  gap: 16px;
+  padding: 20px;
+  background: linear-gradient(135deg, #ffffff 0%, #f8fafc 100%);
+  border: 1px solid #e2e8f0;
+  border-left: 4px solid #2563eb;
+  border-radius: 12px;
+  box-shadow: 0 3px 12px rgba(15, 23, 42, 0.04);
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.ve-dossier__question:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 22px rgba(15, 23, 42, 0.08);
+  border-color: #bfdbfe;
+}
+
+.ve-dossier__number {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex: 0 0 40px;
+  width: 40px;
+  height: 40px;
+  background: #eff6ff;
+  color: #1d4ed8;
+  border: 1px solid #dbeafe;
+  border-radius: 10px;
+  font-size: 13px;
+  font-weight: 800;
+}
+
+.ve-dossier__content {
+  flex: 1;
+  min-width: 0;
+}
+
+.ve-dossier__content h4 {
+  margin: 2px 0 10px;
+  color: #1e293b;
+  font-size: 15px;
+  font-weight: 700;
+  line-height: 1.65;
+  overflow-wrap: anywhere;
+}
+
+.ve-dossier__content p {
+  margin: 0;
+  padding: 12px 14px;
+  color: #475569;
+  background: #f1f5f9;
+  border: 1px solid #e2e8f0;
+  border-radius: 8px;
+  font-size: 14px;
+  line-height: 1.7;
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+}
+
+@media (max-width: 600px) {
+  .ve-dossier__questions {
+    gap: 12px;
+    margin-top: 16px;
+  }
+
+  .ve-dossier__question {
+    gap: 11px;
+    padding: 14px;
+  }
+
+  .ve-dossier__number {
+    flex-basis: 32px;
+    width: 32px;
+    height: 32px;
+    font-size: 12px;
+  }
+
+  .ve-dossier__content h4 {
+    font-size: 14px;
+    line-height: 1.55;
+  }
+
+  .ve-dossier__content p {
+    padding: 10px;
+    font-size: 13px;
+  }
+}
