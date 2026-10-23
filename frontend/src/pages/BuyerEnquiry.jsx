@@ -184,7 +184,30 @@ export default function BuyerEnquiry() {
               <p className="muted">Submitted requirements & structured answers</p>
             </div>
           </div>
-          <pre className="dossier">{enquiry.dossier}</pre>
+          {/* <pre className="dossier">{enquiry.dossier}</pre> */}
+          <div className="be-dossier">
+  {String(enquiry.dossier || "")
+    .split("\n")
+    .filter((line) => line.trim() && !line.includes('<div id="ev-questionnaire">'))
+    .slice(0, 4)
+    .map((line, index) => {
+      const [question, ...answerParts] = line.split(":");
+      const answer = answerParts.join(":").trim();
+
+      return (
+        <div className="be-dossier__question" key={index}>
+          <div className="be-dossier__number">{index + 1}</div>
+
+          <div className="be-dossier__content">
+            <h4>{question.trim()}</h4>
+            <p>
+              {answer || "Answer not available"}
+            </p>
+          </div>
+        </div>
+      );
+    })}
+</div>
         </div>
 
         {/* ============ MATCHES ============ */}
