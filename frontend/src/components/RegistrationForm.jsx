@@ -81,9 +81,9 @@ const buildAddressString = (form, key) =>
 
 const domains = [
   'Water & Wastewater Treatment',
-  'Solid & Hazardous Waste',
-  'Solar & Renewables',
-  'Carbon & ESG',
+  'SOLID AND HAZARDOUS WASTE',
+  'SOLAR AND RENEWABLE ENERGY',
+  'CARBON AND ESG',
   'Air Pollution & Environmental Legal Services',
 ]
 
