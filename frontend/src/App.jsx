@@ -3,13 +3,12 @@ import './styles/base.css'
 import './styles.css'
 
 import ResetPassword from './pages/ResetPassword'
-
+import { LanguageProvider } from './context/LanguageContext'
 import { AuthProvider } from './context/AuthContext'
 import ProtectedRoute from './components/ProtectedRoute'
 
 import Chatbot from './components/Chatbot'
 import FloatingChatButton from './components/FloatingChatButton'
-
 import ScrollToTop from './components/ScrollToTop'
 
 // Public pages
@@ -41,10 +40,10 @@ import CRM from './pages/CRM'
 
 export default function App() {
   return (
+    <LanguageProvider>
     <AuthProvider>
       <BrowserRouter>
         <ScrollToTop />
-       
         <Routes>
           {/* ============ PUBLIC ROUTES ============ */}
           <Route path="/" element={<Home />} />
@@ -171,8 +170,9 @@ export default function App() {
           />
         </Routes>
 
-    <FloatingChatButton />
+        <FloatingChatButton />
       </BrowserRouter>
     </AuthProvider>
+    </LanguageProvider>
   )
 }
