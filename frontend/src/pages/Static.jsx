@@ -119,7 +119,7 @@ function Footer() {
               alt="S&M CleanTech"
               className="footer__logo-image"
             />
-            <p>SM CleanTech Engineering Solutions</p>
+            <p>SM Techsphere Pvt. Ltd</p>
             <span>Diagnose. Match. Solution.</span>
           </div>
 
@@ -141,17 +141,16 @@ function Footer() {
           <div className="footer-column footer-contact">
             <h4>Contact</h4>
             <p>
-              SM CLEANTECH
-              <br />
-              ENGINEERING SOLUTIONS
+              SM Techsphere Pvt. Ltd
+              
             </p>
             <p>
                       Email:{" "}
                       <a
-                        href="mailto:smcleantech2910@gmail.com"
+                        href="mailto:smteschsphere2910@gmail.com"
                         style={{ color: "blue", textDecoration: "none" }}
                       >
-                        smcleantech2910@gmail.com
+                        smteschsphere2910@gmail.com
                       </a>
                     </p>
             <p>India</p>
@@ -159,7 +158,7 @@ function Footer() {
         </div>
 
         <div className="footer-bottom">
-          <span>© 2026 SM CleanTech Engineering Solutions</span>
+          <span>© 2026 SM Techsphere Pvt. Ltd</span>
           <span>Water • Waste • Solar • ESG • SPCB</span>
         </div>
       </div>
@@ -243,7 +242,7 @@ export function Solutions() {
               <span>OUR DOMAINS</span>
               <h2>Solutions for industrial challenges</h2>
               <p>
-                Select the relevant domain to understand the type of engineering, environmental and CleanTech requirements supported by our SM CleanTech platform.
+                Select the relevant domain to understand the type of engineering, environmental and CleanTech requirements supported by our SM Techsphere Pvt. Ltd platform.
               </p>
             </div>
 
@@ -344,7 +343,7 @@ export function HowItWorks() {
       <main className="static-page">
         <PageHeader
           label="ABOUT US"
-          title="How the SM CleanTech Platform Works"
+          title="How the SM Techsphere Pvt. Ltd Platform Works"
           description="A structured industrial workflow connecting buyers with relevant engineering, EPC and CleanTech solution providers."
         />
 
@@ -359,7 +358,7 @@ export function HowItWorks() {
                   solutions.
                 </h2>
                 <p>
-                  SM CleanTech Engineering Solutions provides a structured
+                  SM Techsphere Pvt. Ltd provides a structured
                   B2B environment where industrial buyers can describe their
                   requirements and relevant engineering, EPC and CleanTech
                   providers can respond to matched opportunities.
