@@ -2414,3 +2414,50 @@
     padding: 14px;
   }
 }
+
+
+/* Enquiry Question Answer Input */
+#ev-questionnaire input[type="text"] {
+  width: 100%;
+  min-height: 46px;
+  padding: 12px 15px;
+  margin-top: 8px;
+
+  font-size: 14px;
+  font-family: inherit;
+  color: #1f2937;
+
+  background: #ffffff;
+  border: 1px solid #d1d5db;
+  border-radius: 8px;
+
+  outline: none;
+  box-sizing: border-box;
+  transition: border-color 0.2s ease, box-shadow 0.2s ease;
+}
+
+/* Placeholder */
+#ev-questionnaire input[type="text"]::placeholder {
+  color: #9ca3af;
+  font-size: 14px;
+}
+
+/* Focus Effect */
+#ev-questionnaire input[type="text"]:focus {
+  border-color: #2563eb;
+  box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.12);
+}
+
+/* Required Field Validation */
+#ev-questionnaire input[type="text"]:invalid:focus {
+  border-color: #ef4444;
+}
+
+/* Mobile Responsive */
+@media (max-width: 600px) {
+  #ev-questionnaire input[type="text"] {
+    min-height: 44px;
+    padding: 10px 12px;
+    font-size: 14px;
+  }
+}
