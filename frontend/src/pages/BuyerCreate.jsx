@@ -62,6 +62,7 @@ export default function BuyerCreate() {
   const [domains, setDomains] = useState([])
   const [problems, setProblems] = useState([])
   const [questions, setQuestions] = useState([])
+  const visibleQuestions = questions.slice(0, 4)
   const { logout } = useAuth()
   const [specialNote, setSpecialNote] = useState('')
   const [reportFile, setReportFile] = useState(null)
@@ -209,11 +210,18 @@ export default function BuyerCreate() {
     [problems, problemId]
   )
 
-  const answeredCount = questions.filter((q) => String(answers[q.field_key] || '').trim()).length
-  const requiredQuestionsComplete = questions.every(
-    (q) => !q.required || String(answers[q.field_key] || '').trim().length > 0
-  )
-  const progress = questions.length ? Math.round((answeredCount / questions.length) * 100) : 0
+  const answeredCount = visibleQuestions.filter(
+  (q) => String(answers[q.field_key] || '').trim()
+).length
+
+const requiredQuestionsComplete = visibleQuestions.every(
+  (q) => !q.required || String(answers[q.field_key] || '').trim()
+)
+
+const progress = visibleQuestions.length
+  ? Math.round((answeredCount / visibleQuestions.length) * 100)
+  : 0
+
 
   const companyName =
     profile?.company_name || profile?.company || profile?.name ||
@@ -279,7 +287,7 @@ export default function BuyerCreate() {
 
   /* ---------- Download as formatted report (HTML → printable) ---------- */
   function downloadReview() {
-    const rows = questions
+    const rows = visibleQuestions
       .map((q) => `
         <tr>
           <td class="q">${escapeHtml(q.question_text)}${q.required ? ' <span class="req">*</span>' : ''}</td>
@@ -707,8 +715,8 @@ export default function BuyerCreate() {
                     No questions configured for this sub-category. You can still enter the title and continue.
                   </div>
                 ) : (
-                  <div className="ev-questions">
-                    {questions.map((question, index) => (
+                  <div className="ev-questions" id="ev-questionnaire">
+                    {visibleQuestions.map((question, index) => (
                       <div className="ev-question" key={question.id}>
                         <label htmlFor={`ev-q-${question.id}`}>
                           <span className="ev-q-num">
@@ -720,19 +728,19 @@ export default function BuyerCreate() {
                           </span>
                         </label>
 
-                        <textarea
-                          id={`ev-q-${question.id}`}
-                          rows={3}
-                          required={Boolean(question.required)}
-                          value={answers[question.field_key] || ''}
-                          onChange={(e) =>
-                            setAnswers((prev) => ({
-                              ...prev,
-                              [question.field_key]: e.target.value,
-                            }))
-                          }
-                          placeholder="Enter Your Answer"
-                        />
+                        <input
+                        id={`ev-q-${question.id}`}
+                        type="text"
+                        required={Boolean(question.required)}
+                        value={answers[question.field_key] || ''}
+                        onChange={(e) =>
+                          setAnswers((prev) => ({
+                            ...prev,
+                            [question.field_key]: e.target.value,
+                          }))
+                        }
+                        placeholder="Enter Your Answer"
+                      />
                       </div>
                     ))}
                   </div>
@@ -864,7 +872,7 @@ export default function BuyerCreate() {
                       {questions.length === 0 && (
                         <tr><td colSpan={2} className="ev-report-empty">No questions configured.</td></tr>
                       )}
-                      {questions.map((question) => (
+                      {visibleQuestions.map((question) => (
                         <tr key={question.id}>
                           <td className="q">
                             {question.question_text}{question.required && <span className="req"> *</span>}
