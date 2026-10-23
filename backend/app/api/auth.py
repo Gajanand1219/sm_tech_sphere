@@ -306,14 +306,64 @@ async def match_existing_enquiries_for_vendor(
         if existing_match:
             continue
 
+
         # ----------------------------------------------------
-        # Create match
+        # INDUSTRY / VERTICAL MATCHING
         # ----------------------------------------------------
+
+        def normalize_values(value):
+            import json
+
+            if value is None:
+                return set()
+
+            if isinstance(value, str):
+                value = value.strip()
+
+                if not value:
+                    return set()
+
+                try:
+                    parsed = json.loads(value)
+                    if isinstance(parsed, list):
+                        value = parsed
+                    else:
+                        value = [value]
+                except (json.JSONDecodeError, TypeError):
+                    value = value.split(",")
+
+            if isinstance(value, (list, tuple, set)):
+                return {
+                    str(item).strip().casefold()
+                    for item in value
+                    if item is not None and str(item).strip()
+                }
+
+            return set()
+
+        buyer_profile = getattr(enquiry.buyer, "buyer_profile", None)
+
+        buyer_industries = normalize_values(
+            getattr(buyer_profile, "industry", None)
+        )
+
+        vendor_verticals = normalize_values(
+            getattr(vendor_profile, "industrial_verticals", None)
+        )
+
+        industry_match = bool(
+            buyer_industries & vendor_verticals
+        )
+
+        # Domain match already verified above.
+        # Domain + Industry/Vertical = 100
+        # Domain only = 60
+        score = 100.0 if industry_match else 60.0
 
         match = EnquiryMatch(
             enquiry_id=enquiry.id,
             vendor_id=vendor.id,
-            match_score=100.0,
+            match_score=score,
             notified=False,
         )
 
@@ -355,6 +405,7 @@ async def match_existing_enquiries_for_vendor(
     db.commit()
 
     return matched_count
+
 
 
 # ============================================================
