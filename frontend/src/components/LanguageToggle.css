@@ -1,0 +1,124 @@
+
+.sm-language-toggle {
+  display: inline-flex;
+  align-items: center;
+  gap: 2px;
+  padding: 3px;
+  border: 1px solid #d8e2ec;
+  border-radius: 20px;
+  background: #fff;
+  white-space: nowrap;
+  flex-shrink: 0;
+}
+
+.sm-language-toggle button {
+  border: none;
+  background: transparent;
+  color: #334155;
+  padding: 4px 7px;
+  border-radius: 16px;
+  cursor: pointer;
+  font-family: inherit;
+  font-size: 11px;
+  line-height: 1.2;
+  font-weight: 600;
+  transition: all 0.2s ease;
+}
+
+.sm-language-toggle button.is-active {
+  background: #087f5b;
+  color: #fff;
+}
+
+.sm-language-toggle button:hover {
+  color: #087f5b;
+}
+
+.sm-language-toggle button.is-active:hover {
+  color: #fff;
+}
+
+.navbar__language--small {
+  display: flex;
+  align-items: center;
+  margin-left: 4px;
+}
+
+.navbar__mobile-language {
+  display: flex;
+  justify-content: center;
+  margin-bottom: 10px;
+}
+
+@media (max-width: 768px) {
+  .navbar__language--small {
+    justify-content: center;
+    margin: 8px 0;
+  }
+}
+
+
+
+.sm-language-toggle {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 4px;
+  border: 1px solid #d8e2ec;
+  border-radius: 22px;
+  background: #fff;
+  white-space: nowrap;
+  flex-shrink: 0;
+}
+
+.sm-language-toggle button {
+  border: none;
+  background: transparent;
+  color: #334155;
+  padding: 7px 12px;
+  border-radius: 18px;
+  cursor: pointer;
+  font-family: inherit;
+  font-size: 13px;
+  line-height: 1.2;
+  font-weight: 600;
+  transition: all 0.2s ease;
+}
+
+.sm-language-toggle button.is-active {
+  background: #087f5b;
+  color: #fff;
+  font-weight: 700;
+}
+
+.sm-language-toggle button:hover {
+  color: #087f5b;
+}
+
+.sm-language-toggle button.is-active:hover {
+  color: #fff;
+}
+
+.navbar__language--small {
+  display: flex;
+  align-items: center;
+  margin-left: 6px;
+}
+
+.navbar__mobile-language {
+  display: flex;
+  justify-content: center;
+  margin-bottom: 10px;
+}
+
+@media (max-width: 768px) {
+  .navbar__language--small {
+    justify-content: center;
+    margin: 8px 0;
+  }
+
+  .sm-language-toggle button {
+    padding: 8px 14px;
+    font-size: 13px;
+  }
+}
