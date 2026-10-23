@@ -7,18 +7,15 @@ class RegisterBase(BaseModel):
     password: str = Field(min_length=8, max_length=100)
 
 class BuyerRegister(RegisterBase):
-    company_name: str = Field(min_length=2, max_length=255)
-    industry: str = Field(min_length=2, max_length=150)
-    registered_address: str = Field(min_length=5)
-    plant_location: str = Field(min_length=2)
+    company_name: str = Field(min_length=2, max_length=500)
+    industry: str = Field(min_length=2, max_length=2000)
+    registered_address: str = Field(min_length=5, max_length=1000)
+    plant_location: str = Field(min_length=2, max_length=1000)
     gst_number: str = Field(min_length=5, max_length=50)
-    website: str | None = None
+    website: str | None = Field(default=None, max_length=50)
 
-    # Existing
-    head_office_contact: str | None = None
-    ehs_contact: str | None = None
-
-    # NEW
+    head_office_contact: str | None = Field(default=None, max_length=20)
+    ehs_contact: str | None = Field(default=None, max_length=20)
     director_email: EmailStr | None = None
 
 # ============================================================
@@ -35,22 +32,21 @@ class ResetPasswordRequest(BaseModel):
     
 
 class VendorRegister(RegisterBase):
-    company_name: str = Field(min_length=2, max_length=255)
-    industry_type: str = Field(min_length=2, max_length=150)
-    industrial_verticals: str = Field(min_length=2, max_length=255)
-    address: str = Field(min_length=5)
-    area_of_work: str = Field(min_length=2)
+    company_name: str = Field(min_length=2, max_length=100)
+    industry_type: str = Field(min_length=2, max_length=1000)
+    industrial_verticals: str = Field(min_length=2, max_length=2000)
+    address: str = Field(min_length=5, max_length=1000)
+    area_of_work: str = Field(min_length=2, max_length=1000)
     experience_years: int = Field(ge=0, le=100)
-    capacity: str | None = None
-    specialization: str = Field(min_length=5)
+    capacity: str | None = Field(default=None, max_length=1000)
+    specialization: str = Field(min_length=5, max_length=1000)
     gst_number: str = Field(min_length=5, max_length=50)
-    msme_number: str | None = None
-    website: str | None = None
+    msme_number: str | None = Field(default=None, max_length=100)
+    website: str | None = Field(default=None, max_length=50)
     domains: list[str] = Field(min_length=1)
 
-    # NEW
     director_email: EmailStr | None = None
-    contact_2: str | None = None
+    contact_2: str | None = Field(default=None, max_length=20)
 
     
 class LoginRequest(BaseModel):
