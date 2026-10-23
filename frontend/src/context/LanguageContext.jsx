@@ -889,6 +889,139 @@ const translations = {
 
 
 
+    
+    // ================= Registration page =================
+    regBrandName: 'SM TechSphere Pvt. Ltd.',
+    regBack: 'वापस',
+
+    regBuyerKicker: 'खरीदार पंजीकरण',
+    regVendorKicker: 'विक्रेता पंजीकरण',
+    regBuyerTitle: 'खरीदार खाता बनाएँ',
+    regVendorTitle: 'विक्रेता खाता बनाएँ',
+    regSubtitle: 'शुरू करने के लिए अपनी व्यावसायिक जानकारी भरें।',
+
+    regSection1: 'व्यावसायिक जानकारी',
+    regSection2Buyer: 'खाता जानकारी',
+    regSection2Vendor: 'TECHSPHERE डोमेन',
+    regSection3: 'खाता जानकारी',
+
+    regDomainDesc:
+      'उन क्षेत्रों का चयन करें जिनमें आपकी कंपनी समाधान प्रदान करती है।',
+    regDomainRequired: 'TECHSPHERE डोमेन',
+
+    regSubmitBuyer: 'खरीदार खाता बनाएँ',
+    regSubmitVendor: 'विक्रेता खाता बनाएँ',
+    regSubmitting: 'खाता बनाया जा रहा है...',
+
+    regAlreadyHave: 'क्या आपका पहले से खाता है?',
+    regLoginHere: 'यहाँ लॉगिन करें',
+    regSecureNote:
+      '🔒 आपकी जानकारी सुरक्षित है और सुरक्षित रूप से संसाधित की जाती है।',
+
+    // Success popup
+    regSuccessLabel: 'पंजीकरण पूरा हुआ',
+    regSuccessTitle: 'खाता सफलतापूर्वक बनाया गया!',
+    regSuccessMsg: 'हमने सत्यापन ईमेल भेजा है:',
+    regSuccessHint: 'आपको ईमेल सत्यापन पृष्ठ पर भेजा जा रहा है...',
+    regVerifyNow: 'अभी ईमेल सत्यापित करें',
+
+    // Buyer field labels
+    regCompanyName: 'कंपनी का नाम',
+    regPermanentEmail: 'स्थायी ईमेल',
+    regIndustryType: 'उद्योग का प्रकार',
+    regGstNumber: 'GST नंबर',
+    regWebsite: 'वेबसाइट',
+    regHeadOfficeContact: 'मुख्य कार्यालय का संपर्क नंबर',
+    regEhsContact: 'EHS प्रमुख का संपर्क नंबर',
+    regHeadOfficeAddress: 'मुख्य कार्यालय का पता',
+    regPlantAddress: 'प्लांट का पता',
+
+    // Vendor field labels
+    regGeoTerritories: 'भौगोलिक क्षेत्र',
+    regIndustrialVerticals: 'औद्योगिक क्षेत्र',
+    regVendorType: 'विक्रेता का प्रकार',
+    regExperienceYears: 'अनुभव (वर्ष)',
+    regCapacity: 'क्षमता',
+    regSpecialization: 'विशेषज्ञता',
+    regMsmeNumber: 'MSME नंबर',
+    regContactNumber: 'संपर्क नंबर',
+    regDirectorEmail: 'निदेशक का ईमेल',
+    regAddress: 'पता',
+
+    // Common field labels
+    regFullName: 'पूरा नाम',
+    regBusinessEmail: 'व्यावसायिक ईमेल',
+    regPhoneNumber: 'फोन नंबर',
+    regMobileNumber: 'मोबाइल नंबर',
+    regPassword: 'पासवर्ड',
+    regReenterPassword: 'पासवर्ड दोबारा दर्ज करें',
+
+    // Address parts
+    addrAt: 'गाँव / क्षेत्र',
+    addrSubDistrict: 'तालुका / मंडल',
+    addrDistrict: 'जिला',
+    addrState: 'राज्य',
+    addrPincode: 'पिनकोड',
+
+    addrAtPh: 'गाँव / क्षेत्र दर्ज करें',
+    addrSubDistrictPh: 'तालुका / मंडल दर्ज करें',
+    addrDistrictPh: 'जिला दर्ज करें',
+    addrStatePh: 'राज्य दर्ज करें',
+    addrPincodePh: '6 अंक दर्ज करें',
+
+    addrEnterHint:
+      'अगला फ़ील्ड जोड़ने के लिए जानकारी भरें और Enter दबाएँ।',
+
+    // Multi-select helpers
+    regSelectedCount: 'चयनित',
+    regSelectPlaceholder: 'चुनें',
+    regSearchPlaceholder: 'खोजें',
+    regNoOptions: 'कोई विकल्प नहीं मिला।',
+    regDone: 'पूरा',
+
+    // Field descriptions
+    regAreaOfWorkHelp:
+      'उन सभी क्षेत्रों का चयन करें जहाँ आपकी कंपनी सेवाएँ प्रदान करती है।',
+    regIndustrialVerticalsHelp:
+      'उन सभी उद्योगों का चयन करें जिन्हें आपकी कंपनी सेवाएँ प्रदान करती है।',
+    regIndustryHelp:
+      'उन सभी उद्योगों का चयन करें जिन्हें आपकी कंपनी सेवाएँ प्रदान करती है।',
+    regIndustryTypeHelp:
+      'अपनी मुख्य व्यावसायिक श्रेणी चुनें।',
+
+    // Dynamic placeholders
+    regEnter: 'दर्ज करें',
+
+    // Validation messages
+    regSelectAtLeastOne: 'कृपया कम से कम एक विकल्प चुनें:',
+    regPleaseEnter: 'कृपया दर्ज करें:',
+    regInvalidPin: 'कृपया सही 6 अंकों का पिनकोड दर्ज करें:',
+    regInvalidEmail: 'कृपया सही ईमेल पता दर्ज करें।',
+    regInvalidPhone:
+      'कृपया भारत का सही 10 अंकों का मोबाइल नंबर दर्ज करें।',
+    regPwdShort: 'पासवर्ड में कम से कम 8 अक्षर होने चाहिए।',
+    regPwdUpper:
+      'पासवर्ड में कम से कम एक बड़ा अंग्रेज़ी अक्षर होना चाहिए।',
+    regPwdLower:
+      'पासवर्ड में कम से कम एक छोटा अंग्रेज़ी अक्षर होना चाहिए।',
+    regPwdNumber: 'पासवर्ड में कम से कम एक अंक होना चाहिए।',
+    regPwdMismatch: 'दोनों पासवर्ड मेल नहीं खाते।',
+    regInvalidExp: 'अनुभव 0 से 100 वर्ष के बीच होना चाहिए।',
+    regSelectDomain:
+      'कृपया कम से कम एक TECHSPHERE डोमेन चुनें।',
+    regInvalidWebsite:
+      'कृपया सही वेबसाइट URL दर्ज करें, जैसे https://example.com',
+
+    // Submit messages / API errors
+    regInvalidData: 'पंजीकरण की जानकारी सही नहीं है।',
+    regFail:
+      'पंजीकरण विफल हुआ। कृपया अपनी जानकारी जाँचें।',
+    regSuccessApi:
+      'पंजीकरण सफल हुआ। कृपया अपना ईमेल सत्यापित करें।',
+
+
+      
+
   },
 }
 
