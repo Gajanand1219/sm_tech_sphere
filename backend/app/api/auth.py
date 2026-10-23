@@ -724,7 +724,7 @@ async def forgot_password(
     # )
 
     reset_url = (
-            "https://smtechsphere.vercel.app/reset-password"
+            "https://smtechsphere-virid.vercel.app/reset-password"
             f"?token={token}"
         )
 
