@@ -4,88 +4,100 @@ import '../styles/Home.css'
 import API from '../services/api'
 import { useEffect, useState, useRef } from 'react'
 import '../styles/ScrollAnimations.css'
+import { useLanguage } from '../context/LanguageContext'
+
+/* =========================================================
+   SOLUTIONS — keyed for i18n
+   ========================================================= */
 
 const solutionsList = [
   {
-    name: 'WATER AND WASTEWATER',
-    icon: '💧',
+    id: 'water',
+    nameKey: 'homeDomainWater',
     image:
       'https://images.unsplash.com/photo-1538300342682-cf57afb97285?auto=format&fit=crop&w=900&q=80',
-    points: [
-      'Primary Effluent & Sewage Treatment',
-      'High Recovery Advanced Water Engineering',
-      'Biological & Advanced Membrane Solutions',
-      'Fine Filtration & Pre-treatment Nodes',
-      'Specialized Electrochemical & Recovery Systems'
-    ]
+    pointKeys: [
+      'waterPoint1',
+      'waterPoint2',
+      'waterPoint3',
+      'waterPoint4',
+      'waterPoint5',
+    ],
   },
   {
-    name: 'SOLID AND HAZARDOUS WASTE',
-    icon: '♻️',
+    id: 'solid',
+    nameKey: 'homeDomainSolid',
     image:
       'https://images.unsplash.com/photo-1532996122724-e3c354a0b15b?auto=format&fit=crop&w=900&q=80',
-    points: [
-      'Collection & Pre-processing',
-      'Thermal & Advanced Recovery (Waste to Energy)',
-      'Biological Treatment (Organic Waste)',
-      'Chemical & Stabilization Treatments',
-      'Specialized Recycling & Compliance'
-    ]
+    pointKeys: [
+      'solidPoint1',
+      'solidPoint2',
+      'solidPoint3',
+      'solidPoint4',
+      'solidPoint5',
+    ],
   },
   {
-    name: 'SOLAR AND RENEWABLES',
-    icon: '☀️',
+    id: 'solar',
+    nameKey: 'homeDomainSolar',
     image:
       'https://images.unsplash.com/photo-1509391366360-2e959784a276?auto=format&fit=crop&w=900&q=80',
-    points: [
-      'Capital Efficiency & Grid Integration',
-      'Thermal Utility De-carbonization',
-      'Power Quality & Micro-grid Resilience',
-      'Agro Industrial Logistics & Supply Chains',
-      'Asset Optimization & Digital Intelligence'
-    ]
+    pointKeys: [
+      'solarPoint1',
+      'solarPoint2',
+      'solarPoint3',
+      'solarPoint4',
+      'solarPoint5',
+    ],
   },
   {
-    name: 'CARBON AND ESG',
-    icon: '🌱',
+    id: 'carbon',
+    nameKey: 'homeDomainCarbon',
     image:
       'https://images.unsplash.com/photo-1441974231531-c6227db76b6e?auto=format&fit=crop&w=900&q=80',
-    points: [
-      'Scope 1 & Direct Operational Carbon Footprint',
-      'Scope 2 & Indirect Energy Tracking',
-      'Scope 3 & Supply Chain Vulnerabilities',
-      'Global Trade & Cross-Border Compliance',
-      'ESG Disclosures & Global Frameworks'
-    ]
+    pointKeys: [
+      'carbonPoint1',
+      'carbonPoint2',
+      'carbonPoint3',
+      'carbonPoint4',
+      'carbonPoint5',
+    ],
   },
   {
-    name: 'AIR POLLUTION & ENVIRONMENTAL LEGAL SERVICES',
-    icon: '🏭',
+    id: 'air',
+    nameKey: 'homeDomainAir',
     image:
       'https://images.unsplash.com/photo-1565793298595-6a879b1d9492?auto=format&fit=crop&w=900&q=80',
-    points: [
-      'Industrial Air Pollution Engineering (Physical Solutions)',
-      'Statutory SPCB Consents & Approvals',
-      'SPCB Enforcement & Litigation Defense (Legal Services)',
-      'Factory Infrastructure & Safety Audits (Site Compliance)',
-      'Legacy & Supply Chain Risk Scoping'
-    ]
-  }
+    pointKeys: [
+      'airPoint1',
+      'airPoint2',
+      'airPoint3',
+      'airPoint4',
+      'airPoint5',
+    ],
+  },
 ]
 
-const workflowSteps = [
-  'Buyer Requirement',
-  'Technical Dossier',
-  'Verified Vendor Match',
-  'Quotation',
-  'Mutual Handshake'
+/* =========================================================
+   WORKFLOW STEPS — keyed for i18n
+   ========================================================= */
+
+const workflowStepKeys = [
+  'workflowStep1Title', // Buyer Requirement
+  'workflowStep2Title', // Technical Dossier
+  'workflowStep3Title', // Verified Vendor Match
+  // NOTE: These keys are already used on About page.
+  // For Home, we need shorter step labels.
+  // Using dedicated keys below ↓
 ]
 
-/* ================= SCROLL REVEAL HOOK ================= */
+/* =========================================================
+   SCROLL REVEAL HOOK
+   ========================================================= */
+
 function useScrollReveal() {
   useEffect(() => {
     const elements = document.querySelectorAll('[data-reveal]')
-
     if (!elements.length) return
 
     const observer = new IntersectionObserver(
@@ -104,17 +116,14 @@ function useScrollReveal() {
       }
     )
 
-    elements.forEach((element) => {
-      observer.observe(element)
-    })
-
-    return () => {
-      observer.disconnect()
-    }
+    elements.forEach((element) => observer.observe(element))
+    return () => observer.disconnect()
   }, [])
 }
 
-/* ================= ANIMATED COUNTER ================= */
+/* =========================================================
+   ANIMATED COUNTER
+   ========================================================= */
 
 function Counter({ end, suffix = '', duration = 3500 }) {
   const [count, setCount] = useState(0)
@@ -134,7 +143,10 @@ function Counter({ end, suffix = '', duration = 3500 }) {
             const startTime = performance.now()
 
             const tick = (now) => {
-              const progress = Math.min((now - startTime) / duration, 1)
+              const progress = Math.min(
+                (now - startTime) / duration,
+                1
+              )
               const eased = 1 - Math.pow(1 - progress, 3)
               setCount(Math.floor(eased * end))
 
@@ -161,7 +173,13 @@ function Counter({ end, suffix = '', duration = 3500 }) {
   )
 }
 
+/* =========================================================
+   HOME PAGE
+   ========================================================= */
+
 export default function Home() {
+  const { t } = useLanguage()
+
   const [buyers, setBuyers] = useState([])
   const [vendors, setVendors] = useState([])
 
@@ -185,7 +203,7 @@ export default function Home() {
     name: '',
     mobile: '',
     email: '',
-    message: ''
+    message: '',
   })
 
   const [contactLoading, setContactLoading] = useState(false)
@@ -208,7 +226,7 @@ export default function Home() {
       !contactForm.email.trim() ||
       !contactForm.message.trim()
     ) {
-      setContactError('Please fill in all fields.')
+      setContactError(t('homeContactFillAll'))
       return
     }
 
@@ -216,18 +234,32 @@ export default function Home() {
       setContactLoading(true)
       const response = await API.post('/public/contact', contactForm)
       setContactSuccess(
-        response.data?.message || 'Your enquiry has been sent successfully.'
+        response.data?.message || t('homeContactSuccess')
       )
-      setContactForm({ name: '', mobile: '', email: '', message: '' })
+      setContactForm({
+        name: '',
+        mobile: '',
+        email: '',
+        message: '',
+      })
     } catch (error) {
       setContactError(
-        error.response?.data?.detail ||
-          'Unable to send enquiry. Please try again.'
+        error.response?.data?.detail || t('homeContactFail')
       )
     } finally {
       setContactLoading(false)
     }
   }
+
+  /* ============ WORKFLOW STEPS (translated) ============ */
+
+  const workflowSteps = [
+    t('homeFlow1'),
+    t('homeFlow2'),
+    t('homeFlow3'),
+    t('homeFlow4'),
+    t('homeFlow5'),
+  ]
 
   return (
     <>
@@ -237,7 +269,6 @@ export default function Home() {
         {/* ================= HERO ================= */}
 
         <section className="hero">
-          {/* Floating decorations */}
           <div className="hero__decor hero__decor--1" />
           <div className="hero__decor hero__decor--2" />
           <div className="hero__decor hero__decor--3" />
@@ -245,19 +276,19 @@ export default function Home() {
           <div className="hero__container">
             <div className="hero__content">
               <span className="hero__label" data-reveal>
-                ⚡ Industrial B2B Techsphere Network
+                {t('homeHeroLabel')}
               </span>
 
               <h5 className="hero__title" data-reveal>
-                SM TechSphere Pvt. Ltd.
+                {t('homeHeroTitle')}
               </h5>
 
               <p className="hero__tagline" data-reveal>
-                // DIAGNOSE. MATCH. SOLUTION.
+                {t('homeHeroTagline')}
               </p>
 
               <p className="hero__description" data-reveal>
-                We connect genuine industrial requirements with qualified  EPC, and technology service providers through a structured and transparent technical matching platform.
+                {t('homeHeroDesc')}
               </p>
 
               <div className="hero__buttons" data-reveal>
@@ -265,58 +296,55 @@ export default function Home() {
                   to="/register/buyer"
                   className="home-btn home-btn--primary"
                 >
-                  Register as Buyer
+                  {t('Register as Buyer')}
                 </Link>
 
                 <Link
                   to="/register/vendor"
                   className="home-btn home-btn--outline"
                 >
-                  Register as Vendor
+                  {t('Register as Vendor')}
                 </Link>
 
                 <Link to="/login" className="home-btn home-btn--login">
-                  Login
+                  {t('Login')}
                 </Link>
               </div>
 
               <div className="hero__mini-info" data-reveal>
-  <div className="hero-mini-card">
-    <div className="hero-mini-icon">🌿</div>
+                <div className="hero-mini-card">
+                  <div className="hero-mini-icon">🌿</div>
+                  <div className="hero-mini-content">
+                    <strong>
+                      <Counter end={5} />
+                      <span className="counter-plus">+</span>
+                    </strong>
+                    <span>{t('homeCoreVerticals')}</span>
+                  </div>
+                </div>
 
-    <div className="hero-mini-content">
-      <strong>
-        <Counter end={5} />
-        <span className="counter-plus">+</span>
-      </strong>
-      <span>Core Verticals</span>
-    </div>
-  </div>
+                <div className="hero-mini-card">
+                  <div className="hero-mini-icon">⚙️</div>
+                  <div className="hero-mini-content">
+                    <strong>
+                      <Counter end={10} />
+                      <span className="counter-plus">+</span>
+                    </strong>
+                    <span>{t('homeTechParams')}</span>
+                  </div>
+                </div>
 
-  <div className="hero-mini-card">
-    <div className="hero-mini-icon">⚙️</div>
-
-    <div className="hero-mini-content">
-      <strong>
-        <Counter end={10} />
-        <span className="counter-plus">+</span>
-      </strong>
-      <span>Technical Parameters</span>
-    </div>
-  </div>
-
-  <div className="hero-mini-card">
-    <div className="hero-mini-icon">⚡</div>
-
-    <div className="hero-mini-content">
-      <strong>
-        <Counter end={240} />
-        <span className="counter-unit">h</span>
-      </strong>
-      <span>Active Response Window</span>
-    </div>
-  </div>
-</div>
+                <div className="hero-mini-card">
+                  <div className="hero-mini-icon">⚡</div>
+                  <div className="hero-mini-content">
+                    <strong>
+                      <Counter end={240} />
+                      <span className="counter-unit">h</span>
+                    </strong>
+                    <span>{t('homeResponseWindow')}</span>
+                  </div>
+                </div>
+              </div>
             </div>
 
             {/* PLATFORM FLOW */}
@@ -328,14 +356,14 @@ export default function Home() {
                     <span></span>
                     <span></span>
                   </div>
-                  <span>Platform Flow</span>
+                  <span>{t('homePlatformFlow')}</span>
                 </div>
 
                 <div className="platform-flow">
                   {workflowSteps.map((step, index) => (
                     <div
                       className="platform-flow__item"
-                      key={step}
+                      key={index}
                       style={{ animationDelay: `${index * 0.08}s` }}
                     >
                       <div className="platform-flow__number">
@@ -348,9 +376,7 @@ export default function Home() {
 
                 <div className="platform-security">
                   <span>🔒</span>
-                  <p>
-                    Contact details remain masked until mutual acceptance.
-                  </p>
+                  <p>{t('homePlatformSecurityMsg')}</p>
                 </div>
               </div>
 
@@ -358,16 +384,16 @@ export default function Home() {
                 <div className="info-card">
                   <div className="info-card__icon">🔒</div>
                   <div>
-                    <strong>Strict Masking</strong>
-                    <span>Zero Vendor Spam</span>
+                    <strong>{t('homeStrictMasking')}</strong>
+                    <span>{t('homeZeroSpam')}</span>
                   </div>
                 </div>
 
                 <div className="info-card">
                   <div className="info-card__icon">⚡</div>
                   <div>
-                    <strong>10 Days Timer</strong>
-                    <span>240-Hour Response Window</span>
+                    <strong>{t('homeTimerTitle')}</strong>
+                    <span>{t('homeTimerSub')}</span>
                   </div>
                 </div>
               </div>
@@ -380,52 +406,41 @@ export default function Home() {
         <section className="about" id="about">
           <div className="section-container">
             <div className="section-heading" data-reveal>
-              <span className="section-label">About Us</span>
-              <h2>Who We Are</h2>
-              <p>
-                SM TechSphere Pvt. Ltd. is an industrial B2B platform designed to connect genuine project requirements with relevant engineering, EPC, and technology specialists. We structure requirements, technical information, and matching workflows to make industrial project discovery simpler and more organized.
-              </p>
+              <span className="section-label">{t('homeAboutLabel')}</span>
+              <h2>{t('homeAboutTitle')}</h2>
+              <p>{t('homeAboutDesc')}</p>
             </div>
-                        
+
             <div className="solutions-grid">
-
               {solutionsList.map((solution, index) => (
-
                 <article
-                  key={solution.name}
+                  key={solution.id}
                   className="solution-card"
                   data-reveal
                   style={{ transitionDelay: `${index * 0.06}s` }}
                 >
-
-                  {/* IMAGE */}
                   <div className="solution-card__image">
-
                     <img
                       src={solution.image}
-                      alt={solution.name}
+                      alt={t(solution.nameKey)}
                       loading="lazy"
                     />
-
                     <span className="solution-card__number">
                       {String(index + 1).padStart(2, '0')}
                     </span>
-
                   </div>
 
-                  {/* BODY */}
                   <div className="solution-card__body">
-
-                    <h2>{solution.name}</h2>
+                    <h2>{t(solution.nameKey)}</h2>
 
                     <ul className="solution-card__points">
-                      {solution.points.map((point, i) => (
-                        <li key={i}>
+                      {solution.pointKeys.map((pointKey, i) => (
+                        <li key={pointKey}>
                           <span className="solution-card__point-num">
                             {i + 1}
                           </span>
                           <span className="solution-card__point-text">
-                            {point}
+                            {t(pointKey)}
                           </span>
                         </li>
                       ))}
@@ -435,18 +450,14 @@ export default function Home() {
                       to="/register/buyer"
                       className="solution-card__link"
                     >
-                      Start Requirement
+                      {t('homeStartRequirement')}
                       <span className="solution-card__arrow">→</span>
                     </Link>
-
                   </div>
-
                 </article>
-
               ))}
-
             </div>
-           </div>
+          </div>
         </section>
 
         {/* ================= VISION / MISSION ================= */}
@@ -454,19 +465,17 @@ export default function Home() {
         <section className="vision-mission">
           <div className="section-container">
             <div className="section-heading center" data-reveal>
-              <span className="section-label">Our Purpose</span>
-              <h2>VISION &amp; MISSION</h2>
+              <span className="section-label">{t('homePurposeLabel')}</span>
+              <h2>{t('homeVisionMission')}</h2>
             </div>
 
             <div className="vm-grid">
               <div className="vm-card" data-reveal>
                 <div className="vm-icon">◈</div>
                 <div>
-                  <span className="vm-label">Our Vision</span>
-                  <h3>Building a Trusted Industrial Ecosystem</h3>
-                  <p>
-                    To create a trusted engineering ecosystem where genuine industrial requirements can be connected with qualified technical and technology service providers.
-                  </p>
+                  <span className="vm-label">{t('homeVisionLabel')}</span>
+                  <h3>{t('homeVisionTitle')}</h3>
+                  <p>{t('homeVisionDesc')}</p>
                 </div>
               </div>
 
@@ -477,11 +486,9 @@ export default function Home() {
               >
                 <div className="vm-icon">◎</div>
                 <div>
-                  <span className="vm-label">Our Mission</span>
-                  <h3>Simplifying Industrial Project Connections</h3>
-                  <p>
-                    To simplify requirement discovery, technical matching, and quotation workflows through structured information, verified participants, and mutual-consent processes.
-                  </p>
+                  <span className="vm-label">{t('homeMissionLabel')}</span>
+                  <h3>{t('homeMissionTitle')}</h3>
+                  <p>{t('homeMissionDesc')}</p>
                 </div>
               </div>
             </div>
@@ -493,11 +500,9 @@ export default function Home() {
         <section className="partners">
           <div className="section-container">
             <div className="partners-heading" data-reveal>
-              <span className="section-label">Our Network</span>
-              <h2>Trusted Industrial Network</h2>
-              <p>
-                Connecting verified industrial buyers with approved engineering and EPC service providers through the SM TechSphere Pvt. Ltd. network.
-              </p>
+              <span className="section-label">{t('homeNetworkLabel')}</span>
+              <h2>{t('homeNetworkTitle')}</h2>
+              <p>{t('homeNetworkDesc')}</p>
             </div>
 
             <div className="partners-grid">
@@ -507,63 +512,61 @@ export default function Home() {
                   <div className="partner-network-icon">⚙️</div>
                   <div>
                     <span className="partner-network-kicker">
-                      Technical Network
+                      {t('homeTechNetworkKicker')}
                     </span>
-                    <h3>Approved EPC Providers</h3>
+                    <h3>{t('homeApprovedEPC')}</h3>
                   </div>
                 </div>
 
                 <div className="partner-marquee">
-  <marquee
-    behavior="scroll"
-    direction="left"
-    scrollamount="5"
-    scrolldelay="0"
-    loop="-1"
-  >
-    <div className="partner-marquee-content">
-      {vendors.length > 0 ? (
-        vendors.map((company) => (
-          <div
-            className="partner-company"
-            key={company.id}
-          >
-            <div className="partner-company-logo">
-              <img
-                src={company.logo}
-                alt={company.company_name}
-                onError={(e) => {
-                  e.currentTarget.style.display = 'none'
-                  e.currentTarget.parentElement.classList.add(
-                    'partner-company-logo--fallback'
-                  )
-                }}
-              />
-
-              <span>
-                {company.company_name
-                  ?.charAt(0)
-                  ?.toUpperCase()}
-              </span>
-            </div>
-
-            <span className="partner-company-name">
-              {company.company_name}
-            </span>
-          </div>
-        ))
-      ) : (
-        <div className="partner-empty">
-          No Approved Vendors Yet.
-        </div>
-      )}
-    </div>
-  </marquee>
-</div>
+                  <marquee
+                    behavior="scroll"
+                    direction="left"
+                    scrollamount="5"
+                    scrolldelay="0"
+                    loop="-1"
+                  >
+                    <div className="partner-marquee-content">
+                      {vendors.length > 0 ? (
+                        vendors.map((company) => (
+                          <div
+                            className="partner-company"
+                            key={company.id}
+                          >
+                            <div className="partner-company-logo">
+                              <img
+                                src={company.logo}
+                                alt={company.company_name}
+                                onError={(e) => {
+                                  e.currentTarget.style.display = 'none'
+                                  e.currentTarget.parentElement.classList.add(
+                                    'partner-company-logo--fallback'
+                                  )
+                                }}
+                              />
+                              <span>
+                                {company.company_name
+                                  ?.charAt(0)
+                                  ?.toUpperCase()}
+                              </span>
+                            </div>
+                            <span className="partner-company-name">
+                              {company.company_name}
+                            </span>
+                          </div>
+                        ))
+                      ) : (
+                        <div className="partner-empty">
+                          {t('homeNoVendors')}
+                        </div>
+                      )}
+                    </div>
+                  </marquee>
+                </div>
 
                 <div className="partner-network-footer">
                   <span className="network-status-dot" />
-                 Verified SM TechSphere Pvt. Ltd. Service Providers
+                  {t('homeVerifiedProviders')}
                 </div>
               </div>
 
@@ -577,188 +580,151 @@ export default function Home() {
                   <div className="partner-network-icon">🏢</div>
                   <div>
                     <span className="partner-network-kicker">
-                      Trusted Network
+                      {t('homeTrustedNetworkKicker')}
                     </span>
-                    <h3>Verified Industrial Buyers</h3>
+                    <h3>{t('homeVerifiedBuyers')}</h3>
                   </div>
                 </div>
 
                 <div className="partner-marquee">
-  <marquee
-    behavior="scroll"
-    direction="right"
-    scrollamount="5"
-    scrolldelay="0"
-    loop="-1"
-  >
-    <div className="partner-marquee-content">
-      {buyers.length > 0 ? (
-        buyers.map((company) => (
-          <div
-            className="partner-company"
-            key={company.id}
-          >
-            <div className="partner-company-logo">
-              <img
-                src={company.logo}
-                alt={company.company_name}
-                onError={(e) => {
-                  e.currentTarget.style.display = 'none'
-                  e.currentTarget.parentElement.classList.add(
-                    'partner-company-logo--fallback'
-                  )
-                }}
-              />
-
-              <span>
-                {company.company_name
-                  ?.charAt(0)
-                  ?.toUpperCase()}
-              </span>
-            </div>
-
-            <span className="partner-company-name">
-              {company.company_name}
-            </span>
-          </div>
-        ))
-      ) : (
-        <div className="partner-empty">
-          No Verified Buyers Yet.
-        </div>
-      )}
-    </div>
-  </marquee>
-</div>
+                  <marquee
+                    behavior="scroll"
+                    direction="right"
+                    scrollamount="5"
+                    scrolldelay="0"
+                    loop="-1"
+                  >
+                    <div className="partner-marquee-content">
+                      {buyers.length > 0 ? (
+                        buyers.map((company) => (
+                          <div
+                            className="partner-company"
+                            key={company.id}
+                          >
+                            <div className="partner-company-logo">
+                              <img
+                                src={company.logo}
+                                alt={company.company_name}
+                                onError={(e) => {
+                                  e.currentTarget.style.display = 'none'
+                                  e.currentTarget.parentElement.classList.add(
+                                    'partner-company-logo--fallback'
+                                  )
+                                }}
+                              />
+                              <span>
+                                {company.company_name
+                                  ?.charAt(0)
+                                  ?.toUpperCase()}
+                              </span>
+                            </div>
+                            <span className="partner-company-name">
+                              {company.company_name}
+                            </span>
+                          </div>
+                        ))
+                      ) : (
+                        <div className="partner-empty">
+                          {t('homeNoBuyers')}
+                        </div>
+                      )}
+                    </div>
+                  </marquee>
+                </div>
 
                 <div className="partner-network-footer">
                   <span className="network-status-dot" />
-                  Verified Industrial Businesses
+                  {t('homeVerifiedBusinesses')}
                 </div>
               </div>
             </div>
           </div>
         </section>
 
-
         {/* ================= PLATFORM BENEFITS ================= */}
 
-<section className="platform-benefits">
-  <div className="section-container">
+        <section className="platform-benefits">
+          <div className="section-container">
+            <div className="platform-benefits-heading" data-reveal>
+              <span className="section-label">{t('homeWhyLabel')}</span>
+              <h2>
+                {t('homeWhyTitle')}
+                <span>{t('homeWhyTitleHighlight')}</span>
+              </h2>
+              <p>{t('homeWhyDesc')}</p>
+            </div>
 
-    <div className="platform-benefits-heading" data-reveal>
-      <span className="section-label">Why SM Techsphere?</span>
+            <div className="platform-benefits-grid">
+              <article className="platform-benefit-card" data-reveal>
+                <div className="platform-benefit-icon">🔍</div>
+                <div className="platform-benefit-content">
+                  <h3>{t('homeBenefit1Title')}</h3>
+                  <p>{t('homeBenefit1Desc')}</p>
+                </div>
+              </article>
 
-      <h2>
-        Smarter Connections For
-        <span> Industrial Projects</span>
-      </h2>
+              <article
+                className="platform-benefit-card"
+                data-reveal
+                style={{ transitionDelay: '0.06s' }}
+              >
+                <div className="platform-benefit-icon">📋</div>
+                <div className="platform-benefit-content">
+                  <h3>{t('homeBenefit2Title')}</h3>
+                  <p>{t('homeBenefit2Desc')}</p>
+                </div>
+              </article>
 
-      <p>
-       A structured B2B platform designed to connect genuine industrial requirements with relevant engineering, EPC, and technology solution providers.
-      </p>
-    </div>
+              <article
+                className="platform-benefit-card"
+                data-reveal
+                style={{ transitionDelay: '0.12s' }}
+              >
+                <div className="platform-benefit-icon">⚡</div>
+                <div className="platform-benefit-content">
+                  <h3>{t('homeBenefit3Title')}</h3>
+                  <p>{t('homeBenefit3Desc')}</p>
+                </div>
+              </article>
 
-    <div className="platform-benefits-grid">
+              <article
+                className="platform-benefit-card"
+                data-reveal
+                style={{ transitionDelay: '0.18s' }}
+              >
+                <div className="platform-benefit-icon">🏭</div>
+                <div className="platform-benefit-content">
+                  <h3>{t('homeBenefit4Title')}</h3>
+                  <p>{t('homeBenefit4Desc')}</p>
+                </div>
+              </article>
 
-      {/* CARD 01 */}
-      <article className="platform-benefit-card" data-reveal>
-        <div className="platform-benefit-icon">🔍</div>
+              <article
+                className="platform-benefit-card"
+                data-reveal
+                style={{ transitionDelay: '0.24s' }}
+              >
+                <div className="platform-benefit-icon">🔐</div>
+                <div className="platform-benefit-content">
+                  <h3>{t('homeBenefit5Title')}</h3>
+                  <p>{t('homeBenefit5Desc')}</p>
+                </div>
+              </article>
 
-        <div className="platform-benefit-content">
-          <h3>Verified Vendor Matching</h3>
-          <p>
-            Connect your requirements with relevant and approved engineering, EPC, and technology solution providers.
-          </p>
-        </div>
-      </article>
-
-      {/* CARD 02 */}
-      <article
-        className="platform-benefit-card"
-        data-reveal
-        style={{ transitionDelay: '0.06s' }}
-      >
-        <div className="platform-benefit-icon">📋</div>
-
-        <div className="platform-benefit-content">
-          <h3>Structured Technical Requirements</h3>
-          <p>
-            Capture project details, technical parameters, and business requirements in a structured format.
-          </p>
-        </div>
-      </article>
-
-      {/* CARD 03 */}
-      <article
-        className="platform-benefit-card"
-        data-reveal
-        style={{ transitionDelay: '0.12s' }}
-      >
-        <div className="platform-benefit-icon">⚡</div>
-
-        <div className="platform-benefit-content">
-          <h3>Faster Project Connections</h3>
-          <p>
-            Reduce manual vendor discovery and connect with relevant solution providers through technical matching.
-          </p>
-        </div>
-      </article>
-
-      {/* CARD 04 */}
-      <article
-        className="platform-benefit-card"
-        data-reveal
-        style={{ transitionDelay: '0.18s' }}
-      >
-        <div className="platform-benefit-icon">🏭</div>
-
-        <div className="platform-benefit-content">
-          <h3>Industrial & EPC Expertise</h3>
-          <p>
-           Access service providers across water, waste, renewable energy, carbon, ESG, and environmental engineering domains.
-          </p>
-        </div>
-      </article>
-
-      {/* CARD 05 */}
-      <article
-        className="platform-benefit-card"
-        data-reveal
-        style={{ transitionDelay: '0.24s' }}
-      >
-        <div className="platform-benefit-icon">🔐</div>
-
-        <div className="platform-benefit-content">
-          <h3>Mutual-Consent Communication</h3>
-          <p>
-            Contact information remains protected until both parties accept the opportunity and complete the handshake.
-          </p>
-        </div>
-      </article>
-
-      {/* CARD 06 */}
-      <article
-        className="platform-benefit-card"
-        data-reveal
-        style={{ transitionDelay: '0.30s' }}
-      >
-        <div className="platform-benefit-icon">🤝</div>
-
-        <div className="platform-benefit-content">
-          <h3>Trusted B2B Network</h3>
-          <p>
-           Build connections between verified industrial buyers and approved technical service providers.
-          </p>
-        </div>
-      </article>
-
-    </div>
-
-  </div>
-</section>
-
-        
+              <article
+                className="platform-benefit-card"
+                data-reveal
+                style={{ transitionDelay: '0.30s' }}
+              >
+                <div className="platform-benefit-icon">🤝</div>
+                <div className="platform-benefit-content">
+                  <h3>{t('homeBenefit6Title')}</h3>
+                  <p>{t('homeBenefit6Desc')}</p>
+                </div>
+              </article>
+            </div>
+          </div>
+        </section>
 
         {/* ================= CONTACT ================= */}
 
@@ -766,20 +732,20 @@ export default function Home() {
           <div className="section-container">
             <div className="contact-layout">
               <div className="contact-intro" data-reveal>
-                <span className="section-label">Contact Us</span>
-                <h2>Have an Industrial Requirement?</h2>
-                <p>
-                  Tell us about your requirement. Our platform is designed to structure your enquiry and connect it with relevant technical service providers.
-                </p>
+                <span className="section-label">
+                  {t('homeContactLabel')}
+                </span>
+                <h2>{t('homeContactTitle')}</h2>
+                <p>{t('homeContactDesc')}</p>
 
                 <div className="contact-person-card" align="center">
                   <div className="contact-person-top">
                     <div className="contact-person-avatar">SM</div>
                     <div>
                       <span className="contact-person-label">
-                        Direct Contact
+                        {t('homeDirectContact')}
                       </span>
-                      <h3>Contact our team</h3>
+                      <h3>{t('homeContactOurTeam')}</h3>
                     </div>
                   </div>
 
@@ -791,7 +757,7 @@ export default function Home() {
                       ✉
                     </div>
                     <div className="contact-direct-content">
-                      <span>Email</span>
+                      <span>{t('homeEmailLabel')}</span>
                       <strong>smtechsphere2910@gmail.com</strong>
                     </div>
                     <span className="contact-direct-arrow">→</span>
@@ -805,7 +771,7 @@ export default function Home() {
                       ☎
                     </div>
                     <div className="contact-direct-content">
-                      <span>Phone</span>
+                      <span>{t('homePhoneLabel')}</span>
                       <strong>+91 91127 67997</strong>
                     </div>
                     <span className="contact-direct-arrow">→</span>
@@ -815,15 +781,15 @@ export default function Home() {
                 <div className="contact-points">
                   <div>
                     <strong>01</strong>
-                    <span>Share your requirement</span>
+                    <span>{t('homeContactPoint1')}</span>
                   </div>
                   <div>
                     <strong>02</strong>
-                    <span>Technical Information</span>
+                    <span>{t('homeContactPoint2')}</span>
                   </div>
                   <div>
                     <strong>03</strong>
-                    <span>Connect with relevant specialists</span>
+                    <span>{t('homeContactPoint3')}</span>
                   </div>
                 </div>
               </div>
@@ -833,8 +799,8 @@ export default function Home() {
                 data-reveal
                 style={{ transitionDelay: '0.12s' }}
               >
-                <h3>Send an Enquiry</h3>
-                <p>Fill in your details and our team will get back to you.</p>
+                <h3>{t('homeSendEnquiry')}</h3>
+                <p>{t('homeSendEnquiryDesc')}</p>
 
                 <form
                   className="contact-form"
@@ -844,7 +810,7 @@ export default function Home() {
                     <input
                       type="text"
                       name="name"
-                      placeholder="Name"
+                      placeholder={t('homeFormName')}
                       value={contactForm.name}
                       onChange={handleContactChange}
                       required
@@ -852,7 +818,7 @@ export default function Home() {
                     <input
                       type="tel"
                       name="mobile"
-                      placeholder="Mobile Number"
+                      placeholder={t('homeFormMobile')}
                       value={contactForm.mobile}
                       onChange={handleContactChange}
                       required
@@ -862,7 +828,7 @@ export default function Home() {
                   <input
                     type="email"
                     name="email"
-                    placeholder="Email ID"
+                    placeholder={t('homeFormEmail')}
                     value={contactForm.email}
                     onChange={handleContactChange}
                     required
@@ -870,7 +836,7 @@ export default function Home() {
 
                   <textarea
                     name="message"
-                    placeholder="Tell us about your requirement..."
+                    placeholder={t('homeFormMessage')}
                     rows="5"
                     value={contactForm.message}
                     onChange={handleContactChange}
@@ -892,7 +858,9 @@ export default function Home() {
                     className="contact-submit"
                     disabled={contactLoading}
                   >
-                    {contactLoading ? 'SENDING...' : 'SEND ENQUIRY'}
+                    {contactLoading
+                      ? t('homeFormSending')
+                      : t('homeFormSend')}
                   </button>
                 </form>
               </div>
@@ -911,47 +879,51 @@ export default function Home() {
                   alt="SM TECHSPHERE"
                   className="footer__logo-image"
                 />
-
-                <p>SM TechSphere Pvt. Ltd.</p>
-                <span>Diagnose. Match. Solution.</span>
+                <p>SM Techsphere Pvt. Ltd.</p>
+                <span>{t('footerTagline')}</span>
               </div>
 
               <div className="footer-column">
-                <h4>Platform</h4>
-                <Link to="/">Home</Link>
-                <Link to="/solutions">Domain</Link>
-                <Link to="/how-it-works">About Us</Link>
-                <a href="#contact">Contact</a>
+                <h4>{t('footerPlatform')}</h4>
+                <Link to="/">{t('Home')}</Link>
+                <Link to="/solutions">{t('Domain')}</Link>
+                <Link to="/how-it-works">{t('About Us')}</Link>
+                <a href="#contact">{t('footerContactLink')}</a>
               </div>
 
               <div className="footer-column">
-                <h4>Join Network</h4>
-                <Link to="/register/buyer">Register as Buyer</Link>
-                <Link to="/register/vendor">Register as Vendor</Link>
-                <Link to="/login">Login</Link>
+                <h4>{t('footerJoinNetwork')}</h4>
+                <Link to="/register/buyer">
+                  {t('Register as Buyer')}
+                </Link>
+                <Link to="/register/vendor">
+                  {t('Register as Vendor')}
+                </Link>
+                <Link to="/login">{t('Login')}</Link>
               </div>
 
               <div className="footer-column footer-contact">
-                <h4>Contact</h4>
-                 <p>
-                   SM TechSphere Pvt. Ltd.
-                </p>
+                <h4>{t('footerContact')}</h4>
+                <p>SM Techsphere Pvt. Ltd.</p>
                 <p>
-                  Email:{" "}
+                  Email:{' '}
                   <a
                     href="mailto:smtechsphere2910@gmail.com"
-                    style={{ color: "#007bff", textDecoration: "underline" }}
+                    style={{
+                      color: '#007bff',
+                      textDecoration: 'underline',
+                    }}
                   >
                     smtechsphere2910@gmail.com
                   </a>
                 </p>
-                <p>India</p>
+                <p>{t('footerCountry')}</p>
               </div>
             </div>
 
             <div className="footer-bottom">
-              <span>© 2026  SM TechSphere Pvt. Ltd.</span>
-              <span>Water • Waste • Solar • ESG • SPCB</span>
+              <span>{t('footerRights')}</span>
+              <span>{t('footerDomains')}</span>
             </div>
           </div>
         </footer>
