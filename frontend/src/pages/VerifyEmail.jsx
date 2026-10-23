@@ -1,14 +1,15 @@
-
 import { useState, useEffect, useRef } from 'react'
 import { useSearchParams, useNavigate } from 'react-router-dom'
 import API from '../services/api'
 import { useAuth } from '../context/AuthContext'
+import { useLanguage } from '../context/LanguageContext'
 import '../styles/VerifyEmail.css'
 
 export default function VerifyEmail() {
   const [params] = useSearchParams()
   const nav = useNavigate()
   const { saveAuth } = useAuth()
+  const { t } = useLanguage()
   const inputsRef = useRef([])
 
   const [email, setEmail] = useState(params.get('email') || '')
@@ -62,11 +63,7 @@ export default function VerifyEmail() {
 
   // Keyboard navigation
   const handleKeyDown = (index, event) => {
-    if (
-      event.key === 'Backspace' &&
-      !digits[index] &&
-      index > 0
-    ) {
+    if (event.key === 'Backspace' && !digits[index] && index > 0) {
       inputsRef.current[index - 1]?.focus()
     }
 
@@ -112,12 +109,12 @@ export default function VerifyEmail() {
     setMsg('')
 
     if (!email.trim()) {
-      setError('Please enter your email address.')
+      setError(t('veEmailRequiredErr'))
       return
     }
 
     if (!isComplete) {
-      setError('Please enter the complete 6-digit OTP.')
+      setError(t('veOtpIncompleteErr'))
       return
     }
 
@@ -131,7 +128,7 @@ export default function VerifyEmail() {
 
       saveAuth(data)
 
-      setMsg('Email verified successfully. Redirecting to dashboard...')
+      setMsg(t('veVerifiedSuccess'))
       setMsgType('success')
 
       setTimeout(() => {
@@ -147,8 +144,7 @@ export default function VerifyEmail() {
       }, 900)
     } catch (err) {
       setError(
-        err.response?.data?.detail ||
-          'Verification failed. Please try again.'
+        err.response?.data?.detail || t('veVerifyFailErr')
       )
 
       setDigits(['', '', '', '', '', ''])
@@ -172,7 +168,6 @@ export default function VerifyEmail() {
     setMsg('')
 
     try {
-      // Backend expects email as a query parameter
       await API.post(
         `/auth/resend-verification?email=${encodeURIComponent(
           email.trim()
@@ -182,7 +177,7 @@ export default function VerifyEmail() {
       setDigits(['', '', '', '', '', ''])
       setResendCooldown(60)
 
-      setMsg('A new OTP has been sent to your email.')
+      setMsg(t('veResendSuccess'))
       setMsgType('success')
 
       setTimeout(() => {
@@ -190,8 +185,7 @@ export default function VerifyEmail() {
       }, 0)
     } catch (err) {
       setError(
-        err.response?.data?.detail ||
-          'Unable to resend OTP. Please try again.'
+        err.response?.data?.detail || t('veResendFailErr')
       )
     } finally {
       setResending(false)
@@ -210,12 +204,11 @@ export default function VerifyEmail() {
       <header className="ve-topbar">
         <div className="ve-brand">
           <div className="ve-brand__logo">
-            <img src="/logo2.jpeg" alt="SM TechSphere logo" />
+            <img src="/logo2.jpeg" alt={t('veBrandName')} />
           </div>
 
           <div>
-            <strong>SM TechSphere Pvt. Ltd.</strong>
-            {/* <span>Engineering Solutions</span> */}
+            <strong>{t('veBrandName')}</strong>
           </div>
         </div>
 
@@ -225,7 +218,7 @@ export default function VerifyEmail() {
           onClick={() => nav('/')}
         >
           <span>←</span>
-          Back
+          {t('veBack')}
         </button>
       </header>
 
@@ -236,25 +229,19 @@ export default function VerifyEmail() {
             <div className="ve-card__icon">✉️</div>
 
             <div>
-              <span className="ve-kicker">Email Verification</span>
-              <h2>Check your inbox</h2>
+              <span className="ve-kicker">{t('veKicker')}</span>
+              <h2>{t('veTitle')}</h2>
 
-              <p className="ve-card__sub">
-                We sent a 6-digit verification code to your email.
-              </p>
+              <p className="ve-card__sub">{t('veSubtitle')}</p>
             </div>
           </div>
 
-          <form
-            onSubmit={submit}
-            className="ve-form"
-            noValidate
-          >
+          <form onSubmit={submit} className="ve-form" noValidate>
             {/* Email */}
             <div className="ve-field">
               <label htmlFor="verify-email">
                 <span className="ve-field__icon">📧</span>
-                Email address
+                {t('veEmailLabel')}
               </label>
 
               <input
@@ -265,7 +252,7 @@ export default function VerifyEmail() {
                   setEmail(event.target.value)
                   setError('')
                 }}
-                placeholder="you@company.com"
+                placeholder={t('veEmailPlaceholder')}
                 autoComplete="email"
                 required
               />
@@ -275,13 +262,10 @@ export default function VerifyEmail() {
             <div className="ve-otp">
               <label className="ve-otp__label">
                 <span className="ve-field__icon">🔐</span>
-                Verification code
+                {t('veOtpLabel')}
               </label>
 
-              <div
-                className="ve-otp__boxes"
-                onPaste={handlePaste}
-              >
+              <div className="ve-otp__boxes" onPaste={handlePaste}>
                 {digits.map((digit, index) => (
                   <input
                     key={index}
@@ -314,8 +298,8 @@ export default function VerifyEmail() {
               <div className="ve-otp__meta">
                 <span className="ve-otp__hint">
                   {isComplete
-                    ? '✓ Code ready'
-                    : `${code.length}/6 digits`}
+                    ? `✓ ${t('veOtpHint')}`
+                    : `${code.length}/6 ${t('veOtpDigits')}`}
                 </span>
 
                 <button
@@ -335,17 +319,17 @@ export default function VerifyEmail() {
                   {resending ? (
                     <>
                       <span className="ve-resend__spinner" />
-                      Sending OTP...
+                      {t('veSendingOtp')}
                     </>
                   ) : resendCooldown > 0 ? (
                     <>
                       <span className="ve-resend__clock">◷</span>
-                      Resend OTP in {formattedTime}
+                      {t('veResendIn')} {formattedTime}
                     </>
                   ) : (
                     <>
                       <span className="ve-resend__icon">↻</span>
-                      Resend OTP
+                      {t('veResendOtp')}
                     </>
                   )}
                 </button>
@@ -385,12 +369,12 @@ export default function VerifyEmail() {
               {loading ? (
                 <>
                   <span className="spinner" />
-                  Verifying...
+                  {t('veVerifying')}
                 </>
               ) : (
                 <>
                   <span>✓</span>
-                  Verify &amp; Continue
+                  {t('veVerifyBtn')}
                   <span className="ve-submit__arrow">→</span>
                 </>
               )}
@@ -398,19 +382,17 @@ export default function VerifyEmail() {
 
             {/* Footer */}
             <div className="ve-footer">
-              <span>Wrong email?</span>
+              <span>{t('veWrongEmail')}</span>
 
               <button
                 type="button"
                 onClick={() => nav('/register/buyer')}
               >
-                Register again
+                {t('veRegisterAgain')}
               </button>
             </div>
 
-            <div className="ve-secure">
-              🔒 Your information is protected and securely processed.
-            </div>
+            <div className="ve-secure">{t('veSecureNote')}</div>
           </form>
         </section>
       </main>
