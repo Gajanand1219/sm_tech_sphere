@@ -373,13 +373,13 @@ export default function Login() {
 
           {/* DEMO BOX */}
 
-          <div className="demo-box">
+          {/* <div className="demo-box">
             <span className="demo-dot" />
             <div>
               <strong>{t('demoAdminLabel')}</strong>
               <span>admin@smcleantech.com · Admin@12345</span>
             </div>
-          </div>
+          </div> */}
         </section>
       </main>
 
