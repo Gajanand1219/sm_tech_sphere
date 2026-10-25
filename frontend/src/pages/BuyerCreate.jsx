@@ -62,7 +62,7 @@ export default function BuyerCreate() {
   const [domains, setDomains] = useState([])
   const [problems, setProblems] = useState([])
   const [questions, setQuestions] = useState([])
-  const visibleQuestions = questions.slice(0, 4)
+  const visibleQuestions = questions.slice(0, 10)
   const { logout } = useAuth()
   const [specialNote, setSpecialNote] = useState('')
   const [reportFile, setReportFile] = useState(null)
