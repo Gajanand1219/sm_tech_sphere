@@ -266,6 +266,15 @@ const handleUpdate = async () => {
     }
   }
 
+
+  const serviceDomainOptions = [
+    'Water & Wastewater Treatment',
+    'SOLID AND HAZARDOUS WASTE',
+    'SOLAR AND RENEWABLE ENERGY',
+    'CARBON AND ESG',
+    'Air Pollution & Environmental Legal Services',
+  ]
+
   // ============================================================
   // GO TO EDIT / VIEW MODE
   // ============================================================
@@ -1274,67 +1283,136 @@ const handleUpdate = async () => {
                   Service Domains
                 </div>
 
-                <div className="domain-editor">
+                <div className="profile-field profile-field--wide service-domains-container">
+             
 
-                  <div className="domain-list">
-
-                    {Array.isArray(form.domains) &&
-                    form.domains.length > 0 ? (
-                      form.domains.map(
-                        (domain, index) => (
-                          <span
-                            key={`${domain}-${index}`}
-                            className="domain-tag"
-                          >
-                            {domain}
-
-                            {isEditMode && (
-                              <button
-                                type="button"
-                                className="domain-remove-btn"
-                                onClick={() =>
-                                  removeServiceDomain(index)
-                                }
-                                title="Remove domain"
-                              >
-                                ×
-                              </button>
-                            )}
-                          </span>
+              {/* Suggestions - Only in Edit Mode */}
+              {isEditMode && (
+                <div className="domain-picker">
+                  <div className="domain-section-title">
+                    <div>
+                      <h4>Choose your domains</h4>
+                      <p>Select the services your business provides.</p>
+                    </div>
+                    <span className="domain-count">
+                      {new Set(
+                        (form.domains || []).map((d) =>
+                          String(d).trim().toLowerCase()
                         )
-                      )
-                    ) : (
-                      <span className="no-domains">
-                        No service domains selected
-                      </span>
-                    )}
-
+                      ).size}/5 selected
+                    </span>
                   </div>
 
-                  {/* ADD DOMAIN - ONLY IN EDIT MODE */}
+                  <div className="domain-options-grid">
+                    {serviceDomainOptions
+                      .filter(
+                        (domain) =>
+                          !(form.domains || []).some(
+                            (item) =>
+                              String(item).trim().toLowerCase() ===
+                              domain.trim().toLowerCase()
+                          )
+                      )
+                      .map((domain) => (
+                        <button
+                          key={domain}
+                          type="button"
+                          className="domain-option-card"
+                          onClick={() => {
+                            const current = Array.isArray(form.domains)
+                              ? form.domains
+                              : [];
 
-                  {isEditMode && (
-                    <div className="domain-add-row">
+                            const normalized = domain.trim().toLowerCase();
 
-                      <input
-                        type="text"
-                        id="new-service-domain"
-                        placeholder="Enter service domain"
-                        onKeyDown={handleDomainKeyDown}
-                      />
+                            const exists = current.some(
+                              (item) =>
+                                String(item).trim().toLowerCase() === normalized
+                            );
 
-                      <button
-                        type="button"
-                        className="domain-add-btn"
-                        onClick={addServiceDomain}
-                      >
-                        + Add Domain
-                      </button>
-
-                    </div>
-                  )}
-
+                            if (!exists && current.length < 5) {
+                              updateField("domains", [...current, domain]);
+                            }
+                          }}
+                        >
+                          <span className="domain-option-icon">+</span>
+                          <span className="domain-option-name">{domain}</span>
+                        </button>
+                      ))}
+                  </div>
                 </div>
+              )}
+
+              {/* Selected Domains */}
+              <div className="domain-selected-panel">
+                <div className="domain-section-title">
+                  <div>
+                    <h4>Selected Domains</h4>
+                    <p>
+                      {(form.domains || []).length > 0
+                        ? "Your selected business service areas."
+                        : "No domains selected yet."}
+                    </p>
+                  </div>
+
+                  <span className="selected-count">
+                    {new Set(
+                      (form.domains || []).map((d) =>
+                        String(d).trim().toLowerCase()
+                      )
+                    ).size}
+                  </span>
+                </div>
+
+                <div className="domain-selected-list">
+                  {[
+                    ...new Map(
+                      (Array.isArray(form.domains) ? form.domains : [])
+                        .filter((domain) => String(domain).trim())
+                        .map((domain) => [
+                          String(domain).trim().toLowerCase(),
+                          String(domain).trim(),
+                        ])
+                    ).values(),
+                  ].map((domain) => (
+                    <div
+                      className="domain-selected-item"
+                      key={domain.toLowerCase()}
+                    >
+                      <span className="domain-selected-check">✓</span>
+                      <span className="domain-selected-text">{domain}</span>
+
+                      {isEditMode && (
+                        <button
+                          type="button"
+                          className="domain-remove-btn"
+                          onClick={() => {
+                            const normalized = domain.trim().toLowerCase();
+
+                            updateField(
+                              "domains",
+                              (form.domains || []).filter(
+                                (item) =>
+                                  String(item).trim().toLowerCase() !== normalized
+                              )
+                            );
+                          }}
+                          aria-label={`Remove ${domain}`}
+                        >
+                          ×
+                        </button>
+                      )}
+                    </div>
+                  ))}
+
+                  {(form.domains || []).length === 0 && (
+                    <p className="no-domains-message">
+                      No domains selected yet. Select a domain from above.
+                    </p>
+                  )}
+                </div>
+              </div>
+            </div>
               </>
             )}
 
