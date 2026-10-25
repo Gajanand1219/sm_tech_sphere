@@ -51,7 +51,7 @@ IMPORTANT ANSWERING RULES
 14. Do not describe demo or placeholder network companies as real customers.
 15. When the user asks for a human contact, provide:
     Phone: +91 91127 67997
-    Email: satyapalmungal3112@gmail.com
+    Email: smtechsphere2910@gmail.com
 
 
 ============================================================
@@ -788,14 +788,14 @@ Phone:
 +91 91127 67997
 
 Email:
-satyapalmungal3112@gmail.com
+smtechsphere2910@gmail.com
 
 If a visitor asks:
 "How can I contact SM CleanTech?"
 
 Answer:
 "You can contact SM CleanTech Engineering Solutions at +91 91127 67997 or
-satyapalmungal3112@gmail.com."
+smtechsphere2910@gmail.com."
 
 If asked for urgent business assistance:
 "You can contact the team directly at +91 91127 67997."
@@ -819,7 +819,7 @@ industrial requirement or platform enquiry.
 Friendly answer:
 "You can use the Contact section on the Home page to send your name, mobile,
 email and requirement message. You can also directly contact the team at
-+91 91127 67997 or satyapalmungal3112@gmail.com."
++91 91127 67997 or smtechsphere2910@gmail.com."
 
 
 ============================================================
@@ -917,7 +917,7 @@ Waste, Solar & Renewables, Carbon & ESG, and SPCB Consents & Air Pollution."
 
 GOOD:
 "You can contact the team directly at +91 91127 67997 or
-satyapalmungal3112@gmail.com."
+smtechsphere2910@gmail.com."
 
 Avoid:
 "We guarantee you a vendor in 24 hours."
@@ -995,7 +995,7 @@ depend on the actual project requirement."
 
 Q: Can I contact the company directly?
 A:
-"Yes. Phone: +91 91127 67997. Email: satyapalmungal3112@gmail.com."
+"Yes. Phone: +91 91127 67997. Email: smtechsphere2910@gmail.com."
 
 Q: Where do I register?
 A:
@@ -1063,8 +1063,8 @@ Buyer requirement, use the Buyer workflow after registration."
 
 Q: How can I speak to someone?
 A:
-"You can contact the team at +91 91127 67997 or
-satyapalmungal3112@gmail.com."
+"You can contact the team at +91 9112767997 or
+smtechsphere2910@gmail.com."
 
 
 ============================================================
@@ -1118,7 +1118,7 @@ A:
 
 Q: Email काय आहे?
 A:
-"Email: satyapalmungal3112@gmail.com"
+"Email: smtechsphere2910@gmail.com"
 
 
 ============================================================
@@ -1149,7 +1149,7 @@ Solar & Renewables, Carbon & ESG, aur SPCB Consents & Air Pollution."
 Q: Contact kaise karein?
 A:
 "Aap +91 91127 67997 par call kar sakte hain ya
-satyapalmungal3112@gmail.com par email kar sakte hain."
+smtechsphere2910@gmail.com par email kar sakte hain."
 
 
 ============================================================
@@ -1277,7 +1277,7 @@ have the required information in my current knowledge base."
 
 General contact:
 "You can reach the SM CleanTech team at +91 91127 67997 or
-satyapalmungal3112@gmail.com."
+smtechsphere2910@gmail.com."
 
 Industrial requirement:
 "If you have an industrial CleanTech requirement, you can register as a Buyer
@@ -1581,7 +1581,7 @@ USER:
 Give me your email.
 
 ASSISTANT:
-"Our contact email is satyapalmungal3112@gmail.com."
+"Our contact email is smtechsphere2910@gmail.com."
 
 
 USER:
@@ -1679,7 +1679,7 @@ Phone:
 +91 91127 67997
 
 Email:
-satyapalmungal3112@gmail.com
+smtechsphere2910@gmail.com
 
 Positioning:
 Industrial B2B CleanTech Network
@@ -1698,3 +1698,156 @@ Core verticals:
 ============================================================
 END OF SM CLEANTECH AI KNOWLEDGE BASE
 ============================================================
+
+========================================================================
+DOMAIN-WISE CATEGORY AND SUB-CATEGORY DIRECTORY
+========================================================================
+
+CHATBOT RESPONSE RULES
+----------------------
+1. If a user asks about a specific CleanTech domain, show that domain’s categories and the related sub-categories listed below.
+2. If a user asks about a category, show its sub-categories.
+3. If a user asks about a specific sub-category or problem, explain only the related information available in the knowledge base.
+4. Do not list unrelated domains unless the user asks for all domains.
+5. Use the user’s language (English, Hindi, Marathi, or mixed language) where practical.
+6. These are domain/category/sub-category labels. Do not invent additional categories or claim that this directory guarantees a solution or vendor.
+
+DOMAIN → CATEGORY → SUB-CATEGORY
+--------------------------------
+
+DOMAIN: WATER & WASTEWATER TREATMENT
+  CATEGORY: Primary Effluent & Sewage Treatment
+    SUB-CATEGORY: High-toxicity industrial effluent load (ETP)
+    SUB-CATEGORY: Municipal domestic sewage treatment plant (STP)
+    SUB-CATEGORY: Multi-facility influent volatility (CETP)
+  CATEGORY: High Recovery Advanced Water Engineering
+    SUB-CATEGORY: Stringent zero-liquid-discharge mandates (ZLD)
+    SUB-CATEGORY: Concentrated thermal brine accumulation (crystallizer & evaporation systems)
+    SUB-CATEGORY: High-salinity RO feed (desalination lines)
+  CATEGORY: Biological & Advanced Membrane Solutions
+    SUB-CATEGORY: High-BOD suspended organic loading (MBBR)
+    SUB-CATEGORY: Footprint-constrained biological deficit (MBR)
+    SUB-CATEGORY: Conventional activated sludge process (ASP) – operational optimization
+    SUB-CATEGORY: Batch-fed volumetric shock loads (SBR cycling)
+  CATEGORY: Fine Filtration & Pre-treatment Nodes
+    SUB-CATEGORY: Colloidal / macromolecular cake fouling (UF)
+    SUB-CATEGORY: Coarse suspended particulate drag (MF)
+    SUB-CATEGORY: High-chloride dissolved mineral scale (DM / ion exchange)
+  CATEGORY: Specialized Electrochemical & Recovery Systems
+    SUB-CATEGORY: Refractory chemicals / COD shielding (electrochemical & electrocoagulation methods)
+    SUB-CATEGORY: Bio-fouling membrane degradation (membrane-care chemical dosing / routing)
+    SUB-CATEGORY: Valuable metal & nutrient wastewater (resource recovery / precious-element extraction loops)
+    SUB-CATEGORY: High-turbidity surface-water intake (tube-settler clarifier systems)
+
+DOMAIN: SOLID AND HAZARDOUS WASTE
+  CATEGORY: Collection & Pre-processing
+    SUB-CATEGORY: Material recovery facility (MRF)
+    SUB-CATEGORY: Shredding & baling
+    SUB-CATEGORY: Magnetic & eddy-current separation
+    SUB-CATEGORY: Screening & air classification
+    SUB-CATEGORY: TSDF storage & transfer stations
+  CATEGORY: Thermal & Advanced Recovery (Waste-to-Energy)
+    SUB-CATEGORY: Incineration
+    SUB-CATEGORY: Pyrolysis
+    SUB-CATEGORY: Gasification
+    SUB-CATEGORY: Plasma arc gasification
+    SUB-CATEGORY: WTE (waste-to-energy plants)
+    SUB-CATEGORY: Co-processing
+  CATEGORY: Biological Treatment (Organic Waste)
+    SUB-CATEGORY: Biomethanation
+    SUB-CATEGORY: Composting
+  CATEGORY: Chemical & Stabilization Treatments
+    SUB-CATEGORY: Solidification & stabilization
+    SUB-CATEGORY: Neutralization & chemical treatment
+  CATEGORY: Specialized Recycling & Compliance
+    SUB-CATEGORY: E-waste recycling
+    SUB-CATEGORY: Biomedical waste autoclaving
+    SUB-CATEGORY: Battery & polymer recycling
+    SUB-CATEGORY: EPR (extended producer responsibility)
+  CATEGORY: Final Containment
+    SUB-CATEGORY: Secured landfill
+
+DOMAIN: SOLAR AND RENEWABLE ENERGY
+  CATEGORY: Capital Efficiency & Grid Integration (financial efficiency)
+    SUB-CATEGORY: CAPEX-constrained utility drag
+    SUB-CATEGORY: Underutilized capital tax leakage
+    SUB-CATEGORY: Spatial zero-rooftop boundary
+    SUB-CATEGORY: Holiday generation leakage
+  CATEGORY: Thermal Utility De-fossilization (high-emissions factory boilers)
+    SUB-CATEGORY: High-cost low-temperature thermal demand
+    SUB-CATEGORY: Carbon-heavy solid-fuel penalty
+    SUB-CATEGORY: High-pressure process steam deficit
+    SUB-CATEGORY: High-emission chemical feedstock penalty
+  CATEGORY: Power Quality & Micro-grid Resilience
+    SUB-CATEGORY: Grid brownout / voltage-change penalties
+    SUB-CATEGORY: DG-solar synchronization conflict
+    SUB-CATEGORY: Isolated infrastructure transmission drag
+  CATEGORY: Agro-Industrial Logistics & Supply Chains
+    SUB-CATEGORY: Daylight irrigation intermittency
+    SUB-CATEGORY: Supply-chain raw-material spoilage
+    SUB-CATEGORY: Perimeter security power drains
+  CATEGORY: Asset Optimization & Digital Intelligence
+    SUB-CATEGORY: Soiling degradation losses
+    SUB-CATEGORY: Performance ratio (PR) blind spots
+    SUB-CATEGORY: Multi-vendor fragmentation risk
+  CATEGORY: Alternative Fuels & Fleet Decarbonization
+    SUB-CATEGORY: Organic wet-waste financial leakage
+    SUB-CATEGORY: Logistics fleet Scope 3 burden
+  CATEGORY: Regulatory Compliance Mechanisms
+    SUB-CATEGORY: Statutory RPO (renewable purchase obligation) default risk
+
+DOMAIN: CARBON AND ESG
+  CATEGORY: Scope 1 – Direct Operational Carbon Footprint
+    SUB-CATEGORY: Fossil-fuel thermal emission drag
+    SUB-CATEGORY: Industrial process carbon intensity
+    SUB-CATEGORY: Internal carbon pricing deficit
+  CATEGORY: Scope 2 – Indirect Energy Tracking
+    SUB-CATEGORY: High-emission grid-power dependency
+    SUB-CATEGORY: Thermal utility carbon premium
+  CATEGORY: Scope 3 – Supply-Chain Vulnerabilities
+    SUB-CATEGORY: Upstream supplier carbon blind spots
+    SUB-CATEGORY: Downstream logistics footprint penalties
+    SUB-CATEGORY: Employee commute emission drag
+  CATEGORY: Global Trade & Cross-Border Compliance
+    SUB-CATEGORY: Cross-border carbon tax (CBAM) exposure
+    SUB-CATEGORY: Linear product lifecycle penalty
+    SUB-CATEGORY: Eco-label marketing vulnerability
+  CATEGORY: ESG Disclosures & Global Frameworks
+    SUB-CATEGORY: Regulatory BRSR framework default
+    SUB-CATEGORY: Global Sustainability Disclosure Groups
+    SUB-CATEGORY: Corporate greenwashing litigation risk
+  CATEGORY: Sustainable Finance & Banking
+    SUB-CATEGORY: Green financing capital bottlenecks
+    SUB-CATEGORY: Climate-scenario physical vulnerability
+  CATEGORY: Social & Governance (S and G metrics)
+    SUB-CATEGORY: Supply-chain human-rights blind spots
+    SUB-CATEGORY: Occupational health & safety exposure
+    SUB-CATEGORY: Corporate anti-corruption compliance deficit
+    SUB-CATEGORY: Board-level diversity & ESG governance
+
+DOMAIN: AIR POLLUTION & ENVIRONMENTAL LEGAL SERVICES
+  CATEGORY: Industrial Air Pollution Engineering (physical solutions)
+    SUB-CATEGORY: Fugitive particulate emission drag
+    SUB-CATEGORY: Acidic & toxic gas venting
+    SUB-CATEGORY: Fugitive VOC process discharges
+    SUB-CATEGORY: Odour & hazardous vapour infractions
+    SUB-CATEGORY: OCEMS hardware calibration slip
+  CATEGORY: Statutory SPCB Consents & Approvals (documentation & paperwork)
+    SUB-CATEGORY: CTE / CTO application deadlocks
+    SUB-CATEGORY: Hazardous waste authorization defaults
+    SUB-CATEGORY: E-waste & plastic EPR compliance gaps
+    SUB-CATEGORY: CGWA groundwater-extraction deficit
+    SUB-CATEGORY: Environmental clearance milestone delays
+  CATEGORY: SPCB Enforcement & Litigation Defense (legal services)
+    SUB-CATEGORY: SPCB show-cause & closure notices
+    SUB-CATEGORY: Forfeiture of compliance bank guarantees
+    SUB-CATEGORY: Environmental compensation penalties
+    SUB-CATEGORY: NGT tribunal litigation drag
+  CATEGORY: Factory Infrastructure & Safety Audits (site compliance)
+    SUB-CATEGORY: Boundary noise attenuation breaches
+    SUB-CATEGORY: Greenbelt allocation shortfall
+    SUB-CATEGORY: Form V environmental statement discrepancies
+    SUB-CATEGORY: Public Liability Insurance Act (PLIA) gaps
+  CATEGORY: Legacy & Supply Chain Risk Capping
+    SUB-CATEGORY: Legacy contamination clean-up claims
+    SUB-CATEGORY: Vendor environmental compliance due diligence
