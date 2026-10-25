@@ -530,6 +530,13 @@ def enquiry(
                     q.implementation_time,
                 "warranty": q.warranty,
                 "amc": q.amc,
+                "has_question_file": bool(q.question_file_path),
+                "question_file_name": (
+                        getattr(q, "question_file_name", None)
+                        or Path(q.question_file_path).name
+                        if q.question_file_path
+                        else None
+                    ),
                 "notes": q.proposal_notes,
                 "status": q.status,
             }
@@ -947,3 +954,67 @@ async def upload_enquiry_report(
 
     finally:
         await file.close()
+
+
+
+
+
+@router.get("/quotations/{quotation_id}/file")
+def get_quotation_file(
+    quotation_id: int,
+    download: bool = False,
+    user=Depends(require_roles("buyer")),
+    db: Session = Depends(get_db),
+):
+    quotation = (
+        db.query(Quotation)
+        .join(Enquiry, Quotation.enquiry_id == Enquiry.id)
+        .filter(
+            Quotation.id == quotation_id,
+            Enquiry.buyer_id == user.id,
+        )
+        .first()
+    )
+
+    if not quotation:
+        raise HTTPException(
+            status_code=404,
+            detail="Quotation not found or access denied",
+        )
+
+    if not quotation.question_file_path:
+        raise HTTPException(
+            status_code=404,
+            detail="No technical file attached to this quotation",
+        )
+
+    file_path = Path(quotation.question_file_path).resolve()
+
+    # Ensure the stored path is inside the designated upload folder.
+    upload_dir = (
+        Path(__file__).resolve().parents[2]
+        / "uploads"
+        / "question_files"
+    ).resolve()
+
+    if not file_path.is_relative_to(upload_dir):
+        raise HTTPException(status_code=403, detail="Invalid file path")
+
+    if not file_path.is_file():
+        raise HTTPException(
+            status_code=404,
+            detail="Uploaded file not found on server",
+        )
+
+    filename = (
+        getattr(quotation, "question_file_name", None)
+        or file_path.name
+    )
+
+    return FileResponse(
+        path=str(file_path),
+        filename=filename,
+        media_type="application/octet-stream",
+        content_disposition_type="attachment" if download else "inline",
+    )
+
