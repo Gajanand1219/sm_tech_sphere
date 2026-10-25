@@ -189,7 +189,7 @@ export default function BuyerEnquiry() {
   {String(enquiry.dossier || "")
     .split("\n")
     .filter((line) => line.trim() && !line.includes('<div id="ev-questionnaire">'))
-    .slice(0, 4)
+    .slice(0, 10)
     .map((line, index) => {
       const [question, ...answerParts] = line.split(":");
       const answer = answerParts.join(":").trim();
