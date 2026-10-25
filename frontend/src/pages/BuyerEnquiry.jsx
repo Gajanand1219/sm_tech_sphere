@@ -49,6 +49,66 @@ export default function BuyerEnquiry() {
     }
   }
 
+
+
+const openQuotationFile = async (q, download = false) => {
+  // Open a blank tab immediately to avoid popup blockers.
+  const newTab = download ? null : window.open('about:blank', '_blank');
+
+  try {
+    if (!q?.id) {
+      throw new Error('Quotation ID is missing.');
+    }
+
+    const response = await API.get(
+      `/buyer/quotations/${q.id}/file`,
+      { responseType: 'blob' }
+    );
+
+    const contentType =
+      response.headers['content-type'] || 'application/octet-stream';
+
+    const blob = new Blob([response.data], { type: contentType });
+    const fileUrl = URL.createObjectURL(blob);
+
+    if (download) {
+      const link = document.createElement('a');
+      link.href = fileUrl;
+      link.download = q.question_file_name || 'technical-document';
+      document.body.appendChild(link);
+      link.click();
+      link.remove();
+
+      setTimeout(() => URL.revokeObjectURL(fileUrl), 60000);
+    } else if (newTab) {
+      newTab.location.href = fileUrl;
+
+      // Keep the URL alive while the browser opens the document.
+      setTimeout(() => URL.revokeObjectURL(fileUrl), 60000);
+    } else {
+      URL.revokeObjectURL(fileUrl);
+      throw new Error('Please allow pop-ups to view the file.');
+    }
+  } catch (err) {
+    if (newTab && !newTab.closed) {
+      newTab.close();
+    }
+
+    console.error(
+      'Quotation file error:',
+      err.response?.data || err
+    );
+
+    alert(
+      err.response?.status === 404
+        ? 'Technical document was not found on the server.'
+        : 'Unable to open the technical document. Please try again.'
+    );
+  }
+};
+
+
+
   const reject = async (quotationId) => {
     setBusy(true)
     setMsg('')
@@ -193,6 +253,7 @@ export default function BuyerEnquiry() {
     .map((line, index) => {
       const [question, ...answerParts] = line.split(":");
       const answer = answerParts.join(":").trim();
+
 
       return (
         <div className="be-dossier__question" key={index}>
@@ -339,6 +400,41 @@ export default function BuyerEnquiry() {
                     {q.notes && (
                       <p className="be-quote__notes">{q.notes}</p>
                     )}
+
+
+                        {q.has_question_file && (
+                      <div className="be-technical-file">
+                        <div className="be-technical-file__info">
+                          <span className="be-technical-file__icon">📎</span>
+
+                          <div className="be-technical-file__details">
+                            <strong>Technical Document</strong>
+                            <p title={q.question_file_name || 'Vendor attachment'}>
+                              {q.question_file_name || 'Vendor attachment'}
+                            </p>
+                          </div>
+                        </div>
+
+                        <div className="be-technical-file__actions">
+                          {/* <button
+                            type="button"
+                            className="be-file-btn be-file-btn--view"
+                            onClick={() => openQuotationFile(q, false)}
+                          >
+                            <span>👁</span> View File
+                          </button> */}
+
+                          <button
+                            type="button"
+                            className="be-file-btn be-file-btn--download"
+                            onClick={() => openQuotationFile(q, true)}
+                          >
+                            <span>↓</span> Download
+                          </button>
+                        </div>
+                      </div>
+                    )}
+
 
                     {/* Actions */}
                     <div className="be-quote__actions">
