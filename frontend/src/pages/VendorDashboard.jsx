@@ -613,7 +613,7 @@ export default function VendorDashboard() {
           </div>
 
           {/* WORKSPACE TILES */}
-          <h2 className="ev-h2">Your workspace</h2>
+           <h2 className="ev-h2" style={{ color: "black" }}>Your workspace</h2>
           <div className="ev-mgrid">
             {MENU.map((m) => (
               <Link key={m.id} to={m.to} className="ev-mt">
@@ -628,7 +628,9 @@ export default function VendorDashboard() {
           </div>
 
           {/* RECENT MATCHES */}
-          <h2 className="ev-h2">Recent matching enquiries</h2>
+          <h2 className="ev-h2" style={{ color: "black" }}>
+              Recent matching enquiries
+            </h2>
           {loading ? (
             <div className="ev-loading">Loading enquiries...</div>
           ) : matches.length ? (
