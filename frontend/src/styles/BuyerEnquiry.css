@@ -1204,3 +1204,158 @@
     font-size: 12px;
   }
 }
+
+
+
+/* Technical document card */
+.be-technical-file {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 18px;
+  width: 100%;
+  margin: 16px 0;
+  padding: 18px;
+  box-sizing: border-box;
+  background: #f8fafc;
+  border: 1px solid #dbe4ef;
+  border-radius: 14px;
+  transition: border-color 0.2s ease, box-shadow 0.2s ease;
+}
+
+.be-technical-file:hover {
+  border-color: #93b4e8;
+  box-shadow: 0 5px 18px rgba(15, 45, 85, 0.07);
+}
+
+.be-technical-file__info {
+  display: flex;
+  align-items: center;
+  gap: 13px;
+  flex: 1;
+  min-width: 0;
+}
+
+.be-technical-file__icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  width: 46px;
+  height: 46px;
+  font-size: 23px;
+  background: #e7efff;
+  border-radius: 12px;
+}
+
+.be-technical-file__details {
+  min-width: 0;
+}
+
+.be-technical-file__details strong {
+  display: block;
+  margin-bottom: 5px;
+  color: #172b4d;
+  font-size: 14px;
+  font-weight: 700;
+}
+
+.be-technical-file__details p {
+  max-width: 320px;
+  margin: 0;
+  overflow-wrap: anywhere;
+  color: #64748b;
+  font-size: 13px;
+  line-height: 1.5;
+}
+
+.be-technical-file__actions {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-shrink: 0;
+}
+
+.be-file-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 7px;
+  min-height: 40px;
+  padding: 10px 15px;
+  border: 1px solid transparent;
+  border-radius: 9px;
+  font-family: inherit;
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  transition:
+    background 0.2s ease,
+    color 0.2s ease,
+    border-color 0.2s ease,
+    transform 0.2s ease;
+}
+
+.be-file-btn:hover {
+  transform: translateY(-1px);
+}
+
+.be-file-btn:focus-visible {
+  outline: 3px solid #93c5fd;
+  outline-offset: 3px;
+}
+
+.be-file-btn--view {
+  color: #1d4ed8;
+  background: #eff6ff;
+  border-color: #bfdbfe;
+}
+
+.be-file-btn--view:hover {
+  color: #fff;
+  background: #2563eb;
+  border-color: #2563eb;
+}
+
+.be-file-btn--download {
+  color: #fff;
+  background: #0f766e;
+  border-color: #0f766e;
+}
+
+.be-file-btn--download:hover {
+  background: #115e59;
+  border-color: #115e59;
+}
+
+/* Responsive layout */
+@media (max-width: 640px) {
+  .be-technical-file {
+    align-items: stretch;
+    flex-direction: column;
+    gap: 15px;
+    padding: 14px;
+  }
+
+  .be-technical-file__details p {
+    max-width: 100%;
+  }
+
+  .be-technical-file__actions {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    width: 100%;
+  }
+
+  .be-file-btn {
+    width: 100%;
+    padding: 10px 8px;
+    font-size: 12px;
+  }
+}
+
+@media (max-width: 360px) {
+  .be-technical-file__actions {
+    grid-template-columns: 1fr;
+  }
+}
