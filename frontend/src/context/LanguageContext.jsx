@@ -150,7 +150,7 @@ const translations = {
     forgotPassword: 'Forgot Password?',
     loginBtn: 'Login',
     signingIn: 'Signing In...',
-    newToPlatform: 'New To SM TECHSPHERE Pvt Ltd',
+    newToPlatform: 'New To ENVIQUO',
     createAccount: 'Create Account',
     secureNote:
       '🔒 Your Information Is Protected And Securely Processed.',
@@ -343,7 +343,7 @@ const translations = {
       'Registration successful. Please verify your email.',
 
         // ================= Home page =================
-    homeHeroLabel: '⚡ Industrial B2B Techsphere Network',
+    homeHeroLabel: '⚡ Industrial B2B Techsphere Network By ENVIQUO',
     homeHeroTitle: 'SM Techsphere Pvt. Ltd.',
     homeHeroTagline: '// DIAGNOSE. MATCH. SOLUTION.',
     homeHeroDesc:
@@ -520,8 +520,8 @@ const translations = {
     'About Us': 'हमारे बारे में',
     'Contact Us': 'संपर्क करें',
     Login: 'लॉग इन',
-    'Register as Buyer': 'खरीदार के रूप में पंजीकरण करें',
-    'Register as Vendor': 'विक्रेता के रूप में पंजीकरण करें',
+    'Register as Buyer': 'खरीदार बनने के लिए निवेदन करें',
+    'Register as Vendor': 'विक्रेता बनने के लिए निवेदन करें',
     Dashboard: 'डैशबोर्ड',
     Logout: 'लॉग आउट',
 
@@ -653,7 +653,7 @@ const translations = {
     forgotPassword: 'पासवर्ड भूल गए?',
     loginBtn: 'लॉग इन',
     signingIn: 'साइन इन हो रहा है...',
-    newToPlatform: 'SM TECHSPHERE Pvt Ltd पर नए हैं?',
+    newToPlatform: 'ENVIQUO पर नए हैं?',
     createAccount: 'खाता बनाएं',
     secureNote:
       '🔒 आपकी जानकारी सुरक्षित है और सुरक्षित रूप से संसाधित की जाती है।',
@@ -721,7 +721,7 @@ const translations = {
     veResendFailErr: 'OTP पुनः भेजने में असमर्थ। कृपया पुनः प्रयास करें।',
 
         // ================= Home page =================
-    homeHeroLabel: '⚡ औद्योगिक B2B टेकस्फियर नेटवर्क',
+    homeHeroLabel: '⚡ औद्योगिक B2B टेकस्फियर नेटवर्क By ENVIQUO',
     homeHeroTitle: 'SM Techsphere Pvt. Ltd.',
     homeHeroTagline: '// निदान. मिलान. समाधान.',
     homeHeroDesc:
