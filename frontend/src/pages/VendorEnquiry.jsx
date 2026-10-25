@@ -399,7 +399,7 @@ const submit = async (event) => {
                 }
               }
 
-              return items.slice(0, 4).map((item, index) => (
+              return items.slice(0, 10).map((item, index) => (
                 <div className="ve-dossier__question" key={index}>
                   <div className="ve-dossier__number">
                     {String(index + 1).padStart(2, '0')}
