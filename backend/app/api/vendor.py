@@ -1,7 +1,14 @@
 from pathlib import Path
 from datetime import datetime, timedelta
-
-from fastapi import APIRouter, Depends, HTTPException
+from uuid import uuid4
+from fastapi import (
+    APIRouter,
+    Depends,
+    HTTPException,
+    UploadFile,
+    File,
+    Form,
+)
 from starlette.responses import FileResponse
 from sqlalchemy.orm import Session
 
@@ -21,7 +28,7 @@ from app.models import (
     EnquiryReport,
 )
 
-from app.schemas.enquiry import QuotationCreate, HandshakeAction
+from app.schemas.enquiry import HandshakeAction
 
 from app.services.email import (
     send_quotation_submitted_email,
@@ -39,6 +46,27 @@ router = APIRouter(prefix="/vendor", tags=["Vendor"])
 # ============================================================
 # CONSTANTS
 # ============================================================
+
+REPORTS_DIR = (
+    Path(__file__).resolve().parents[2]
+    / "uploads"
+    / "question_files"
+)
+
+REPORTS_DIR.mkdir(parents=True, exist_ok=True)
+
+ALLOWED_QUESTION_FILE_EXTENSIONS = {
+    ".pdf",
+    ".doc",
+    ".docx",
+    ".xls",
+    ".xlsx",
+    ".png",
+    ".jpg",
+    ".jpeg",
+}
+
+MAX_QUESTION_FILE_SIZE = 10 * 1024 * 1024  # 10 MB
 
 QUOTATION_WINDOW_HOURS = 240
 
@@ -331,14 +359,22 @@ def view_enquiry(
 
 @router.post("/quotations")
 async def quotation(
-    payload: QuotationCreate,
+    enquiry_id: int = Form(...),
+    capex: float = Form(...),
+    opex: float | None = Form(None),
+    technology: str = Form(...),
+    implementation_time: str = Form(...),
+    warranty: str | None = Form(None),
+    amc: str | None = Form(None),
+    proposal_notes: str | None = Form(None),
+    question_file: UploadFile | None = File(None),
     user=Depends(require_roles("vendor")),
     db: Session = Depends(get_db),
 ):
     match = (
         db.query(EnquiryMatch)
         .filter(
-            EnquiryMatch.enquiry_id == payload.enquiry_id,
+            EnquiryMatch.enquiry_id == enquiry_id,
             EnquiryMatch.vendor_id == user.id,
         )
         .first()
@@ -346,8 +382,8 @@ async def quotation(
 
     if not match:
         raise HTTPException(
-            403,
-            "You are not matched to this enquiry",
+            status_code=403,
+            detail="You are not matched to this enquiry",
         )
 
     e = match.enquiry
@@ -358,22 +394,22 @@ async def quotation(
         EnquiryStatus.QUOTATION.value,
     ]:
         raise HTTPException(
-            400,
-            "Quotation is available only for a matched enquiry."
+            status_code=400,
+            detail="Quotation is available only for a matched enquiry.",
         )
 
     deadline = _deadline(e)
 
     if deadline and datetime.utcnow() > deadline:
         raise HTTPException(
-            400,
-            "The 240-hour quotation window has expired.",
+            status_code=400,
+            detail="The 240-hour quotation window has expired.",
         )
 
     existing = (
         db.query(Quotation)
         .filter(
-            Quotation.enquiry_id == payload.enquiry_id,
+            Quotation.enquiry_id == enquiry_id,
             Quotation.vendor_id == user.id,
         )
         .first()
@@ -381,31 +417,94 @@ async def quotation(
 
     if existing:
         raise HTTPException(
-            400,
-            "Quotation already submitted",
+            status_code=400,
+            detail="Quotation already submitted",
         )
+
+    # Optional vendor question/technical document
+    saved_file_path = None
+
+    if question_file and question_file.filename:
+        extension = Path(question_file.filename).suffix.lower()
+
+        if extension not in ALLOWED_QUESTION_FILE_EXTENSIONS:
+            raise HTTPException(
+                status_code=400,
+                detail=(
+                    "Unsupported file type. Upload PDF, DOC, DOCX, "
+                    "XLS, XLSX, PNG or JPG."
+                ),
+            )
+
+        content = await question_file.read()
+
+        if len(content) > MAX_QUESTION_FILE_SIZE:
+            raise HTTPException(
+                status_code=400,
+                detail="File size must be 10 MB or less.",
+            )
+
+        if not content:
+            raise HTTPException(
+                status_code=400,
+                detail="Uploaded file is empty.",
+            )
+
+        # Unique filename avoids collisions and unsafe original filenames
+        stored_filename = f"{uuid4().hex}{extension}"
+        destination = REPORTS_DIR / stored_filename
+
+        destination.write_bytes(content)
+        saved_file_path = str(destination.resolve())
 
     q = Quotation(
+        enquiry_id=enquiry_id,
         vendor_id=user.id,
-        **payload.model_dump(),
+        capex=capex,
+        opex=opex,
+        technology=technology.strip(),
+        implementation_time=implementation_time.strip(),
+        warranty=warranty.strip() if warranty else None,
+        amc=amc.strip() if amc else None,
+        proposal_notes=(
+            proposal_notes.strip() if proposal_notes else None
+        ),
+        question_file_path=saved_file_path,
+        question_file_name=(
+            Path(question_file.filename).name
+            if question_file and question_file.filename
+            else None
+        ),
     )
 
-    db.add(q)
-    db.flush()
+    try:
+        db.add(q)
+        db.flush()
 
-    e.status = EnquiryStatus.QUOTATION.value
+        e.status = EnquiryStatus.QUOTATION.value
 
-    db.add(
-        CRMEvent(
-            enquiry_id=e.id,
-            actor_id=user.id,
-            event_type="quotation_submitted",
-            note=f"Quotation #{q.id} submitted.",
+        db.add(
+            CRMEvent(
+                enquiry_id=e.id,
+                actor_id=user.id,
+                event_type="quotation_submitted",
+                note=f"Quotation #{q.id} submitted.",
+            )
         )
-    )
 
-    db.commit()
-    db.refresh(q)
+        db.commit()
+        db.refresh(q)
+
+    except Exception:
+        db.rollback()
+
+        if saved_file_path:
+            Path(saved_file_path).unlink(missing_ok=True)
+
+        raise HTTPException(
+            status_code=500,
+            detail="Unable to save quotation.",
+        )
 
     await send_quotation_submitted_email(
         buyer=e.buyer,
@@ -417,8 +516,8 @@ async def quotation(
         "message": "Quotation submitted",
         "quotation_id": q.id,
         "quotation_deadline": deadline,
+        "question_file_uploaded": bool(q.question_file_path),
     }
-
 
 # ============================================================
 # VENDOR HANDSHAKE
