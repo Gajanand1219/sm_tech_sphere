@@ -23,6 +23,24 @@ REQUIRED_COLUMNS = {
 }
 
 
+# Questions already covered by registration/profile fields.
+EXCLUDED_QUESTION_KEYWORDS = (
+    "total working hours",
+    "working hours of operation",
+    "experience (years)",
+    "company name",
+    "company segment",
+    "industry type",
+    "industrial verticals",
+    "geographical territories",
+    "director email",
+    "contact number",
+    "website",
+    "gst number",
+    "msme number",
+)
+
+
 def _read_reference_rows(base_dir: Path):
     """Read every supplied CSV, validate its schema, and deduplicate exact questions."""
     rows = []
@@ -51,6 +69,14 @@ def _read_reference_rows(base_dir: Path):
                 if not all(row.get(k) for k in ("domain", "category", "sub_category", "question_text")):
                     continue
 
+                question_text = row["question_text"].casefold()
+
+                if any(
+                    keyword in question_text
+                    for keyword in EXCLUDED_QUESTION_KEYWORDS
+                ):
+                    continue
+                
                 # Same question text in the same sub-category is one question even if
                 # duplicate CSV versions assign a different field_key.
                 key = (
@@ -205,4 +231,3 @@ def seed_database(db):
         "inserted_questions": inserted,
         "updated_questions": updated,
     }
-
