@@ -15,6 +15,8 @@ from app.models import (
     EmailVerification,
     EnquiryMatch,
     Enquiry,
+    Quotation,
+    Handshake,
     LoginEvent,
     Role,
     AccountStatus,
@@ -52,7 +54,6 @@ router = APIRouter(
 
 
 
-
 class ChangePasswordRequest(BaseModel):
     current_password: str
     new_password: str = Field(min_length=8, max_length=128)
@@ -67,7 +68,6 @@ class ChangePasswordRequest(BaseModel):
             raise ValueError("New password must be different from the current password.")
 
         return self
-
 
 
 # ============================================================
@@ -406,6 +406,129 @@ async def match_existing_enquiries_for_vendor(
 
     return matched_count
 
+
+
+async def refresh_vendor_enquiry_matches(db: Session, vendor: User):
+    """
+    Refresh a vendor's enquiry matches after Service Domains change.
+
+    - Add newly matching enquiries.
+    - Remove stale matches if no quotation/deal exists.
+    - Preserve matches with quotations or handshakes.
+    - Respect MAX_VENDOR_MATCHES.
+    """
+
+    profile = (
+        db.query(VendorProfile)
+        .filter(VendorProfile.user_id == vendor.id)
+        .first()
+    )
+
+    if not profile:
+        return
+
+    vendor_domains = {
+        str(domain).strip().casefold()
+        for domain in (profile.domains or [])
+        if str(domain).strip()
+    }
+
+    active_statuses = [
+        EnquiryStatus.APPROVED.value,
+        EnquiryStatus.MATCHED.value,
+    ]
+
+    enquiries = (
+        db.query(Enquiry)
+        .filter(Enquiry.status.in_(active_statuses))
+        .order_by(Enquiry.id.desc())
+        .all()
+    )
+
+    for enquiry in enquiries:
+        domain_name = (
+            str(enquiry.domain.name).strip().casefold()
+            if enquiry.domain and enquiry.domain.name
+            else ""
+        )
+
+        matches_domain = domain_name in vendor_domains
+
+        existing_match = (
+            db.query(EnquiryMatch)
+            .filter(
+                EnquiryMatch.enquiry_id == enquiry.id,
+                EnquiryMatch.vendor_id == vendor.id,
+            )
+            .first()
+        )
+
+        # Preserve matches that already have a quotation.
+        vendor_quotation = (
+            db.query(Quotation)
+            .filter(
+                Quotation.enquiry_id == enquiry.id,
+                Quotation.vendor_id == vendor.id,
+            )
+            .first()
+        )
+
+        handshake = enquiry.handshake
+        selected_handshake = bool(
+            handshake
+            and handshake.quotation
+            and handshake.quotation.vendor_id == vendor.id
+        )
+
+        if not matches_domain:
+            # Do not remove an existing commercial commitment.
+            if existing_match and not vendor_quotation and not selected_handshake:
+                db.delete(existing_match)
+
+            continue
+
+        # Domain matches and the vendor is already assigned.
+        if existing_match:
+            continue
+
+        # Do not add another vendor if this enquiry already has
+        # the maximum number of vendor matches.
+        match_count = (
+            db.query(EnquiryMatch)
+            .filter(EnquiryMatch.enquiry_id == enquiry.id)
+            .count()
+        )
+
+        if match_count >= MAX_VENDOR_MATCHES:
+            continue
+
+        new_match = EnquiryMatch(
+            enquiry_id=enquiry.id,
+            vendor_id=vendor.id,
+            match_score=60.0,
+            notified=False,
+        )
+
+        db.add(new_match)
+        db.flush()
+
+        try:
+            if vendor.email:
+                await send_vendor_matched_email(
+                    vendor=vendor,
+                    enquiry=enquiry,
+                )
+                new_match.notified = True
+        except Exception as exc:
+            # Keep the match even if the notification email fails.
+            print(
+                f"[VENDOR REMATCH EMAIL ERROR] "
+                f"vendor={vendor.id} "
+                f"enquiry={enquiry.id} "
+                f"error={exc}"
+            )
+
+    db.commit()
 
 
 # ============================================================
@@ -784,7 +907,7 @@ async def forgot_password(
         f"""
         Hello {user.full_name},<br><br>
 
-        We received a request to reset your SM Clean Tech
+        We received a request to reset your SM Techsphere Pvt. Ltd
         account password.<br><br>
 
         Click the button below to create a new password:
@@ -820,14 +943,14 @@ async def forgot_password(
         <br><br>
 
         Regards,<br>
-        <strong>SM Clean Tech Engineering Solutions</strong>
+        <strong>SM Techsphere Pvt. Ltd</strong>
         """,
     )
 
     background.add_task(
         send_email,
         user.email,
-        "Reset your SM Clean Tech password",
+        "Reset your SM Techsphere Pvt. Ltd password",
         html,
     )
 
@@ -1074,7 +1197,7 @@ def get_my_profile(
 # ============================================================
 
 @router.put("/profile")
-def update_my_profile(
+async def update_my_profile(
     payload: ProfileUpdate,
     user=Depends(require_roles("buyer", "vendor", "admin")),
     db: Session = Depends(get_db),
@@ -1225,6 +1348,16 @@ def update_my_profile(
 
         db.commit()
 
+        # Refresh enquiry matching only when vendor domains were updated.
+        if (
+            user.role == Role.VENDOR.value
+            and "domains" in data
+        ):
+            await refresh_vendor_enquiry_matches(
+                db=db,
+                vendor=user,
+            )
+
         return {
             "message": "Profile updated successfully",
         }
@@ -1246,8 +1379,6 @@ def update_my_profile(
             status_code=500,
             detail="Failed to update profile",
         )
-
-
 
 
 
@@ -1285,6 +1416,3 @@ def change_password(
     return {
         "message": "Password updated successfully."
     }
-
-
-    
