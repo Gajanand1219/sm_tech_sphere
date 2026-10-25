@@ -343,7 +343,7 @@ const translations = {
       'Registration successful. Please verify your email.',
 
         // ================= Home page =================
-    homeHeroLabel: '⚡ Industrial B2B Techsphere Network By ENVIQUO',
+    homeHeroLabel: '⚡ Industrial B2B Techsphere Network',
     homeHeroTitle: 'SM Techsphere Pvt. Ltd.',
     homeHeroTagline: '// DIAGNOSE. MATCH. SOLUTION.',
     homeHeroDesc:
@@ -721,7 +721,7 @@ const translations = {
     veResendFailErr: 'OTP पुनः भेजने में असमर्थ। कृपया पुनः प्रयास करें।',
 
         // ================= Home page =================
-    homeHeroLabel: '⚡ औद्योगिक B2B टेकस्फियर नेटवर्क By ENVIQUO',
+    homeHeroLabel: '⚡ औद्योगिक B2B टेकस्फियर नेटवर्क ',
     homeHeroTitle: 'SM Techsphere Pvt. Ltd.',
     homeHeroTagline: '// निदान. मिलान. समाधान.',
     homeHeroDesc:
