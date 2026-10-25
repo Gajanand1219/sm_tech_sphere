@@ -279,9 +279,20 @@ export default function Home() {
                 {t('homeHeroLabel')}
               </span>
 
-              <h5 className="hero__title" data-reveal>
+              {/* <h5 className="hero__title" data-reveal>
                 {t('homeHeroTitle')}
-              </h5>
+              </h5> */}
+
+
+
+                <h1 className="hero__title" data-reveal>
+                  ENVIQUO
+                  <span className="hero__subtitle">
+                    By
+                    <small>SM Techsphere Pvt. Ltd.</small>
+                  </span>
+                </h1>
+               
 
               <p className="hero__tagline" data-reveal>
                 {t('homeHeroTagline')}
