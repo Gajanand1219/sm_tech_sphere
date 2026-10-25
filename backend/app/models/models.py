@@ -143,6 +143,15 @@ class Quotation(Base):
     warranty: Mapped[str | None] = mapped_column(String(120))
     amc: Mapped[str | None] = mapped_column(String(120))
     proposal_notes: Mapped[str | None] = mapped_column(Text)
+    # Optional vendor technical document
+    question_file_path: Mapped[str | None] = mapped_column(
+            Text,
+            nullable=True,
+        )
+    question_file_name: Mapped[str | None] = mapped_column(
+            String(255),
+            nullable=True,
+        )
     status: Mapped[QuotationStatus] = mapped_column(String(30), default=QuotationStatus.SUBMITTED)
     created_at: Mapped[datetime] = mapped_column(DateTime, server_default=func.now())
     enquiry = relationship("Enquiry", back_populates="quotations")
