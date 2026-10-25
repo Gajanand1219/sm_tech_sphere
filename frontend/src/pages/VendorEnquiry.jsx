@@ -50,6 +50,7 @@ export default function VendorEnquiry() {
   const [loading, setLoading] = useState(true)
   const [reports, setReports] = useState([])
   const [reportsError, setReportsError] = useState('')
+  const [questionFile, setQuestionFile] = useState(null)
 
   
 const load = async () => {
@@ -153,6 +154,8 @@ const downloadReport = async (report) => {
   }
 
   
+
+
 const submit = async (event) => {
   event.preventDefault();
 
@@ -161,39 +164,144 @@ const submit = async (event) => {
   setBusy(true);
   setMsg('');
 
-  const payload = {
-    enquiry_id: Number(id),
-    capex: Number(form.capex),
-    opex:
-      form.opex.trim() !== ''
-        ? Number(form.opex)
-        : null,
-    technology: form.technology.trim(),
-    implementation_time: form.implementation_time.trim(),
-    warranty: form.warranty.trim() || null,
-    amc: form.amc.trim() || null,
-    proposal_notes: form.proposal_notes.trim() || null,
-  };
-
   try {
-    const response = await API.post('/vendor/quotations', payload);
+    // Validate required fields
+    if (!id || !Number.isFinite(Number(id))) {
+      throw new Error('Invalid enquiry ID.');
+    }
 
-    setMsg(response.data.message || 'Quotation submitted successfully.');
+    if (
+      form.capex === '' ||
+      form.capex === null ||
+      form.capex === undefined ||
+      !Number.isFinite(Number(form.capex)) ||
+      Number(form.capex) < 0
+    ) {
+      throw new Error('Please enter a valid CAPEX amount.');
+    }
+
+    if (!form.technology.trim()) {
+      throw new Error('Please enter the technology.');
+    }
+
+    if (!form.implementation_time.trim()) {
+      throw new Error('Please enter the implementation time.');
+    }
+
+    // Build multipart/form-data request
+    const payload = new FormData();
+
+    payload.append('enquiry_id', String(Number(id)));
+    payload.append('capex', String(Number(form.capex)));
+
+    if (form.opex.trim() !== '') {
+      const opexValue = Number(form.opex);
+
+      if (!Number.isFinite(opexValue) || opexValue < 0) {
+        throw new Error('Please enter a valid OPEX amount.');
+      }
+
+      payload.append('opex', String(opexValue));
+    }
+
+    payload.append('technology', form.technology.trim());
+
+    payload.append(
+      'implementation_time',
+      form.implementation_time.trim()
+    );
+
+    if (form.warranty.trim()) {
+      payload.append('warranty', form.warranty.trim());
+    }
+
+    if (form.amc.trim()) {
+      payload.append('amc', form.amc.trim());
+    }
+
+    if (form.proposal_notes.trim()) {
+      payload.append(
+        'proposal_notes',
+        form.proposal_notes.trim()
+      );
+    }
+
+    // Optional technical document
+    if (questionFile) {
+      const allowedExtensions = [
+        'pdf',
+        'doc',
+        'docx',
+        'xls',
+        'xlsx',
+        'jpg',
+        'jpeg',
+        'png',
+      ];
+
+      const extension = questionFile.name
+        .split('.')
+        .pop()
+        .toLowerCase();
+
+      if (!allowedExtensions.includes(extension)) {
+        throw new Error(
+          'Unsupported file type. Upload PDF, DOC, DOCX, XLS, XLSX, JPG or PNG.'
+        );
+      }
+
+      if (questionFile.size > 10 * 1024 * 1024) {
+        throw new Error('File size must be 10 MB or less.');
+      }
+
+      payload.append('question_file', questionFile);
+    }
+
+    // Do not manually set Content-Type here.
+    // Axios/browser must generate the multipart boundary.
+    const response = await API.post(
+      '/vendor/quotations',
+      payload
+    );
+
+    setMsg(
+      response.data?.message ||
+        'Quotation submitted successfully.'
+    );
     setMsgType('success');
 
+    setQuestionFile(null);
+
+    // Reload enquiry/quotation information
     await load();
   } catch (err) {
-    console.error('Quotation API error:', err.response?.data || err);
+    console.error(
+      'Quotation API error:',
+      err.response?.data || err
+    );
 
     const detail = err.response?.data?.detail;
 
-    const errorMessage = Array.isArray(detail)
-      ? detail
-          .map((item) => `${item.loc?.join('.')}: ${item.msg}`)
-          .join(' | ')
-      : typeof detail === 'string'
-        ? detail
-        : 'Quotation submission failed. Please check the form.';
+    let errorMessage;
+
+    if (Array.isArray(detail)) {
+      errorMessage = detail
+        .map((item) => {
+          const location = Array.isArray(item.loc)
+            ? item.loc.join('.')
+            : 'request';
+
+          return `${location}: ${item.msg}`;
+        })
+        .join(' | ');
+    } else if (typeof detail === 'string') {
+      errorMessage = detail;
+    } else if (err.message) {
+      errorMessage = err.message;
+    } else {
+      errorMessage =
+        'Quotation submission failed. Please try again.';
+    }
 
     setMsg(errorMessage);
     setMsgType('error');
@@ -201,6 +309,7 @@ const submit = async (event) => {
     setBusy(false);
   }
 };
+
 
 
   if (loading) {
@@ -626,6 +735,45 @@ const submit = async (event) => {
                       placeholder="Any additional details about your solution, scope, or conditions…"
                       rows={4}
                     />
+                  </div>
+                </div>
+
+                {/* Optional Question / Technical File */}
+                <div className="ve-form__section">
+                  <div className="ve-form__section-title">
+                    <span className="ve-form__section-num">04</span>
+                    Question / Technical File (Optional)
+                  </div>
+
+                  <div className="ve-field">
+                    <label htmlFor="question_file">
+                      Upload Questions, Proposal or Technical Document
+                    </label>
+
+                    <input
+                      id="question_file"
+                      type="file"
+                      accept=".pdf,.doc,.docx,.xls,.xlsx,.png,.jpg,.jpeg"
+                      onChange={(e) =>
+                        setQuestionFile(e.target.files?.[0] || null)
+                      }
+                    />
+
+                    <small>
+                      PDF, DOC, DOCX, XLS, XLSX, JPG or PNG. Maximum 10 MB.
+                    </small>
+
+                    {questionFile && (
+                      <p>
+                        Selected file: <strong>{questionFile.name}</strong>
+                        <button
+                          type="button"
+                          onClick={() => setQuestionFile(null)}
+                        >
+                          Remove
+                        </button>
+                      </p>
+                    )}
                   </div>
                 </div>
 
