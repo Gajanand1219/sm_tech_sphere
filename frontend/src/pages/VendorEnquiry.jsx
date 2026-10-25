@@ -152,28 +152,56 @@ const downloadReport = async (report) => {
     }
   }
 
-  const submit = async (event) => {
-    event.preventDefault()
-    setBusy(true)
-    setMsg('')
+  
+const submit = async (event) => {
+  event.preventDefault();
 
-    try {
-      const r = await API.post('/vendor/quotations', {
-        ...form,
-        enquiry_id: Number(id),
-        capex: Number(form.capex),
-        opex: form.opex ? Number(form.opex) : null,
-      })
-      setMsg(r.data.message || '✓ Quotation submitted successfully.')
-      setMsgType('success')
-      await load()
-    } catch (err) {
-      setMsg(err.response?.data?.detail || 'Quotation failed')
-      setMsgType('error')
-    } finally {
-      setBusy(false)
-    }
+  if (busy) return;
+
+  setBusy(true);
+  setMsg('');
+
+  const payload = {
+    enquiry_id: Number(id),
+    capex: Number(form.capex),
+    opex:
+      form.opex.trim() !== ''
+        ? Number(form.opex)
+        : null,
+    technology: form.technology.trim(),
+    implementation_time: form.implementation_time.trim(),
+    warranty: form.warranty.trim() || null,
+    amc: form.amc.trim() || null,
+    proposal_notes: form.proposal_notes.trim() || null,
+  };
+
+  try {
+    const response = await API.post('/vendor/quotations', payload);
+
+    setMsg(response.data.message || 'Quotation submitted successfully.');
+    setMsgType('success');
+
+    await load();
+  } catch (err) {
+    console.error('Quotation API error:', err.response?.data || err);
+
+    const detail = err.response?.data?.detail;
+
+    const errorMessage = Array.isArray(detail)
+      ? detail
+          .map((item) => `${item.loc?.join('.')}: ${item.msg}`)
+          .join(' | ')
+      : typeof detail === 'string'
+        ? detail
+        : 'Quotation submission failed. Please check the form.';
+
+    setMsg(errorMessage);
+    setMsgType('error');
+  } finally {
+    setBusy(false);
   }
+};
+
 
   if (loading) {
     return (
