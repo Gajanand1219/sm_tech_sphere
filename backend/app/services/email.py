@@ -209,7 +209,7 @@ def email_template(
                     margin:0;
                     font-size:22px;
                 ">
-                    SM TECHSPHERE Pvt Ltd
+                    SM TechSphere Pvt. Ltd
                 </h2>
 
                 <p style="
@@ -251,7 +251,7 @@ def email_template(
             ">
 
                 <strong>
-                    SM TECHSPHERE Pvt Ltd
+                    SM TechSphere Pvt. Ltd
                 </strong>
 
                 <br>
@@ -277,7 +277,7 @@ async def send_otp_email(
     otp: str,
 ) -> bool:
 
-    subject = "Verify your SM TECHSPHERE Pvt Ltd account"
+    subject = "Verify your SM TechSphere Pvt. Ltd account"
 
     body = f"""
         <p>Hello,</p>
@@ -340,13 +340,13 @@ async def send_account_status_email(
     note: str | None = None,
 ) -> bool:
 
-    subject = f"Your SM TECHSPHERE Pvt Ltd account is {status}"
+    subject = f"Your SM TechSphere Pvt. Ltd account is {status}"
 
     body = f"""
         <p>Hello <strong>{escape(name)}</strong>,</p>
 
         <p>
-            Your SM TECHSPHERE Pvt Ltd account status has been updated.
+            Your SM TechSphere Pvt. Ltd account status has been updated.
         </p>
 
         <p>
@@ -462,7 +462,7 @@ async def send_enquiry_approved_email(
 
         <p>
             Your technical enquiry has been reviewed and
-            <strong>approved</strong> by the SM TECHSPHERE Pvt Ltd admin team.
+            <strong>approved</strong> by the SM TechSphere Pvt. Ltd admin team.
         </p>
 
         <div style="
@@ -1239,7 +1239,7 @@ async def send_contact_form_email(
 
         <p>
             A new enquiry has been submitted from the
-            <strong>SM TECHSPHERE Pvt Ltd website contact form</strong>.
+            <strong>SM TechSphere Pvt. Ltd website contact form</strong>.
         </p>
 
         <div style="
@@ -1313,7 +1313,7 @@ async def send_buyer_enquiry_confirmation_email(
 
         <p>
             Your technical enquiry has been submitted successfully
-            to <strong>SM TECHSPHERE Pvt Ltd</strong>.
+            to <strong>SM TechSphere Pvt. Ltd</strong>.
         </p>
 
         <div style="
@@ -1332,7 +1332,7 @@ async def send_buyer_enquiry_confirmation_email(
             to your dashboard to track its status and quotation activity.
         </p>
 
-        <p>Thank you for choosing SM TECHSPHERE Pvt Ltd.</p>
+        <p>Thank you for choosing SM TechSphere Pvt. Ltd.</p>
     """
 
     return await send_email(
@@ -1362,7 +1362,7 @@ async def send_vendor_new_enquiry_email(
 
         <p>
             A new technical enquiry matching your registered domain
-            has been added to SM TECHSPHERE Pvt Ltd.
+            has been added to SM TechSphere Pvt. Ltd.
         </p>
 
         <div style="
