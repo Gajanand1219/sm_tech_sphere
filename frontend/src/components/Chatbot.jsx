@@ -355,7 +355,7 @@ export default function Chatbot() {
         },
       ])
     } catch (error) {
-      console.error('SM TECHSPHERE chatbot error:', error)
+      console.error('ENVIQUO chatbot error:', error)
       setMessages((prev) => [
         ...prev,
         {
