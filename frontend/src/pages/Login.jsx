@@ -191,7 +191,7 @@ export default function Login() {
           </div>
           <div>
             <strong>{t('loginBrandName')}</strong>
-            <span>{t('loginBrandSub')}</span>
+            {/* <span>{t('loginBrandSub')}</span> */}
           </div>
         </div>
 
