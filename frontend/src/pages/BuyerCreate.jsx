@@ -297,7 +297,7 @@ const progress = visibleQuestions.length
 
     const html = `<!DOCTYPE html>
 <html><head><meta charset="utf-8"/>
-<title>Enquiry Review — SM TechSphere</title>
+<title>Enquiry Review — ENVIQUO</title>
 <style>
   *{box-sizing:border-box}
   body{font-family:system-ui,-apple-system,Segoe UI,Roboto,sans-serif;color:#0f2a4a;margin:0;padding:32px;background:#f3f6fa}
@@ -321,7 +321,7 @@ const progress = visibleQuestions.length
   <div class="sheet">
     <div class="brand">
       <div>
-        <h1>SM TECHSPHERE</h1>
+        <h1>ENVIQUO</h1>
         <small>ENVIQUO · Buyer Enquiry Report</small>
       </div>
       <span class="badge">ENQUIRY REVIEW</span>
@@ -340,7 +340,7 @@ const progress = visibleQuestions.length
       <tbody>${rows || '<tr><td colspan="2">No questions configured.</td></tr>'}</tbody>
     </table>
 
-    <div class="foot">Generated on ${new Date().toLocaleString()} · SM TechSphere Pvt Ltd</div>
+    <div class="foot">Generated on ${new Date().toLocaleString()} · ENVIQUO SM Pvt Ltd</div>
   </div>
 </body></html>`
 
@@ -348,7 +348,7 @@ const progress = visibleQuestions.length
     const url = URL.createObjectURL(blob)
     const a = document.createElement('a')
     a.href = url
-    a.download = 'SM-TECHSPHERE-Enquiry-Review.html'
+    a.download = 'ENVIQUO-Enquiry-Review.html'
     a.click()
     URL.revokeObjectURL(url)
   }
@@ -461,7 +461,7 @@ const progress = visibleQuestions.length
       <aside className={`ev-side ${mobileOpen ? 'open' : ''}`}>
         <div className="ev-brand">
           <div className="ev-logo"><img src="/image.png" alt="ENVIQUO" /></div>
-          <div><b>ENVIQUO</b><small>by SM TechSphere Pvt Ltd</small></div>
+          <div><b>ENVIQUO</b><small>by Enviquo SM Pvt. Ltd.</small></div>
         </div>
         <nav className="ev-nav">
           <Link to="/" className="ev-nav-item" title="Go to Home Page"><span>🏠</span> Home</Link>
@@ -475,7 +475,7 @@ const progress = visibleQuestions.length
           ))}
         </nav>
         <div className="ev-side-foot">
-          <b>SM TechSphere Pvt Ltd.</b>
+          <b>ENVIQUO SM Pvt. Ltd.</b>
           Buyer workspace
         </div>
       </aside>
@@ -915,7 +915,7 @@ const progress = visibleQuestions.length
                 </div>
 
                   <div className="ev-report-foot">
-                    Generated on {new Date().toLocaleString()} · SM TechSphere Pvt Ltd
+                    Generated on {new Date().toLocaleString()} · Enviquo SM Pvt. Ltd.
                   </div>
                 </div>
 
@@ -932,7 +932,7 @@ const progress = visibleQuestions.length
               <section className="ev-panel ev-submit-panel">
                 <span className="ev-submit-icon">✓</span>
                 <h2>Ready To Submit?</h2>
-                <p>Your enquiry will be created using the existing SM TechSphere backend workflow.</p>
+                <p>Your enquiry will be created using the existing ENVIQUO backend workflow.</p>
                 <div className="ev-submit-summary">
                   <span>{selectedDomain?.name}</span>
                   <strong>{title}</strong>
