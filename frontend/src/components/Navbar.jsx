@@ -119,7 +119,7 @@ export default function Navbar() {
 
         <Link to="/" className="navbar__brand" onClick={closeMenu}>
           <img
-            src="/logo2.jpeg"
+            src="/image.png"
             alt="S&M TECHSPHERE"
             className="navbar__logo-image"
           />
