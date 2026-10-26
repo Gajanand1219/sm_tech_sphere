@@ -297,7 +297,7 @@ export default function PanelLayout({
           </div>
           <div>
             <b>ENVIQUO</b>
-            <small>by ENVIQUO Pvt Ltd</small>
+            {/* <small>by ENVIQUO Pvt Ltd</small> */}
           </div>
         </div>
 
