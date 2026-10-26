@@ -45,7 +45,7 @@ export default function FloatingChatButton() {
             </div>
 
             <div className="sm-chat-popup-content">
-              <strong>SM TECHSPHERE AI</strong>
+              <strong>ENVIQUO AI</strong>
 
               <span>
                 Hi! 👋 How can I help you?
@@ -63,8 +63,8 @@ export default function FloatingChatButton() {
           className={`sm-chat-button ${
             alert ? 'sm-chat-alert' : ''
           }`}
-          aria-label="Open SM TECHSPHERE AI Assistant"
-          title="SM TECHSPHERE AI Assistant"
+          aria-label="Open ENVIQUO AI Assistant"
+          title="ENVIQUO AI Assistant"
         >
 
           {alert && (
@@ -89,7 +89,7 @@ export default function FloatingChatButton() {
         </button>
 
         <div className="sm-chat-label">
-          🤖 SM TECHSPHERE AI
+          🤖 ENVIQUO AI
         </div>
 
       </div>
@@ -110,7 +110,7 @@ export default function FloatingChatButton() {
 
             <div>
               <strong>
-                SM TECHSPHERE AI
+                ENVIQUO AI
               </strong>
 
               <span>
@@ -127,8 +127,8 @@ export default function FloatingChatButton() {
           className={`sm-chat-button sm-chat-button-mobile ${
             alert ? 'sm-chat-alert' : ''
           }`}
-          aria-label="Open SM TECHSPHERE AI Assistant"
-          title="SM TECHSPHERE AI Assistant"
+          aria-label="Open ENVIQUO AI Assistant"
+          title="ENVIQUO AI Assistant"
         >
 
           {alert && (
