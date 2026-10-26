@@ -172,7 +172,7 @@ export default function Login() {
       <div className="login-topbar">
         <div className="login-brand">
           <div className="login-brand-logo">
-            <img src="/logo2.jpeg" alt={t('loginBrandName')} />
+            <img src="/image.png" alt={t('loginBrandName')} />
           </div>
           <div>
             <strong>{t('loginBrandName')}</strong>
