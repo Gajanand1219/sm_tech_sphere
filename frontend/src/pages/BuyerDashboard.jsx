@@ -478,7 +478,7 @@ export default function BuyerDashboard() {
           </div>
           <div>
             <b>ENVIQUO</b>
-            <small>by SM Techsphere Pvt Ltd</small>
+            {/* <small>by SM Techsphere Pvt Ltd</small> */}
           </div>
         </div>
 
@@ -519,7 +519,7 @@ export default function BuyerDashboard() {
         </nav>
 
         <div className="ev-side-foot">
-          <b>SM Techsphere Pvt Ltd.</b>
+          <b>ENVIQUO SM Pvt. Ltd.</b>
           Buyer workspace
         </div>
       </aside>
@@ -885,11 +885,12 @@ export default function BuyerDashboard() {
               </div>
 
               <h2
-                  className="ev-h2"
-                  style={{ backgroundColor: 'blue', color: 'white', padding: '10px' }}
-                >
-                  Start an enquiry
-                </h2>
+                className="ev-h2"
+                style={{ color: 'black', padding: '10px' }}
+              >
+                Start an enquiry
+              </h2>
+
               <div className="ev-dgrid">
                 {DOMAINS.map((d, i) => (
                   <Link
@@ -904,7 +905,9 @@ export default function BuyerDashboard() {
                 ))}
               </div>
 
-              <h2 className="ev-h2">Your workspace</h2>
+              <h2 className="ev-h2" style={{ color: 'black', backgroundColor: 'transparent' }}>
+  Your workspace
+</h2>
               <div className="ev-mgrid">
                 {MENU.map((m) => (
                   <Link key={m.id} to={m.to} className="ev-mt">
