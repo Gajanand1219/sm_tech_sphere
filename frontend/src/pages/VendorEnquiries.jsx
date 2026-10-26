@@ -354,7 +354,7 @@ export default function VendorEnquiries() {
           </div>
           <div>
             <b>ENVIQUO</b>
-            <small>by SM Techsphere Pvt Ltd</small>
+            {/* <small>by SM Techsphere Pvt Ltd</small> */}
           </div>
         </div>
 
