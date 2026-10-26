@@ -4,6 +4,7 @@ import API from '../services/api'
 import PanelLayout from '../components/PanelLayout'
 import '../styles/VendorEnquiry.css'
 
+
 function formatDeadline(value) {
   if (!value) return '—'
   return new Date(value).toLocaleString('en-IN', {
