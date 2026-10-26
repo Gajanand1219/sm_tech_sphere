@@ -1557,7 +1557,7 @@ export default function RegistrationForm({ type }) {
 
           <div>
 
-            <strong>SM TechSphere Pvt. Ltd.</strong>
+             <strong>ENVIQUO</strong>
 
           </div>
 
