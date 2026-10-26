@@ -1551,7 +1551,7 @@ export default function RegistrationForm({ type }) {
 
           <div className="registration-brand-logo">
 
-            <img src="/logo2.jpeg" alt="SM TechSphere Pvt. Ltd." />
+            <img src="/image.png" alt="SM TechSphere Pvt. Ltd." />
 
           </div>
 
