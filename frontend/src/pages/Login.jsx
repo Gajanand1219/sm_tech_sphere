@@ -150,10 +150,25 @@ export default function Login() {
         password,
       })
 
-      if (data.role === 'admin') navigate('/admin', { replace: true })
-      else if (data.role === 'buyer') navigate('/buyer', { replace: true })
-      else if (data.role === 'vendor') navigate('/vendor', { replace: true })
-      else setError(t('unknownRoleErr'))
+      
+      if (data.role === 'admin') {
+        navigate('/admin', { replace: true })
+      } else if (data.role === 'buyer' || data.role === 'vendor') {
+        navigate('/welcome', {
+          replace: true,
+          state: {
+            role: data.role,
+            companyName:
+              data.company_name ||
+              data.company ||
+              data.user?.company_name ||
+              '',
+          },
+        })
+      } else {
+        setError(t('unknownRoleErr'))
+      }
+
     } catch (err) {
       setError(getErrorMessage(err))
       refreshCaptcha()
