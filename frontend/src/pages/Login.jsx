@@ -419,6 +419,7 @@ export default function Login() {
             >
               ×
             </button>
+             
 
             <span className="register-modal__label">
               {t('joinNetworkLabel')}
