@@ -36,7 +36,7 @@ const translations = {
     ourDomainsLabel: 'OUR DOMAINS',
     domainIntroTitle: 'Solutions for industrial challenges',
     domainIntroDesc:
-      'Select the relevant domain to understand the type of engineering, environmental and CleanTech requirements supported by our SM Techsphere Pvt. Ltd platform.',
+      'Select the relevant domain to understand the type of engineering, environmental and CleanTech requirements supported by our Enviquo  platform.',
     startRequirement: 'Start Requirement →',
     industrialRequirementLabel: 'INDUSTRIAL REQUIREMENT',
     haveCleanTechRequirement: 'Have a CleanTech requirement?',
@@ -542,7 +542,7 @@ const translations = {
     ourDomainsLabel: 'हमारे डोमेन',
     domainIntroTitle: 'औद्योगिक चुनौतियों के लिए समाधान',
     domainIntroDesc:
-      'SM Techsphere Pvt. Ltd प्लेटफ़ॉर्म द्वारा समर्थित इंजीनियरिंग, पर्यावरणीय और CleanTech आवश्यकताओं को समझने के लिए संबंधित डोमेन चुनें।',
+      'ENVIQUO प्लेटफ़ॉर्म द्वारा समर्थित इंजीनियरिंग, पर्यावरणीय और CleanTech आवश्यकताओं को समझने के लिए संबंधित डोमेन चुनें।',
     startRequirement: 'आवश्यकता शुरू करें →',
     industrialRequirementLabel: 'औद्योगिक आवश्यकता',
     haveCleanTechRequirement: 'क्या आपको CleanTech आवश्यकता है?',
@@ -595,7 +595,7 @@ const translations = {
     aboutTitle:
       'औद्योगिक आवश्यकताओं और समाधानों के बीच एक संरचित संबंध।',
     aboutP1:
-      'SM Techsphere Pvt. Ltd एक संरचित B2B वातावरण प्रदान करता है जहाँ औद्योगिक खरीदार अपनी आवश्यकताएँ बता सकते हैं और संबंधित इंजीनियरिंग, EPC और CleanTech प्रदाता मिलान अवसरों पर प्रतिक्रिया दे सकते हैं।',
+      'ENVIQUO एक संरचित B2B वातावरण प्रदान करता है जहाँ औद्योगिक खरीदार अपनी आवश्यकताएँ बता सकते हैं और संबंधित इंजीनियरिंग, EPC और CleanTech प्रदाता मिलान अवसरों पर प्रतिक्रिया दे सकते हैं।',
     aboutP2:
       'प्लेटफ़ॉर्म आवश्यकता सबमिशन से लेकर तकनीकी मिलान, कोटेशन और आपसी स्वीकृति तक पूरी प्रक्रिया को व्यवस्थित करता है।',
 
