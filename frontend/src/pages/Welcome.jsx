@@ -2,7 +2,7 @@
 import { useEffect, useState } from 'react'
 import { useLocation, useNavigate } from 'react-router-dom'
 import API from '../services/api'
-// import '../styles/Welcome.css'
+import '../styles/Welcome.css'
 
 function EnviquoLogo({ size = 150, animated = false }) {
   return (
