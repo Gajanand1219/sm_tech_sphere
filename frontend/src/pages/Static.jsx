@@ -91,7 +91,7 @@ function Footer() {
         <div className="footer-main">
           <div className="footer-brand">
             <img
-              src="/logo2.jpeg"
+              src="/image.png"
               alt="S&M CleanTech"
               className="footer__logo-image"
             />
