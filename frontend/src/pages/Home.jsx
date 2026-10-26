@@ -886,7 +886,7 @@ export default function Home() {
             <div className="footer-main">
               <div className="footer-brand">
                 <img
-                  src="/logo2.jpeg"
+                  src="/image.png"
                   alt="SM TECHSPHERE"
                   className="footer__logo-image"
                 />
