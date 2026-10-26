@@ -474,7 +474,7 @@ export default function BuyerDashboard() {
       <aside className={`ev-side ${mobileOpen ? 'open' : ''}`}>
         <div className="ev-brand">
           <div className="ev-logo">
-            <img src="/logo2.jpeg" alt="ENVIQUO" />
+            <img src="/image.png" alt="ENVIQUO" />
           </div>
           <div>
             <b>ENVIQUO</b>
