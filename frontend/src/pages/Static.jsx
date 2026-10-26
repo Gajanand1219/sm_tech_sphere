@@ -95,7 +95,7 @@ function Footer() {
               alt="S&M CleanTech"
               className="footer__logo-image"
             />
-            <p>SM Techsphere Pvt. Ltd</p>
+            <p>ENVIQUO</p>
             <span>{t('footerTagline')}</span>
           </div>
 
@@ -116,7 +116,7 @@ function Footer() {
 
           <div className="footer-column footer-contact">
             <h4>{t('footerContact')}</h4>
-            <p>SM Techsphere Pvt. Ltd</p>
+            <p>Enviquo SM Pvt. Ltd.</p>
             <p>
               Email:{' '}
               <a
