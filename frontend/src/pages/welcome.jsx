@@ -138,7 +138,7 @@ export default function Welcome() {
           <span className="welcome-footer-line" />
 
           <p>
-            BY <strong>SM ENVIQUO</strong>{' '}
+            BY <strong>ENVIQUO SM </strong>{' '}
             <span className="welcome-footer-pvt">
               Pvt. Ltd.
             </span>
