@@ -284,15 +284,13 @@ export default function Home() {
               </h5> */}
 
 
-
-                <h1 className="hero__title" data-reveal>
+              <h1 className="hero__title" data-reveal>
                   ENVIQUO
-                  <span className="hero__subtitle">
+                  {/* <span className="hero__subtitle">
                     By
                     <small>SM Techsphere Pvt. Ltd.</small>
-                  </span>
+                  </span> */}
                 </h1>
-               
 
               <p className="hero__tagline" data-reveal>
                 {t('homeHeroTagline')}
@@ -751,12 +749,13 @@ export default function Home() {
 
                 <div className="contact-person-card" align="center">
                   <div className="contact-person-top">
-                    <div className="contact-person-avatar">SM</div>
+                    <div className="contact-person-avatar">EN</div>
                     <div>
                       <span className="contact-person-label">
                         {t('homeDirectContact')}
                       </span>
-                      <h3>{t('homeContactOurTeam')}</h3>
+                      <h3>ENVIQUO SM PVT. LTD.</h3>
+                      <p>{t('homeContactOurTeam')}</p>
                     </div>
                   </div>
 
@@ -887,10 +886,10 @@ export default function Home() {
               <div className="footer-brand">
                 <img
                   src="/image.png"
-                  alt="SM TECHSPHERE"
+                  alt="ENVIQUO"
                   className="footer__logo-image"
                 />
-                <p>SM Techsphere Pvt. Ltd.</p>
+                <p>ENVIQUO</p>
                 <span>{t('footerTagline')}</span>
               </div>
 
@@ -915,7 +914,7 @@ export default function Home() {
 
               <div className="footer-column footer-contact">
                 <h4>{t('footerContact')}</h4>
-                <p>SM Techsphere Pvt. Ltd.</p>
+                <p>ENVIQUO SM PVT. LTD.</p>
                 <p>
                   Email:{' '}
                   <a
