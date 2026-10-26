@@ -34,7 +34,6 @@ import AdminRegistrations from './pages/AdminRegistrations'
 import AdminEnquiries from './pages/AdminEnquiries'
 
 import ProfilePage from './pages/ProfilePage'
-import Welcome from './pages/Welcome'
 
 // Shared
 import CRM from './pages/CRM'
@@ -104,7 +103,6 @@ export default function App() {
           />
 
           <Route path="/chatbot" element={<Chatbot />} />
-          <Route path="/welcome" element={<Welcome />} />
 
           {/* ============ VENDOR ROUTES ============ */}
           <Route
