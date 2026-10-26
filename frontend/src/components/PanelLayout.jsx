@@ -42,7 +42,7 @@ const ROLE_LABEL = {
 }
 
 const ROLE_COMPANY = {
-  admin: 'SM Techsphere',
+  admin: 'ENVIQUO',
   buyer: 'Your Company',
   vendor: 'Your Company',
 }
@@ -297,7 +297,7 @@ export default function PanelLayout({
           </div>
           <div>
             <b>ENVIQUO</b>
-            <small>by SM Techsphere Pvt Ltd</small>
+            <small>by ENVIQUO Pvt Ltd</small>
           </div>
         </div>
 
@@ -351,7 +351,7 @@ export default function PanelLayout({
         </nav>
 
         <div className="ev-side-foot">
-          <b>SM Techsphere Pvt Ltd.</b>
+          <b>Enviquo SM Pvt. Ltd.</b>
           {roleLabel} workspace
         </div>
       </aside>
@@ -468,9 +468,8 @@ export default function PanelLayout({
 
         <footer className="ev-footer">
           <span>
-            © {new Date().getFullYear()} SM Techsphere Engineering Solutions
+            © 2026 Enviquo SM Pvt. Ltd. All rights reserved.
           </span>
-          <span>SM Techsphere Pvt Ltd.</span>
         </footer>
       </div>
     </div>
