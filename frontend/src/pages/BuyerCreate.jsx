@@ -460,7 +460,7 @@ const progress = visibleQuestions.length
       {/* SIDEBAR */}
       <aside className={`ev-side ${mobileOpen ? 'open' : ''}`}>
         <div className="ev-brand">
-          <div className="ev-logo"><img src="/logo2.jpeg" alt="ENVIQUO" /></div>
+          <div className="ev-logo"><img src="/image.png" alt="ENVIQUO" /></div>
           <div><b>ENVIQUO</b><small>by SM TechSphere Pvt Ltd</small></div>
         </div>
         <nav className="ev-nav">
