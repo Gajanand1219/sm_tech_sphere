@@ -177,5 +177,4 @@ export default function App() {
     </AuthProvider>
     </LanguageProvider>
   )
-  
 }
