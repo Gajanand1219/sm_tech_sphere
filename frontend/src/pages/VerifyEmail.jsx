@@ -133,13 +133,21 @@ export default function VerifyEmail() {
 
       setTimeout(() => {
         if (data.role === 'admin') {
-          nav('/admin')
-        } else if (data.role === 'buyer') {
-          nav('/buyer')
-        } else if (data.role === 'vendor') {
-          nav('/vendor')
+          nav('/admin', { replace: true })
+        } else if (data.role === 'buyer' || data.role === 'vendor') {
+          nav('/welcome', {
+            replace: true,
+            state: {
+              role: data.role,
+              companyName:
+                data.company_name ||
+                data.company ||
+                data.user?.company_name ||
+                '',
+            },
+          })
         } else {
-          nav('/login')
+          nav('/login', { replace: true })
         }
       }, 900)
     } catch (err) {
@@ -204,7 +212,7 @@ export default function VerifyEmail() {
       <header className="ve-topbar">
         <div className="ve-brand">
           <div className="ve-brand__logo">
-            <img src="/logo2.jpeg" alt={t('veBrandName')} />
+            <img src="/image.png" alt={t('veBrandName')} />
           </div>
 
           <div>
