@@ -332,7 +332,7 @@ export default function VendorDashboard() {
           </div>
           <div>
             <b>ENVIQUO</b>
-            <small>by SM Techsphere Pvt Ltd</small>
+            {/* <small>by SM Techsphere Pvt Ltd</small> */}
           </div>
         </div>
 
@@ -357,7 +357,7 @@ export default function VendorDashboard() {
         </nav>
 
         <div className="ev-side-foot">
-          <b>SM Techsphere Pvt Ltd.</b>
+          <b>Enviquo SM Pvt. Ltd.</b>
           Vendor workspace
         </div>
       </aside>
@@ -613,7 +613,7 @@ export default function VendorDashboard() {
           </div>
 
           {/* WORKSPACE TILES */}
-           <h2 className="ev-h2" style={{ color: "black" }}>Your workspace</h2>
+          <h2 className="ev-h2" style={{ color: "black" }}>Your workspace</h2>
           <div className="ev-mgrid">
             {MENU.map((m) => (
               <Link key={m.id} to={m.to} className="ev-mt">
