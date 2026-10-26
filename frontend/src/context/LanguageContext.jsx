@@ -28,7 +28,8 @@ const translations = {
     footerContactLink: 'Contact',
     footerTagline: 'Diagnose. Match. Solution.',
     footerCountry: 'India',
-    footerRights: '© 2026 SM Techsphere Pvt. Ltd',
+    footerRights: '© 2026 Enviquo SM Pvt. Ltd.',
+
     footerDomains: 'Water • Waste • Solar • ESG • SPCB',
 
     // ================= Domain / Solutions page =================
@@ -80,16 +81,16 @@ const translations = {
 
     // ================= About Us page =================
     aboutPageLabel: 'ABOUT US',
-    aboutPageTitle: 'How the SM Techsphere Pvt. Ltd Platform Works',
+    aboutPageTitle: 'How the ENVIQUO Platform Works',
     aboutPageDesc:
       'A structured industrial workflow connecting buyers with relevant engineering, EPC and CleanTech solution providers.',
 
     whoWeAre: 'WHO WE ARE',
     aboutTitle:
       'A structured connection between industrial requirements and solutions.',
-    aboutP1:
-      'SM Techsphere Pvt. Ltd provides a structured B2B environment where industrial buyers can describe their requirements and relevant engineering, EPC and CleanTech providers can respond to matched opportunities.',
-    aboutP2:
+      aboutP1:
+       'ENVIQUO provides a structured B2B environment where industrial buyers can describe their requirements and relevant engineering, EPC and CleanTech providers can respond to matched opportunities.',
+      aboutP2:
       'The platform organizes the process from requirement submission through technical matching, quotation and mutual acceptance.',
 
     aboutPoint1: 'Structured industrial requirements',
@@ -125,8 +126,8 @@ const translations = {
       'Join as an industrial buyer or an engineering and CleanTech solution provider.',
 
     // ================= Login page =================
-    loginBrandName: 'SM TECHSPHERE Pvt Ltd',
-    loginBrandSub: 'Engineering Solutions',
+    loginBrandName: 'ENVIQUO',
+    // loginBrandSub: 'Engineering Solutions',
     backBtn: 'Back',
     secureAccessLabel: 'SECURE ACCESS',
     welcomeBack: 'Welcome Back',
@@ -182,7 +183,7 @@ const translations = {
     forgotFailMsg: 'Unable To Send Password Reset Email.',
 
         // ================= Verify Email page =================
-    veBrandName: 'SM TechSphere Pvt. Ltd.',
+    veBrandName: 'ENVIQUO',
     veBack: 'Back',
 
     veKicker: 'Email Verification',
@@ -218,7 +219,7 @@ const translations = {
     veResendFailErr: 'Unable to resend OTP. Please try again.',
 
         // ================= Registration page =================
-    regBrandName: 'SM TechSphere Pvt. Ltd.',
+    regBrandName: 'ENVIQUO',
     regBack: 'Back',
 
     regBuyerKicker: 'BUYER REGISTRATION',
@@ -344,7 +345,7 @@ const translations = {
 
         // ================= Home page =================
     homeHeroLabel: '⚡ Industrial B2B Techsphere Network',
-    homeHeroTitle: 'SM Techsphere Pvt. Ltd.',
+    homeHeroTitle: 'ENVIQUO',
     homeHeroTagline: '// DIAGNOSE. MATCH. SOLUTION.',
     homeHeroDesc:
       'We connect genuine industrial requirements with qualified engineering, EPC, and technology service providers through a structured and transparent technical matching platform.',
@@ -365,9 +366,10 @@ const translations = {
     // About
     homeAboutLabel: 'ABOUT US',
     homeAboutTitle: 'Who We Are',
+   
     homeAboutDesc:
-      'SM Techsphere Pvt. Ltd. is an industrial B2B platform designed to connect genuine project requirements with relevant engineering, EPC, and technology specialists. We structure requirements, technical information, and matching workflows to make industrial project discovery simpler and more organized.',
-    homeStartRequirement: 'Start Requirement',
+      'ENVIQUO is an industrial B2B platform designed to connect genuine project requirements with relevant engineering, EPC, and technology specialists. We structure requirements, technical information, and matching workflows to make industrial project discovery simpler and more organized.',
+  
 
     // Domain names on home
     homeDomainWater: 'WATER AND WASTEWATER',
@@ -394,13 +396,14 @@ const translations = {
     homeNetworkLabel: 'Our Network',
     homeNetworkTitle: 'Trusted Industrial Network',
     homeNetworkDesc:
-      'Connecting verified industrial buyers with approved engineering and EPC service providers through the SM Techsphere Pvt. Ltd. network.',
+    'Connecting verified industrial buyers with approved engineering and EPC service providers through the ENVIQUO network.',
 
-    homeTechNetworkKicker: 'Technical Network',
+  homeTechNetworkKicker: 'Technical Network',
     homeApprovedEPC: 'Approved EPC Providers',
     homeNoVendors: 'No Approved Vendors Yet.',
+   
     homeVerifiedProviders:
-      'Verified SM Techsphere Pvt. Ltd. Service Providers',
+  'Verified ENVIQUO Service Providers',
 
     homeTrustedNetworkKicker: 'Trusted Network',
     homeVerifiedBuyers: 'Verified Industrial Buyers',
@@ -408,7 +411,7 @@ const translations = {
     homeVerifiedBusinesses: 'Verified Industrial Businesses',
 
     // Platform benefits
-    homeWhyLabel: 'Why SM Techsphere?',
+    homeWhyLabel: 'Why ENVIQUO?',
     homeWhyTitle: 'Smarter Connections For',
     homeWhyTitleHighlight: ' Industrial Projects',
     homeWhyDesc:
@@ -477,28 +480,28 @@ const translations = {
     homeFlow5: 'Mutual Handshake',
 
         // ================= Chatbot page =================
-    cbHeaderTitle: 'SM TECHSPHERE Assistant',
-    cbHeaderSub: 'SM TECHSPHERE Pvt Ltd · Platform Support',
+    cbHeaderTitle: 'ENVIQUO Assistant',
+    cbHeaderSub: 'ENVIQUO · Platform Support',
     cbBack: 'Back',
     cbOnline: 'Online',
     cbClear: 'Clear chat',
 
     cbWelcomeMsg:
-      'Hello 👋 Welcome to SM TECHSPHERE Assistant.\n\nAsk about our SM TECHSPHERE Pvt Ltd, buyer/vendor registration, vendor matching, or the project workflow.',
+       'Hello 👋 Welcome to ENVIQUO Assistant.\n\nAsk about ENVIQUO, buyer/vendor registration, vendor matching, or the project workflow.',
     cbClearedMsg:
-      'Chat cleared. How can I help you with SM TECHSPHERE?',
+      'Chat cleared. How can I help you with ENVIQUO?',
 
     cbYou: 'You',
     cbAssistant: 'Assistant',
 
     cbInputPlaceholder:
-      'Ask about SM TECHSPHERE Pvt Ltd, registration, matching…',
+      'Ask about ENVIQUO, registration, matching…',
     cbSendTitle: 'Send message',
     cbInputHint:
       'Press Enter to send · Shift + Enter for new line',
 
     cbErrorReply:
-      '⚠️ Sorry, I am unable to connect to the AI service right now. Please make sure the SM TECHSPHERE backend is running.',
+      '⚠️ Sorry, I am unable to connect to the AI service right now. Please make sure the ENVIQUO backend is running.',
     cbApiFail: 'Unable to get response from AI.',
     cbEmptyAnswer: 'Sorry, I could not generate an answer.',
 
@@ -532,7 +535,7 @@ const translations = {
     footerContactLink: 'संपर्क',
     footerTagline: 'निदान. मिलान. समाधान.',
     footerCountry: 'भारत',
-    footerRights: '© 2026 SM Techsphere Pvt. Ltd',
+    footerRights: '© 2026 Enviquo SM Pvt. Ltd..',
     footerDomains: 'जल • अपशिष्ट • सौर • ESG • SPCB',
 
     // ================= Domain / Solutions page =================
@@ -584,7 +587,7 @@ const translations = {
 
     // ================= About Us page =================
     aboutPageLabel: 'हमारे बारे में',
-    aboutPageTitle: 'SM Techsphere Pvt. Ltd प्लेटफ़ॉर्म कैसे काम करता है',
+    aboutPageTitle: 'ENVIQUO  प्लेटफ़ॉर्म कैसे काम करता है',
     aboutPageDesc:
       'खरीदारों को संबंधित इंजीनियरिंग, EPC और CleanTech समाधान प्रदाताओं से जोड़ने वाला एक संरचित औद्योगिक वर्कफ़्लो।',
 
@@ -628,8 +631,8 @@ const translations = {
       'औद्योगिक खरीदार या इंजीनियरिंग और CleanTech समाधान प्रदाता के रूप में जुड़ें।',
 
     // ================= Login page =================
-    loginBrandName: 'SM TECHSPHERE Pvt Ltd',
-    loginBrandSub: 'इंजीनियरिंग समाधान',
+    loginBrandName: 'ENVIQUO',
+    // loginBrandSub: 'इंजीनियरिंग समाधान',
     backBtn: 'वापस',
     secureAccessLabel: 'सुरक्षित पहुँच',
     welcomeBack: 'वापसी पर स्वागत है',
@@ -685,7 +688,7 @@ const translations = {
     forgotFailMsg: 'पासवर्ड रीसेट ईमेल भेजने में असमर्थ।',
 
         // ================= Verify Email page =================
-    veBrandName: 'SM TechSphere Pvt. Ltd.',
+    veBrandName: 'ENVIQUO',
     veBack: 'वापस',
 
     veKicker: 'ईमेल सत्यापन',
@@ -722,7 +725,7 @@ const translations = {
 
         // ================= Home page =================
     homeHeroLabel: '⚡ औद्योगिक B2B टेकस्फियर नेटवर्क ',
-    homeHeroTitle: 'SM Techsphere Pvt. Ltd.',
+    homeHeroTitle: 'ENVIQUO',
     homeHeroTagline: '// निदान. मिलान. समाधान.',
     homeHeroDesc:
       'हम वास्तविक औद्योगिक आवश्यकताओं को योग्य इंजीनियरिंग, EPC और प्रौद्योगिकी सेवा प्रदाताओं से जोड़ते हैं, एक संरचित और पारदर्शी तकनीकी मिलान प्लेटफ़ॉर्म के माध्यम से।',
@@ -744,7 +747,7 @@ const translations = {
     homeAboutLabel: 'हमारे बारे में',
     homeAboutTitle: 'हम कौन हैं',
     homeAboutDesc:
-      'SM Techsphere Pvt. Ltd. एक औद्योगिक B2B प्लेटफ़ॉर्म है जो वास्तविक परियोजना आवश्यकताओं को संबंधित इंजीनियरिंग, EPC और प्रौद्योगिकी विशेषज्ञों से जोड़ने के लिए बनाया गया है। हम औद्योगिक परियोजना खोज को सरल और अधिक व्यवस्थित बनाने के लिए आवश्यकताओं, तकनीकी जानकारी और मिलान वर्कफ़्लो को व्यवस्थित करते हैं।',
+      'ENVIQUO एक औद्योगिक B2B प्लेटफ़ॉर्म है जो वास्तविक परियोजना आवश्यकताओं को संबंधित इंजीनियरिंग, EPC और प्रौद्योगिकी विशेषज्ञों से जोड़ने के लिए बनाया गया है। हम औद्योगिक परियोजना खोज को सरल और अधिक व्यवस्थित बनाने के लिए आवश्यकताओं, तकनीकी जानकारी और मिलान वर्कफ़्लो को व्यवस्थित करते हैं।',
     homeStartRequirement: 'आवश्यकता शुरू करें',
 
     // Domain names on home
@@ -772,13 +775,13 @@ const translations = {
     homeNetworkLabel: 'हमारा नेटवर्क',
     homeNetworkTitle: 'विश्वसनीय औद्योगिक नेटवर्क',
     homeNetworkDesc:
-      'SM Techsphere Pvt. Ltd. नेटवर्क के माध्यम से सत्यापित औद्योगिक खरीदारों को अनुमोदित इंजीनियरिंग और EPC सेवा प्रदाताओं से जोड़ना।',
+      'ENVIQUO नेटवर्क के माध्यम से सत्यापित औद्योगिक खरीदारों को अनुमोदित इंजीनियरिंग और EPC सेवा प्रदाताओं से जोड़ना।',
 
     homeTechNetworkKicker: 'तकनीकी नेटवर्क',
     homeApprovedEPC: 'अनुमोदित EPC प्रदाता',
     homeNoVendors: 'अभी तक कोई अनुमोदित विक्रेता नहीं।',
     homeVerifiedProviders:
-      'सत्यापित SM Techsphere Pvt. Ltd. सेवा प्रदाता',
+      'सत्यापित ENVIQUO सेवा प्रदाता',
 
     homeTrustedNetworkKicker: 'विश्वसनीय नेटवर्क',
     homeVerifiedBuyers: 'सत्यापित औद्योगिक खरीदार',
@@ -786,7 +789,7 @@ const translations = {
     homeVerifiedBusinesses: 'सत्यापित औद्योगिक व्यवसाय',
 
     // Platform benefits
-    homeWhyLabel: 'SM Techsphere क्यों?',
+    homeWhyLabel: 'ENVIQUO क्यों?',
     homeWhyTitle: 'औद्योगिक परियोजनाओं के लिए',
     homeWhyTitleHighlight: ' स्मार्ट कनेक्शन',
     homeWhyDesc:
@@ -855,28 +858,28 @@ const translations = {
     homeFlow5: 'आपसी हैंडशेक',
 
         // ================= Chatbot page =================
-    cbHeaderTitle: 'SM TECHSPHERE सहायक',
-    cbHeaderSub: 'SM TECHSPHERE Pvt Ltd · प्लेटफ़ॉर्म सहायता',
+    cbHeaderTitle: 'ENVIQUO सहायक',
+    cbHeaderSub: 'ENVIQUO Pvt Ltd · प्लेटफ़ॉर्म सहायता',
     cbBack: 'वापस',
     cbOnline: 'ऑनलाइन',
     cbClear: 'चैट साफ़ करें',
 
     cbWelcomeMsg:
-      'नमस्ते 👋 SM TECHSPHERE सहायक में आपका स्वागत है।\n\nSM TECHSPHERE Pvt Ltd, खरीदार/विक्रेता पंजीकरण, विक्रेता मिलान, या परियोजना वर्कफ़्लो के बारे में पूछें।',
+      'नमस्ते 👋 ENVIQUO सहायक में आपका स्वागत है।\n\nENVIQUO Pvt Ltd, खरीदार/विक्रेता पंजीकरण, विक्रेता मिलान, या परियोजना वर्कफ़्लो के बारे में पूछें।',
     cbClearedMsg:
-      'चैट साफ़ हो गई। मैं SM TECHSPHERE के बारे में आपकी कैसे सहायता कर सकता हूँ?',
+      'चैट साफ़ हो गई। मैं ENVIQUO के बारे में आपकी कैसे सहायता कर सकता हूँ?',
 
     cbYou: 'आप',
     cbAssistant: 'सहायक',
 
     cbInputPlaceholder:
-      'SM TECHSPHERE Pvt Ltd, पंजीकरण, मिलान के बारे में पूछें…',
+      'ENVIQUO Pvt Ltd, पंजीकरण, मिलान के बारे में पूछें…',
     cbSendTitle: 'संदेश भेजें',
     cbInputHint:
       'भेजने के लिए Enter दबाएँ · नई पंक्ति के लिए Shift + Enter',
 
     cbErrorReply:
-      '⚠️ क्षमा करें, मैं अभी AI सेवा से कनेक्ट नहीं हो पा रहा हूँ। कृपया सुनिश्चित करें कि SM TECHSPHERE बैकएंड चल रहा है।',
+      '⚠️ क्षमा करें, मैं अभी AI सेवा से कनेक्ट नहीं हो पा रहा हूँ। कृपया सुनिश्चित करें कि ENVIQUO बैकएंड चल रहा है।',
     cbApiFail: 'AI से प्रतिक्रिया प्राप्त करने में असमर्थ।',
     cbEmptyAnswer: 'क्षमा करें, मैं उत्तर उत्पन्न नहीं कर सका।',
 
@@ -891,7 +894,7 @@ const translations = {
 
     
     // ================= Registration page =================
-    regBrandName: 'SM TechSphere Pvt. Ltd.',
+    regBrandName: 'ENVIQUO',
     regBack: 'वापस',
 
     regBuyerKicker: 'खरीदार पंजीकरण',
