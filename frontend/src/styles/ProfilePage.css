@@ -1722,3 +1722,156 @@
     min-height: 52px;
   }
 }
+
+
+/* ==========================================
+   ENVIQUO — PROFILE PAGE LIGHT THEME
+   SM TECHSPHERE Pvt Ltd
+   ========================================== */
+
+/* Main profile background */
+.profile-page {
+  background-color: #f4f9f6;
+  background-image:
+    radial-gradient(
+      circle at 90% 5%,
+      rgba(34, 197, 94, 0.08),
+      transparent 28%
+    ),
+    radial-gradient(
+      circle at 5% 90%,
+      rgba(14, 165, 233, 0.04),
+      transparent 25%
+    );
+  color: #17201c;
+  min-height: calc(100vh - 80px);
+}
+
+/* Remove dark background behind the profile */
+body:has(.profile-page) {
+  background: #f4f9f6 !important;
+}
+
+main:has(.profile-page),
+.main-content:has(.profile-page),
+.content-area:has(.profile-page),
+.page-content:has(.profile-page),
+.dashboard-content:has(.profile-page),
+.workspace-content:has(.profile-page) {
+  background: #f4f9f6 !important;
+  color: #17201c;
+}
+
+/* Profile header */
+.profile-header {
+  background: #ffffff;
+  border-color: #dce7e1;
+  box-shadow: 0 8px 28px rgba(20, 70, 45, 0.06);
+}
+
+/* Main profile card */
+.profile-card {
+  background: #ffffff;
+  border-color: #dce7e1;
+  box-shadow: 0 12px 35px rgba(20, 70, 45, 0.06);
+}
+
+/* Section headings */
+.profile-header h2,
+.profile-section-title,
+.profile-mode-banner strong {
+  color: #173c2a;
+}
+
+/* Soft green profile banner */
+.profile-mode-banner {
+  background: linear-gradient(
+    135deg,
+    #f0fdf4,
+    #ffffff
+  );
+  border-bottom-color: #e1eee5;
+}
+
+/* Read-only profile fields */
+.profile-view-value {
+  background: #f7fbf9;
+  border-color: #e0ebe4;
+  color: #26382f;
+}
+
+/* Input fields */
+.profile-field input,
+.profile-password-field input,
+.domain-add-row input {
+  background: #ffffff;
+  color: #17201c;
+  border-color: #d5e3da;
+}
+
+.profile-field input:focus,
+.profile-password-field input:focus,
+.domain-add-row input:focus {
+  border-color: #16a34a;
+  box-shadow: 0 0 0 4px rgba(34, 197, 94, 0.10);
+}
+
+/* Vendor service domains */
+.domain-picker,
+.domain-list,
+.domain-editor {
+  background: #f7fbf9;
+  border-color: #dce7e1;
+}
+
+.domain-option-card {
+  background: #ffffff;
+  border-color: #dce7e1;
+  color: #26382f;
+}
+
+.domain-option-card:hover:not(:disabled) {
+  background: #f0faf4;
+  border-color: #16a34a;
+}
+
+/* Selected domains */
+.domain-selected-panel {
+  background: #f5fbf7;
+  border-color: #d5e9dc;
+}
+
+.domain-selected-item {
+  background: #ffffff;
+  border-color: #dce7e1;
+}
+
+/* Bottom action area */
+.profile-actions {
+  background: #f8fcf9;
+  border-top-color: #e1eee5;
+}
+
+/* Consistent green buttons */
+.profile-update-btn,
+.domain-add-btn {
+  background: linear-gradient(
+    135deg,
+    #15803d,
+    #22c55e
+  );
+  color: #ffffff;
+}
+
+/* Keep cards clean on mobile */
+@media (max-width: 650px) {
+  .profile-page {
+    background-color: #f4f9f6;
+    padding: 14px 10px 30px;
+  }
+
+  .profile-card,
+  .profile-header {
+    background: #ffffff;
+  }
+}
