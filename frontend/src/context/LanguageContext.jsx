@@ -151,7 +151,7 @@ const translations = {
     forgotPassword: 'Forgot Password?',
     loginBtn: 'Login',
     signingIn: 'Signing In...',
-    newToPlatform: 'New To ENVIQUO',
+    newToPlatform: 'New to ENVIQUO',
     createAccount: 'Create Account',
     secureNote:
       '🔒 Your Information Is Protected And Securely Processed.',
