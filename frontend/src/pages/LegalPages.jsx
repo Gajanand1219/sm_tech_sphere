@@ -1,17 +1,22 @@
 import { Link, useLocation } from 'react-router-dom'
-import { useState, useEffect } from 'react'
+import { useEffect } from 'react'
 import Navbar from '../components/Navbar'
 
 const company = 'ENVIQUO SM PVT. LTD.'
 const email = 'smtechsphere2910@gmail.com'
 const phone = '+91 91127 67997'
 
+/* =========================================================
+   DATA — unchanged routes & content
+   Each policy now carries a `theme` key for page-wise design
+   ========================================================= */
 const policies = {
   '/privacy-policy': {
     no: '01',
     title: 'Privacy Policy',
     label: 'PRIVACY & DATA',
     icon: 'shield',
+    theme: 'privacy',
     intro:
       'How ENVIQUO handles information when you visit our website or use our industrial B2B platform.',
     sections: [
@@ -28,6 +33,7 @@ const policies = {
     title: 'Terms & Conditions',
     label: 'PLATFORM TERMS',
     icon: 'document',
+    theme: 'terms',
     intro:
       'General rules for accessing and using ENVIQUO registration, enquiry, matching and quotation features.',
     sections: [
@@ -44,6 +50,7 @@ const policies = {
     title: 'Buyer & Vendor Policy',
     label: 'NETWORK PARTICIPATION',
     icon: 'users',
+    theme: 'network',
     intro:
       'Responsibilities for buyers and vendors participating in ENVIQUO’s structured industrial workflow.',
     sections: [
@@ -61,6 +68,7 @@ const policies = {
     title: 'Disclaimer',
     label: 'IMPORTANT INFORMATION',
     icon: 'alert',
+    theme: 'disclaimer',
     intro:
       'Important limitations concerning information and features available through ENVIQUO.',
     sections: [
@@ -77,6 +85,7 @@ const policies = {
     title: 'Copyright & Intellectual Property',
     label: 'CONTENT & OWNERSHIP',
     icon: 'copyright',
+    theme: 'copyright',
     intro:
       'How ENVIQUO website materials and participant-submitted content should be treated.',
     sections: [
@@ -92,6 +101,7 @@ const policies = {
     title: 'Contact & Grievance',
     label: 'SUPPORT & COMPLAINTS',
     icon: 'mail',
+    theme: 'contact',
     intro:
       'Contact the ENVIQUO team about platform questions, policy concerns, account issues or complaints.',
     sections: [
@@ -104,477 +114,451 @@ const policies = {
   },
 }
 
-/* ---------------- Inline SVG Icons ---------------- */
+/* ---------------- ICONS ---------------- */
 function Icon({ name, size = 20 }) {
-  const common = {
-    width: size,
-    height: size,
-    viewBox: '0 0 24 24',
-    fill: 'none',
-    stroke: 'currentColor',
-    strokeWidth: 1.7,
-    strokeLinecap: 'round',
-    strokeLinejoin: 'round',
+  const p = {
+    width: size, height: size, viewBox: '0 0 24 24', fill: 'none',
+    stroke: 'currentColor', strokeWidth: 1.7, strokeLinecap: 'round', strokeLinejoin: 'round',
   }
   const paths = {
-    shield: (
-      <>
-        <path d="M12 3l7 3v5c0 4.5-3 8.4-7 10-4-1.6-7-5.5-7-10V6l7-3z" />
-        <path d="M9 12l2 2 4-4" />
-      </>
-    ),
-    document: (
-      <>
-        <path d="M14 3H7a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V8z" />
-        <path d="M14 3v5h5" />
-        <path d="M9 13h6M9 17h6" />
-      </>
-    ),
-    users: (
-      <>
-        <circle cx="9" cy="8" r="3" />
-        <path d="M3 20c0-3.3 2.7-6 6-6s6 2.7 6 6" />
-        <circle cx="17" cy="9" r="2.3" />
-        <path d="M21 19c0-2.5-1.7-4.5-4-5" />
-      </>
-    ),
-    alert: (
-      <>
-        <path d="M12 3l9 16H3z" />
-        <path d="M12 9v5" />
-        <circle cx="12" cy="17" r="0.6" fill="currentColor" />
-      </>
-    ),
-    copyright: (
-      <>
-        <circle cx="12" cy="12" r="9" />
-        <path d="M15 9.5a3.5 3.5 0 1 0 0 5" />
-      </>
-    ),
-    mail: (
-      <>
-        <rect x="3" y="5" width="18" height="14" rx="2" />
-        <path d="M3 7l9 6 9-6" />
-      </>
-    ),
-    phone: (
-      <path d="M22 16.9v2.6a2 2 0 0 1-2.2 2 19.8 19.8 0 0 1-8.6-3.1 19.4 19.4 0 0 1-6-6A19.8 19.8 0 0 1 2.1 3.7 2 2 0 0 1 4.1 1.5h2.6a2 2 0 0 1 2 1.7c.1.9.3 1.8.6 2.7a2 2 0 0 1-.5 2.1L7.7 9.2a16 16 0 0 0 6 6l1.2-1.1a2 2 0 0 1 2.1-.5c.9.3 1.8.5 2.7.6a2 2 0 0 1 1.7 2z" />
-    ),
-    arrow: (
-      <>
-        <path d="M7 17L17 7" />
-        <path d="M8 7h9v9" />
-      </>
-    ),
+    shield: <><path d="M12 3l7 3v5c0 4.5-3 8.4-7 10-4-1.6-7-5.5-7-10V6l7-3z" /><path d="M9 12l2 2 4-4" /></>,
+    document: <><path d="M14 3H7a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V8z" /><path d="M14 3v5h5" /><path d="M9 13h6M9 17h6" /></>,
+    users: <><circle cx="9" cy="8" r="3" /><path d="M3 20c0-3.3 2.7-6 6-6s6 2.7 6 6" /><circle cx="17" cy="9" r="2.3" /><path d="M21 19c0-2.5-1.7-4.5-4-5" /></>,
+    alert: <><path d="M12 3l9 16H3z" /><path d="M12 9v5" /><circle cx="12" cy="17" r=".6" fill="currentColor" /></>,
+    copyright: <><circle cx="12" cy="12" r="9" /><path d="M15 9.5a3.5 3.5 0 1 0 0 5" /></>,
+    mail: <><rect x="3" y="5" width="18" height="14" rx="2" /><path d="M3 7l9 6 9-6" /></>,
+    phone: <path d="M22 16.9v2.6a2 2 0 0 1-2.2 2 19.8 19.8 0 0 1-8.6-3.1 19.4 19.4 0 0 1-6-6A19.8 19.8 0 0 1 2.1 3.7 2 2 0 0 1 4.1 1.5h2.6a2 2 0 0 1 2 1.7c.1.9.3 1.8.6 2.7a2 2 0 0 1-.5 2.1L7.7 9.2a16 16 0 0 0 6 6l1.2-1.1a2 2 0 0 1 2.1-.5c.9.3 1.8.5 2.7.6a2 2 0 0 1 1.7 2z" />,
+    arrow: <><path d="M7 17L17 7" /><path d="M8 7h9v9" /></>,
     chevron: <path d="M9 6l6 6-6 6" />,
-    check: <path d="M5 12l4 4 10-10" />,
-    clock: (
-      <>
-        <circle cx="12" cy="12" r="9" />
-        <path d="M12 7v5l3 2" />
-      </>
-    ),
-    layers: (
-      <>
-        <path d="M12 3l9 5-9 5-9-5 9-5z" />
-        <path d="M3 13l9 5 9-5" />
-      </>
-    ),
+    clock: <><circle cx="12" cy="12" r="9" /><path d="M12 7v5l3 2" /></>,
+    layers: <><path d="M12 3l9 5-9 5-9-5 9-5z" /><path d="M3 13l9 5 9-5" /></>,
+    lock: <><rect x="4" y="10" width="16" height="11" rx="2" /><path d="M8 10V7a4 4 0 0 1 8 0v3" /></>,
+    scale: <><path d="M12 3v18" /><path d="M5 8h14" /><path d="M5 8l-3 7h6zM19 8l-3 7h6z" /></>,
+    handshake: <><path d="M2 12l4-4 5 3 5-3 4 4" /><path d="M6 8v6M18 8v6M10 11l-2 4M14 11l2 4" /></>,
+    ring: <><circle cx="12" cy="12" r="8" /><circle cx="12" cy="12" r="3" /></>,
+    chat: <><path d="M21 12a8 8 0 1 1-3-6.2L21 4v6a8 8 0 0 1 0 2z" /><path d="M8 11h8M8 15h5" /></>,
   }
-  return <svg {...common}>{paths[name] || paths.document}</svg>
+  return <svg {...p}>{paths[name] || paths.document}</svg>
 }
 
-/* ---------------- Sidebar ---------------- */
-function Sidebar({ pathname }) {
+/* =========================================================
+   SHARED SHELL
+   ========================================================= */
+function Crumb({ page }) {
   return (
-    <aside className="lp-sidebar">
-      <div className="lp-side-head">
-        <span className="lp-side-kicker">POLICY CENTRE</span>
-        <h3>Legal &amp; Compliance</h3>
-        <p>Official documents governing the ENVIQUO platform.</p>
-      </div>
-
-      <nav className="lp-side-nav">
-        {Object.entries(policies).map(([path, p]) => (
-          <Link
-            key={path}
-            to={path}
-            className={path === pathname ? 'active' : ''}
-          >
-            <span className="lp-side-ico">
-              <Icon name={p.icon} size={16} />
-            </span>
-            <span className="lp-side-txt">
-              <b>{p.title}</b>
-              <small>{p.label}</small>
-            </span>
-            <span className="lp-side-no">{p.no}</span>
-          </Link>
-        ))}
-      </nav>
-
-      <div className="lp-side-help">
-        <div className="lp-side-help-ico">
-          <Icon name="mail" size={18} />
-        </div>
-        <b>Need assistance?</b>
-        <p>Reach the ENVIQUO team for policy or platform questions.</p>
-        <a href={'mailto:' + email}>Contact support</a>
-      </div>
-    </aside>
+    <div className="lg-crumb">
+      <Link to="/">Home</Link>
+      <Icon name="chevron" size={12} />
+      <Link to="/privacy-policy">Policy Centre</Link>
+      {page && (
+        <>
+          <Icon name="chevron" size={12} />
+          <b>{page.title}</b>
+        </>
+      )}
+    </div>
   )
 }
 
-/* ---------------- Hero (index) ---------------- */
-function IndexHero() {
+function LegalFooter() {
   return (
-    <section className="lp-hero">
-      <div className="lp-hero-copy">
-        <span className="lp-eyebrow">
-          <i /> ENVIQUO · POLICY CENTRE
-        </span>
-        <h1>
-          Policies built for
-          <br />
-          <em>business clarity.</em>
-        </h1>
-        <p>
-          Everything you need to understand how the ENVIQUO platform operates —
-          from data privacy to buyer–vendor participation, in one organised place.
-        </p>
-        <div className="lp-hero-meta">
-          <span>
-            <Icon name="layers" size={14} /> 6 Official Documents
-          </span>
-          <span>
-            <Icon name="clock" size={14} /> Updated 27 Oct 2026
-          </span>
+    <footer className="lg-footer">
+      <div className="lg-footer-in">
+        <div className="lg-f-brand">
+          <span className="lg-f-mark">E</span>
+          <div><b>ENVIQUO</b><small>Diagnose. Match. Solution.</small></div>
+        </div>
+        <nav className="lg-f-links">
+          {Object.entries(policies).map(([p, v]) => (
+            <Link key={p} to={p}>{v.title}</Link>
+          ))}
+        </nav>
+        <div className="lg-f-meta">
+          <a href={'mailto:' + email}><Icon name="mail" size={13} /> {email}</a>
+          <a href={'tel:' + phone.replace(/\s/g, '')}><Icon name="phone" size={13} /> {phone}</a>
+        </div>
+        <div className="lg-f-bottom">
+          <span>© {new Date().getFullYear()} {company}. All rights reserved.</span>
+          <span>Policy Centre · ENVIQUO</span>
         </div>
       </div>
-      <div className="lp-hero-art">
-        <div className="lp-ring r1" />
-        <div className="lp-ring r2" />
-        <div className="lp-ring r3" />
-        <div className="lp-hero-badge">
-          <span>EN</span>
-          <small>QUO</small>
-        </div>
-      </div>
-    </section>
+    </footer>
   )
 }
 
-/* ---------------- Hero (detail) ---------------- */
-function DetailHero({ page }) {
-  return (
-    <section className="lp-hero lp-hero-detail">
-      <div className="lp-hero-copy">
-        <span className="lp-eyebrow">
-          <span className="lp-dot">
-            <Icon name={page.icon} size={13} />
-          </span>
-          {page.label}
-        </span>
-        <h1>{page.title}</h1>
-        <p>{page.intro}</p>
-        <div className="lp-hero-meta">
-          <span>
-            <Icon name="clock" size={14} /> Last updated: 27 October 2026
-          </span>
-          <span>
-            <Icon name="layers" size={14} /> {page.sections.length} sections
-          </span>
-          <span>
-            <Icon name="shield" size={14} /> {company}
-          </span>
-        </div>
-      </div>
-      <div className="lp-hero-art">
-        <div className="lp-ring r1" />
-        <div className="lp-ring r2" />
-        <div className="lp-ring r3" />
-        <div className="lp-hero-badge">
-          <span>EN</span>
-          <small>QUO</small>
-        </div>
-      </div>
-    </section>
-  )
-}
-
-/* ---------------- Policy Index ---------------- */
+/* =========================================================
+   INDEX (landing) — "Policy Centre"
+   ========================================================= */
 function PolicyIndex() {
   return (
-    <>
-      <IndexHero />
-      <section className="lp-index">
-        <div className="lp-index-head">
-          <span className="lp-eyebrow plain">ALL DOCUMENTS</span>
-          <h2>Browse the policy centre</h2>
+    <div className="lg-index">
+      <section className="lg-index-hero">
+        <span className="lg-eyebrow"><i /> ENVIQUO · POLICY CENTRE</span>
+        <h1>Legal clarity, <em>by design.</em></h1>
+        <p>Six official documents covering privacy, terms, network participation, disclaimers, intellectual property and support.</p>
+        <div className="lg-index-meta">
+          <span><Icon name="layers" size={14} /> 6 Documents</span>
+          <span><Icon name="clock" size={14} /> Updated 27 Oct 2026</span>
+          <span><Icon name="lock" size={14} /> {company}</span>
         </div>
-        <div className="lp-index-grid">
-          {Object.entries(policies).map(([path, p], i) => (
-            <Link className="lp-card" to={path} key={path}>
-              <div className="lp-card-top">
-                <span className="lp-card-ico">
-                  <Icon name={p.icon} size={20} />
-                </span>
-                <span className="lp-card-no">{p.no}</span>
-              </div>
-              <h3>{p.title}</h3>
-              <p>{p.intro}</p>
-              <span className="lp-card-link">
-                Read policy <Icon name="arrow" size={14} />
-              </span>
-            </Link>
+      </section>
+
+      <div className="lg-index-grid">
+        {Object.entries(policies).map(([path, p]) => (
+          <Link key={path} to={path} className={`lg-icard theme-${p.theme}`}>
+            <div className="lg-icard-top">
+              <span className="lg-ico"><Icon name={p.icon} size={20} /></span>
+              <span className="lg-no">{p.no}</span>
+            </div>
+            <h3>{p.title}</h3>
+            <p>{p.intro}</p>
+            <span className="lg-icard-link">Open document <Icon name="arrow" size={13} /></span>
+          </Link>
+        ))}
+      </div>
+    </div>
+  )
+}
+
+/* =========================================================
+   PAGE 01 — PRIVACY POLICY
+   Layout: split hero + numbered vertical timeline
+   Accent: teal / aqua (trust + data)
+   ========================================================= */
+function PrivacyLayout({ page }) {
+  return (
+    <div className="lg-layout theme-privacy">
+      <section className="lg-split-hero">
+        <div className="lg-split-copy">
+          <span className="lg-eyebrow"><span className="lg-pill"><Icon name="shield" size={13} /></span>{page.label}</span>
+          <h1>{page.title}</h1>
+          <p>{page.intro}</p>
+          <div className="lg-hero-chips">
+            <span><Icon name="clock" size={13} /> 27 Oct 2026</span>
+            <span><Icon name="layers" size={13} /> {page.sections.length} sections</span>
+          </div>
+        </div>
+        <div className="lg-split-art">
+          <div className="lg-shield-art">
+            <div className="lg-shield-ring" />
+            <Icon name="shield" size={64} />
+          </div>
+        </div>
+      </section>
+
+      <div className="lg-timeline">
+        {page.sections.map(([h, body], i) => (
+          <div className="lg-tl-item" key={h}>
+            <div className="lg-tl-marker">{String(i + 1).padStart(2, '0')}</div>
+            <div className="lg-tl-body">
+              <h2>{h}</h2>
+              <p>{body}</p>
+            </div>
+          </div>
+        ))}
+      </div>
+
+      <ContactStrip page={page} />
+    </div>
+  )
+}
+
+/* =========================================================
+   PAGE 02 — TERMS & CONDITIONS
+   Layout: banner + horizontal tab-navigated sections
+   Accent: deep navy / amber (contractual)
+   ========================================================= */
+function TermsLayout({ page }) {
+  return (
+    <div className="lg-layout theme-terms">
+      <section className="lg-banner">
+        <div>
+          <span className="lg-eyebrow"><span className="lg-pill"><Icon name="document" size={13} /></span>{page.label}</span>
+          <h1>{page.title}</h1>
+          <p>{page.intro}</p>
+        </div>
+        <div className="lg-banner-badge">
+          <Icon name="scale" size={40} />
+          <span>PLATFORM<br />AGREEMENT</span>
+        </div>
+      </section>
+
+      <div className="lg-terms-nav">
+        {page.sections.map(([h], i) => (
+          <a key={h} href={`#term-${i}`} className="lg-terms-nav-item">
+            <span>{String(i + 1).padStart(2, '0')}</span>
+            {h}
+          </a>
+        ))}
+      </div>
+
+      <div className="lg-terms-body">
+        {page.sections.map(([h, body], i) => (
+          <section className="lg-terms-block" id={`term-${i}`} key={h}>
+            <div className="lg-terms-block-head">
+              <span className="lg-terms-badge">{String(i + 1).padStart(2, '0')}</span>
+              <h2>{h}</h2>
+            </div>
+            <p>{body}</p>
+          </section>
+        ))}
+      </div>
+
+      <ContactStrip page={page} />
+    </div>
+  )
+}
+
+/* =========================================================
+   PAGE 03 — BUYER & VENDOR POLICY
+   Layout: two-column network diagram + paired sections
+   Accent: emerald (connection + growth)
+   ========================================================= */
+function NetworkLayout({ page }) {
+  const buyerSecs = page.sections.filter(([h]) => /buyer/i.test(h))
+  const vendorSecs = page.sections.filter(([h]) => /vendor/i.test(h))
+  const shared = page.sections.filter(([h]) => !/buyer|vendor/i.test(h))
+
+  return (
+    <div className="lg-layout theme-network">
+      <section className="lg-net-hero">
+        <span className="lg-eyebrow"><span className="lg-pill"><Icon name="users" size={13} /></span>{page.label}</span>
+        <h1>{page.title}</h1>
+        <p>{page.intro}</p>
+        <div className="lg-net-diagram">
+          <div className="lg-net-node buyer"><Icon name="users" size={22} /><b>BUYER</b></div>
+          <div className="lg-net-line" />
+          <div className="lg-net-node handshake"><Icon name="handshake" size={26} /></div>
+          <div className="lg-net-line" />
+          <div className="lg-net-node vendor"><Icon name="document" size={22} /><b>VENDOR</b></div>
+        </div>
+      </section>
+
+      <div className="lg-net-split">
+        <div className="lg-net-col buyer">
+          <h3 className="lg-net-col-title"><Icon name="users" size={16} /> Buyer Responsibilities</h3>
+          {buyerSecs.map(([h, body]) => (
+            <div className="lg-net-card" key={h}>
+              <h4>{h}</h4>
+              <p>{body}</p>
+            </div>
           ))}
+        </div>
+        <div className="lg-net-col vendor">
+          <h3 className="lg-net-col-title"><Icon name="document" size={16} /> Vendor Responsibilities</h3>
+          {vendorSecs.map(([h, body]) => (
+            <div className="lg-net-card" key={h}>
+              <h4>{h}</h4>
+              <p>{body}</p>
+            </div>
+          ))}
+        </div>
+      </div>
+
+      <div className="lg-net-shared">
+        <h3>Shared Workflow Rules</h3>
+        <div className="lg-net-shared-grid">
+          {shared.map(([h, body], i) => (
+            <div className="lg-net-shared-card" key={h}>
+              <span>{String(i + 1).padStart(2, '0')}</span>
+              <div><h4>{h}</h4><p>{body}</p></div>
+            </div>
+          ))}
+        </div>
+      </div>
+
+      <ContactStrip page={page} />
+    </div>
+  )
+}
+
+/* =========================================================
+   PAGE 04 — DISCLAIMER
+   Layout: alert-styled hero + warning card list
+   Accent: amber / orange (caution)
+   ========================================================= */
+function DisclaimerLayout({ page }) {
+  return (
+    <div className="lg-layout theme-disclaimer">
+      <section className="lg-alert-hero">
+        <div className="lg-alert-icon"><Icon name="alert" size={38} /></div>
+        <div className="lg-alert-copy">
+          <span className="lg-eyebrow"><span className="lg-pill"><Icon name="alert" size={13} /></span>{page.label}</span>
+          <h1>{page.title}</h1>
+          <p>{page.intro}</p>
+        </div>
+      </section>
+
+      <div className="lg-alert-grid">
+        {page.sections.map(([h, body], i) => (
+          <div className="lg-alert-card" key={h}>
+            <div className="lg-alert-card-top">
+              <span className="lg-alert-num">{String(i + 1).padStart(2, '0')}</span>
+              <span className="lg-alert-tag">NOTICE</span>
+            </div>
+            <h3>{h}</h3>
+            <p>{body}</p>
+          </div>
+        ))}
+      </div>
+
+      <ContactStrip page={page} />
+    </div>
+  )
+}
+
+/* =========================================================
+   PAGE 05 — COPYRIGHT & IP
+   Layout: magazine / editorial list with quote-style pullouts
+   Accent: violet / indigo (creative ownership)
+   ========================================================= */
+function CopyrightLayout({ page }) {
+  return (
+    <div className="lg-layout theme-copyright">
+      <section className="lg-editorial-hero">
+        <div>
+          <span className="lg-eyebrow"><span className="lg-pill"><Icon name="copyright" size={13} /></span>{page.label}</span>
+          <h1>{page.title}</h1>
+          <p>{page.intro}</p>
+        </div>
+        <div className="lg-editorial-mark">©</div>
+      </section>
+
+      <div className="lg-editorial-list">
+        {page.sections.map(([h, body], i) => (
+          <article className="lg-editorial-item" key={h}>
+            <div className="lg-editorial-num">{String(i + 1).padStart(2, '0')}</div>
+            <div className="lg-editorial-content">
+              <h2>{h}</h2>
+              <p>{body}</p>
+            </div>
+          </article>
+        ))}
+      </div>
+
+      <ContactStrip page={page} />
+    </div>
+  )
+}
+
+/* =========================================================
+   PAGE 06 — CONTACT & GRIEVANCE
+   Layout: support card grid + prominent contact block
+   Accent: sky blue (communication)
+   ========================================================= */
+function ContactLayout({ page }) {
+  return (
+    <div className="lg-layout theme-contact">
+      <section className="lg-contact-hero">
+        <div>
+          <span className="lg-eyebrow"><span className="lg-pill"><Icon name="chat" size={13} /></span>{page.label}</span>
+          <h1>{page.title}</h1>
+          <p>{page.intro}</p>
+        </div>
+        <div className="lg-contact-cards">
+          <a className="lg-contact-tile" href={'mailto:' + email}>
+            <span className="lg-ct-ico"><Icon name="mail" size={20} /></span>
+            <div><small>EMAIL</small><b>{email}</b></div>
+          </a>
+          <a className="lg-contact-tile" href={'tel:' + phone.replace(/\s/g, '')}>
+            <span className="lg-ct-ico"><Icon name="phone" size={20} /></span>
+            <div><small>PHONE</small><b>{phone}</b></div>
+          </a>
+        </div>
+      </section>
+
+      <div className="lg-contact-grid">
+        {page.sections.map(([h, body], i) => (
+          <div className="lg-contact-card" key={h}>
+            <span className="lg-contact-card-ico"><Icon name="chat" size={18} /></span>
+            <span className="lg-contact-card-no">{String(i + 1).padStart(2, '0')}</span>
+            <h3>{h}</h3>
+            <p>{body}</p>
+          </div>
+        ))}
+      </div>
+
+      <ContactStrip page={page} />
+    </div>
+  )
+}
+
+/* ---------------- Shared contact strip ---------------- */
+function ContactStrip({ page }) {
+  return (
+    <>
+      <div className="lg-cta">
+        <div>
+          <span className="lg-eyebrow plain">HAVE QUESTIONS?</span>
+          <h3>Talk to the ENVIQUO team.</h3>
+          <p>Reach us by email or phone for assistance with this policy.</p>
+        </div>
+        <div className="lg-cta-actions">
+          <a className="lg-btn primary" href={'mailto:' + email}><Icon name="mail" size={15} /> Email us</a>
+          <a className="lg-btn ghost" href={'tel:' + phone.replace(/\s/g, '')}><Icon name="phone" size={15} /> {phone}</a>
+        </div>
+      </div>
+
+      <p className="lg-draft">
+        <b>Draft notice:</b> This page is a practical draft, not legal advice. Confirm actual data practices, statutory disclosures and applicable legal requirements with qualified counsel before publishing.
+      </p>
+
+      <section className="lg-more">
+        <span className="lg-eyebrow plain">EXPLORE MORE</span>
+        <h2>Other official policies</h2>
+        <div className="lg-more-grid">
+          {Object.entries(policies)
+            .filter(([p]) => p !== Object.keys(policies).find(k => policies[k] === page))
+            .slice(0, 3)
+            .map(([p, v]) => (
+              <Link key={p} to={p} className={`lg-more-card theme-${v.theme}`}>
+                <div className="lg-more-top">
+                  <span className="lg-ico sm"><Icon name={v.icon} size={16} /></span>
+                  <span className="lg-no">{v.no}</span>
+                </div>
+                <h3>{v.title}</h3>
+                <span className="lg-more-link">Read <Icon name="chevron" size={12} /></span>
+              </Link>
+            ))}
         </div>
       </section>
     </>
   )
 }
 
-/* ---------------- Policy Detail ---------------- */
-function PolicyDetail({ page, pathname }) {
-  const [active, setActive] = useState(0)
-
-  // Scroll spy
-  useEffect(() => {
-    const onScroll = () => {
-      const sections = document.querySelectorAll('.lp-section')
-      let current = 0
-      sections.forEach((el, i) => {
-        if (el.getBoundingClientRect().top < 140) current = i
-      })
-      setActive(current)
-    }
-    window.addEventListener('scroll', onScroll, { passive: true })
-    onScroll()
-    return () => window.removeEventListener('scroll', onScroll)
-  }, [pathname])
-
-  return (
-    <>
-      <DetailHero page={page} />
-
-      <div className="lp-layout">
-        <Sidebar pathname={pathname} />
-
-        <div className="lp-main">
-          {/* On this page */}
-          <div className="lp-toc">
-            <span className="lp-toc-title">On this page</span>
-            <div className="lp-toc-list">
-              {page.sections.map(([h], i) => (
-                <a
-                  key={h}
-                  href={`#sec-${i}`}
-                  className={active === i ? 'active' : ''}
-                >
-                  <span className="lp-toc-num">{String(i + 1).padStart(2, '0')}</span>
-                  {h}
-                </a>
-              ))}
-            </div>
-          </div>
-
-          {/* Sections */}
-          <article className="lp-content">
-            {page.sections.map(([h, body], i) => (
-              <section className="lp-section" id={`sec-${i}`} key={h}>
-                <div className="lp-section-head">
-                  <span className="lp-section-num">{String(i + 1).padStart(2, '0')}</span>
-                  <h2>{h}</h2>
-                </div>
-                <p>{body}</p>
-              </section>
-            ))}
-
-            {/* Contact block */}
-            <div className="lp-contact">
-              <div>
-                <span className="lp-eyebrow plain">HAVE QUESTIONS?</span>
-                <h3>Talk to the ENVIQUO team.</h3>
-                <p>Reach us by email or phone for assistance with this policy.</p>
-              </div>
-              <div className="lp-contact-actions">
-                <a className="lp-btn primary" href={'mailto:' + email}>
-                  <Icon name="mail" size={15} /> Email us
-                </a>
-                <a className="lp-btn ghost" href={'tel:' + phone.replace(/\s/g, '')}>
-                  <Icon name="phone" size={15} /> {phone}
-                </a>
-              </div>
-            </div>
-
-            <p className="lp-draft">
-              <b>Draft notice:</b> This page is a practical draft, not legal advice.
-              Confirm actual data practices, statutory disclosures and applicable
-              legal requirements with qualified counsel before publishing.
-            </p>
-          </article>
-
-          {/* Other policies */}
-          <section className="lp-related">
-            <div className="lp-related-head">
-              <span className="lp-eyebrow plain">EXPLORE MORE</span>
-              <h2>Other official policies</h2>
-            </div>
-            <div className="lp-related-grid">
-              {Object.entries(policies)
-                .filter(([p]) => p !== pathname)
-                .slice(0, 3)
-                .map(([path, p]) => (
-                  <Link className="lp-card sm" to={path} key={path}>
-                    <div className="lp-card-top">
-                      <span className="lp-card-ico sm">
-                        <Icon name={p.icon} size={16} />
-                      </span>
-                      <span className="lp-card-no">{p.no}</span>
-                    </div>
-                    <h3>{p.title}</h3>
-                    <span className="lp-card-link">
-                      Read <Icon name="chevron" size={13} />
-                    </span>
-                  </Link>
-                ))}
-            </div>
-          </section>
-        </div>
-      </div>
-    </>
-  )
-}
-
-/* ---------------- Footer ---------------- */
-function LegalFooter() {
-  return (
-    
-<footer className="footer">
-  <div className="section-container">
-    <div className="footer-main">
-
-      {/* Brand */}
-      <div className="footer-brand">
-        <Link to="/" className="footer-brand__logo">
-          <img
-            src="/image.png"
-            alt="ENVIQUO"
-            className="footer__logo-image"
-          />
-          <span>ENVIQUO</span>
-        </Link>
-
-        <p className="footer-brand__tagline">
-          Diagnose. Match. Solution.
-        </p>
-      </div>
-
-      {/* Platform */}
-      <div className="footer-column">
-        <h4>Platform</h4>
-        <Link to="/">Home</Link>
-        <Link to="/solutions">Domains</Link>
-        <Link to="/how-it-works">About Us</Link>
-        <Link to="/#contact">Contact Us</Link>
-      </div>
-
-      {/* Join Network */}
-      <div className="footer-column">
-        <h4>Join Our Network</h4>
-        <Link to="/register/buyer">Register as Buyer</Link>
-        <Link to="/register/vendor">Register as Vendor</Link>
-        <Link to="/login">Login</Link>
-      </div>
-
-      {/* Legal Policies */}
-      <div className="footer-column footer-legal">
-        <h4>Legal & Policies</h4>
-
-        {Object.entries(policies).map(([path, policy]) => (
-          <Link key={path} to={path}>
-            {policy.title}
-          </Link>
-        ))}
-      </div>
-
-      {/* Contact */}
-      <div className="footer-column footer-contact">
-        <h4>Contact Us</h4>
-
-        <p className="footer-contact__company">
-          {company}
-        </p>
-
-        <a
-          className="footer-contact__email"
-          href={'mailto:' + email}
-        >
-          <Icon name="mail" size={15} />
-          <span>{email}</span>
-        </a>
-
-        <a
-          className="footer-contact__email"
-          href={'tel:' + phone.replace(/\s/g, '')}
-        >
-          <Icon name="phone" size={15} />
-          <span>{phone}</span>
-        </a>
-
-        <p className="footer-contact__country">
-          India
-        </p>
-      </div>
-    </div>
-
-    {/* Bottom Bar */}
-    <div className="footer-bottom">
-      <span>
-        © {new Date().getFullYear()} {company}. All rights reserved.
-      </span>
-      <span>Policy Centre · ENVIQUO</span>
-    </div>
-  </div>
-</footer>
-
-  )
-}
-
-/* ---------------- Main ---------------- */
+/* =========================================================
+   ROUTER
+   ========================================================= */
 export default function LegalPages() {
   const { pathname } = useLocation()
   const page = policies[pathname]
 
-  // Scroll to top on route change
-  useEffect(() => {
-    window.scrollTo({ top: 0, behavior: 'instant' })
-  }, [pathname])
+  useEffect(() => { window.scrollTo({ top: 0, behavior: 'instant' }) }, [pathname])
+
+  const render = () => {
+    if (!page) return <PolicyIndex />
+    switch (page.theme) {
+      case 'privacy':    return <PrivacyLayout page={page} />
+      case 'terms':      return <TermsLayout page={page} />
+      case 'network':    return <NetworkLayout page={page} />
+      case 'disclaimer': return <DisclaimerLayout page={page} />
+      case 'copyright':  return <CopyrightLayout page={page} />
+      case 'contact':    return <ContactLayout page={page} />
+      default:           return <PrivacyLayout page={page} />
+    }
+  }
 
   return (
     <>
       <Navbar />
-      <main className="lp-page">
-        <div className="lp-bg">
-          <span className="lp-blob a" />
-          <span className="lp-blob b" />
-          <span className="lp-grid-bg" />
+      <main className={`lg-page theme-${page?.theme || 'index'}`}>
+        <div className="lg-bg" aria-hidden>
+          <span className="lg-blob a" />
+          <span className="lg-blob b" />
         </div>
-
-        <div className="lp-wrap">
-          <div className="lp-crumb">
-            <Link to="/">Home</Link>
-            <Icon name="chevron" size={12} />
-            <Link to="/privacy-policy">Policy Centre</Link>
-            {page && (
-              <>
-                <Icon name="chevron" size={12} />
-                <b>{page.title}</b>
-              </>
-            )}
-          </div>
-
-          {!page ? <PolicyIndex /> : <PolicyDetail page={page} pathname={pathname} />}
+        <div className="lg-wrap">
+          <Crumb page={page} />
+          {render()}
         </div>
       </main>
       <LegalFooter />
@@ -583,451 +567,377 @@ export default function LegalPages() {
   )
 }
 
-/* ---------------- STYLES ---------------- */
+/* =========================================================
+   STYLES — one base + one theme block per page
+   ========================================================= */
 const styles = `
-/* ===== BASE ===== */
-.lp-page{
+/* ============ BASE ============ */
+.lg-page{
   position:relative;isolation:isolate;overflow:hidden;
   background:#f4f7fb;color:#0f2438;min-height:80vh;
   padding:26px 22px 90px;
   font-family:ui-sans-serif,system-ui,-apple-system,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+  --accent:#149987;--accent-2:#2499cc;--accent-soft:#eaf8f5;--accent-ink:#0b3a34;
 }
-.lp-page *{box-sizing:border-box}
-.lp-wrap{max-width:1200px;margin:0 auto;position:relative;z-index:1}
+.lg-page.theme-privacy{--accent:#149987;--accent-2:#2499cc;--accent-soft:#eaf8f5;--accent-ink:#0b3a34}
+.lg-page.theme-terms{--accent:#b8730f;--accent-2:#0f2a3e;--accent-soft:#fdf3e2;--accent-ink:#3b2a10}
+.lg-page.theme-network{--accent:#0e9f6e;--accent-2:#12739b;--accent-soft:#e7f8f0;--accent-ink:#0a3a2a}
+.lg-page.theme-disclaimer{--accent:#d97706;--accent-2:#b45309;--accent-soft:#fef3e2;--accent-ink:#4a2a05}
+.lg-page.theme-copyright{--accent:#7c5cff;--accent-2:#4a3ad6;--accent-soft:#f1edff;--accent-ink:#2a1f6e}
+.lg-page.theme-contact{--accent:#0284c7;--accent-2:#0ea5e9;--accent-soft:#e6f4fb;--accent-ink:#062e44}
+.lg-page *{box-sizing:border-box}
+.lg-wrap{max-width:1160px;margin:0 auto;position:relative;z-index:1}
 
-/* ===== BACKGROUND ===== */
-.lp-bg{position:absolute;inset:0;z-index:0;pointer-events:none;overflow:hidden}
-.lp-blob{position:absolute;border-radius:50%;filter:blur(60px);opacity:.55}
-.lp-blob.a{width:520px;height:520px;right:-160px;top:-80px;background:radial-gradient(circle,#2bb7a0 0%,transparent 70%)}
-.lp-blob.b{width:480px;height:480px;left:-200px;top:520px;background:radial-gradient(circle,#2499cc 0%,transparent 70%)}
-.lp-grid-bg{
-  position:absolute;inset:0;
-  background-image:linear-gradient(rgba(15,36,56,.035) 1px,transparent 1px),
-                   linear-gradient(90deg,rgba(15,36,56,.035) 1px,transparent 1px);
-  background-size:56px 56px;
-  mask-image:radial-gradient(ellipse at center,black 30%,transparent 80%);
-  -webkit-mask-image:radial-gradient(ellipse at center,black 30%,transparent 80%);
-}
+.lg-bg{position:absolute;inset:0;z-index:0;pointer-events:none;overflow:hidden}
+.lg-blob{position:absolute;border-radius:50%;filter:blur(70px);opacity:.45;background:radial-gradient(circle,var(--accent) 0%,transparent 70%)}
+.lg-blob.a{width:520px;height:520px;right:-160px;top:-100px}
+.lg-blob.b{width:460px;height:460px;left:-200px;top:560px;opacity:.35;background:radial-gradient(circle,var(--accent-2) 0%,transparent 70%)}
 
-/* ===== CRUMB ===== */
-.lp-crumb{
-  display:flex;align-items:center;gap:6px;flex-wrap:wrap;
-  font-size:12px;color:#8496a8;margin:6px 0 26px;
-}
-.lp-crumb a{color:#4b6b82;text-decoration:none;transition:color .18s}
-.lp-crumb a:hover{color:#0f8a7c}
-.lp-crumb b{color:#1b3348;font-weight:600}
+/* ============ CRUMB ============ */
+.lg-crumb{display:flex;align-items:center;gap:6px;flex-wrap:wrap;font-size:12px;color:#8496a8;margin:6px 0 24px}
+.lg-crumb a{color:#4b6b82;text-decoration:none;transition:color .18s}
+.lg-crumb a:hover{color:var(--accent)}
+.lg-crumb b{color:#1b3348;font-weight:600}
 
-/* ===== HERO ===== */
-.lp-hero{
-  display:flex;align-items:center;justify-content:space-between;
-  gap:40px;padding:52px 52px;min-height:280px;
-  border:1px solid #dbe7ee;border-radius:28px;
-  background:linear-gradient(125deg,#ffffff 0%,#f9fcff 52%,#eaf9f5 100%);
-  box-shadow:0 24px 60px -20px rgba(20,54,80,.16),0 0 0 1px rgba(255,255,255,.6) inset;
-  overflow:hidden;position:relative;
-}
-.lp-hero-copy{max-width:720px;position:relative;z-index:2}
-.lp-eyebrow{
-  display:inline-flex;align-items:center;gap:9px;
-  color:#0f9488;font-size:11px;font-weight:800;
-  letter-spacing:1.8px;text-transform:uppercase;
-}
-.lp-eyebrow.plain{color:#5b7488;font-size:10px;letter-spacing:1.6px}
-.lp-eyebrow i{
-  width:7px;height:7px;border-radius:50%;background:#20b99b;
-  box-shadow:0 0 0 5px rgba(32,185,155,.14);
-}
-.lp-dot{
-  display:inline-flex;align-items:center;justify-content:center;
-  width:22px;height:22px;border-radius:7px;
-  background:rgba(20,150,132,.1);color:#0f9488;
-}
-.lp-hero h1{
-  font-size:clamp(34px,4.4vw,56px);
-  letter-spacing:-1.9px;line-height:1.06;
-  margin:18px 0 16px;color:#0d2237;font-weight:850;
-}
-.lp-hero h1 em{font-style:normal;color:#0f9c8a}
-.lp-hero p{
-  max-width:660px;color:#5f7488;font-size:14.5px;
-  line-height:1.85;margin:0;
-}
-.lp-hero-meta{
-  display:flex;flex-wrap:wrap;gap:10px 22px;margin-top:26px;
-  font-size:11.5px;color:#6f8496;
-}
-.lp-hero-meta span{display:inline-flex;align-items:center;gap:6px}
+/* ============ SHARED UTILITIES ============ */
+.lg-eyebrow{display:inline-flex;align-items:center;gap:9px;color:var(--accent);font-size:11px;font-weight:800;letter-spacing:1.7px;text-transform:uppercase}
+.lg-eyebrow.plain{color:#5b7488;font-size:10px}
+.lg-eyebrow i{width:7px;height:7px;border-radius:50%;background:var(--accent);box-shadow:0 0 0 5px color-mix(in srgb,var(--accent) 18%,transparent)}
+.lg-pill{display:inline-flex;align-items:center;justify-content:center;width:22px;height:22px;border-radius:7px;background:color-mix(in srgb,var(--accent) 12%,transparent);color:var(--accent)}
+.lg-hero-chips{display:flex;flex-wrap:wrap;gap:10px 18px;margin-top:22px;font-size:11.5px;color:#6f8496}
+.lg-hero-chips span{display:inline-flex;align-items:center;gap:6px}
 
-/* hero art */
-.lp-hero-art{
-  width:220px;height:220px;flex:0 0 220px;position:relative;
-  display:grid;place-items:center;
+/* ============ INDEX ============ */
+.lg-index-hero{
+  background:linear-gradient(125deg,#ffffff 0%,#f7fcff 50%,#eaf9f5 100%);
+  border:1px solid #dbe7ee;border-radius:26px;padding:48px 48px;
+  box-shadow:0 22px 55px -22px rgba(20,54,80,.2);margin-bottom:32px;
 }
-.lp-ring{
-  position:absolute;border-radius:50%;
-  border:1px dashed rgba(30,155,201,.32);
-}
-.lp-ring.r1{inset:0;animation:lp-spin 40s linear infinite}
-.lp-ring.r2{
-  inset:26px;border-style:solid;border-color:rgba(31,169,113,.28);
-  box-shadow:0 0 0 12px rgba(31,169,113,.03),0 0 0 26px rgba(30,155,201,.025);
-}
-.lp-ring.r3{inset:52px;border-color:rgba(20,150,132,.22);border-style:dotted}
-.lp-hero-badge{
-  width:112px;height:112px;display:flex;flex-direction:column;
-  align-items:center;justify-content:center;border-radius:30px;
-  background:linear-gradient(150deg,#12739b,#20b99b);
-  box-shadow:0 24px 48px -12px rgba(21,139,149,.5),
-             0 0 0 1px rgba(255,255,255,.2) inset;
-  color:#fff;font-size:26px;font-weight:900;letter-spacing:2px;
-  transform:rotate(-7deg);position:relative;z-index:2;
-}
-.lp-hero-badge small{font-size:9px;letter-spacing:5px;margin-left:6px;opacity:.9}
+.lg-index-hero h1{font-size:clamp(34px,4.3vw,52px);letter-spacing:-1.7px;line-height:1.06;margin:16px 0 14px;color:#0d2237;font-weight:850}
+.lg-index-hero h1 em{font-style:normal;color:#0f9c8a}
+.lg-index-hero p{max-width:620px;color:#5f7488;font-size:14px;line-height:1.85;margin:0}
+.lg-index-meta{display:flex;flex-wrap:wrap;gap:10px 22px;margin-top:24px;font-size:11.5px;color:#6f8496}
+.lg-index-meta span{display:inline-flex;align-items:center;gap:6px}
 
-@keyframes lp-spin{to{transform:rotate(360deg)}}
-
-/* ===== INDEX SECTION ===== */
-.lp-index{margin-top:52px}
-.lp-index-head h2{
-  font-size:clamp(22px,2.4vw,30px);letter-spacing:-.8px;
-  color:#0f263c;margin:10px 0 0;font-weight:800;
-}
-.lp-index-grid{
-  display:grid;grid-template-columns:repeat(3,minmax(0,1fr));
-  gap:16px;margin-top:26px;
-}
-
-/* ===== CARD ===== */
-.lp-card{
-  display:flex;flex-direction:column;
-  background:#fff;border:1px solid #e2eaf1;border-radius:18px;
+.lg-index-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:16px}
+.lg-icard{
+  display:flex;flex-direction:column;background:#fff;border:1px solid #e2eaf1;border-radius:18px;
   padding:24px;text-decoration:none;color:inherit;
-  transition:transform .22s ease,border-color .22s ease,box-shadow .22s ease;
-  position:relative;overflow:hidden;
+  transition:transform .22s,border-color .22s,box-shadow .22s;position:relative;overflow:hidden;
 }
-.lp-card::after{
-  content:"";position:absolute;left:0;right:0;bottom:0;height:3px;
-  background:linear-gradient(90deg,#20b99b,#2499cc);
-  opacity:0;transition:opacity .22s;
+.lg-icard::before{
+  content:"";position:absolute;left:0;right:0;top:0;height:4px;
+  background:linear-gradient(90deg,var(--accent),var(--accent-2));
+  opacity:.9;
 }
-.lp-card:hover{
-  transform:translateY(-4px);
-  border-color:#b9e4d9;
-  box-shadow:0 20px 40px -18px rgba(20,54,80,.22);
-}
-.lp-card:hover::after{opacity:1}
-.lp-card-top{
-  display:flex;align-items:center;justify-content:space-between;
-  margin-bottom:18px;
-}
-.lp-card-ico{
-  width:44px;height:44px;display:grid;place-items:center;
-  border-radius:12px;background:linear-gradient(135deg,#eaf8f5,#e6f2fa);
-  color:#128a7d;border:1px solid rgba(20,150,132,.15);
-}
-.lp-card-ico.sm{width:34px;height:34px;border-radius:10px}
-.lp-card-no{
-  font-size:11px;font-weight:900;letter-spacing:2px;
-  color:#b2c2d0;
-}
-.lp-card h3{
-  font-size:17px;line-height:1.35;margin:0 0 10px;
-  color:#0f263c;font-weight:750;letter-spacing:-.3px;
-}
-.lp-card p{
-  font-size:12.5px;line-height:1.75;color:#677a8e;
-  margin:0 0 18px;flex:1;
-}
-.lp-card-link{
-  display:inline-flex;align-items:center;gap:7px;
-  font-size:11.5px;font-weight:800;color:#0f9488;
-  letter-spacing:.3px;
-}
-.lp-card-link svg{transition:transform .2s}
-.lp-card:hover .lp-card-link svg{transform:translate(2px,-2px)}
-.lp-card.sm{padding:20px}
-.lp-card.sm h3{font-size:14.5px;margin-top:6px}
+.lg-icard:hover{transform:translateY(-4px);border-color:color-mix(in srgb,var(--accent) 30%,#e2eaf1);box-shadow:0 22px 44px -20px rgba(20,54,80,.25)}
+.lg-icard-top{display:flex;align-items:center;justify-content:space-between;margin-bottom:18px}
+.lg-ico{width:44px;height:44px;display:grid;place-items:center;border-radius:12px;background:var(--accent-soft);color:var(--accent);border:1px solid color-mix(in srgb,var(--accent) 22%,transparent)}
+.lg-ico.sm{width:34px;height:34px;border-radius:10px}
+.lg-no{font-size:11px;font-weight:900;letter-spacing:2px;color:#b2c2d0}
+.lg-icard h3{font-size:17px;line-height:1.35;margin:0 0 10px;color:#0f263c;font-weight:750;letter-spacing:-.3px}
+.lg-icard p{font-size:12.5px;line-height:1.75;color:#677a8e;margin:0 0 18px;flex:1}
+.lg-icard-link{display:inline-flex;align-items:center;gap:7px;font-size:11.5px;font-weight:800;color:var(--accent);letter-spacing:.3px}
+.lg-icard-link svg{transition:transform .2s}
+.lg-icard:hover .lg-icard-link svg{transform:translate(2px,-2px)}
 
-/* ===== LAYOUT (detail) ===== */
-.lp-layout{
-  display:grid;grid-template-columns:280px minmax(0,1fr);
-  gap:26px;align-items:start;margin-top:30px;
+/* ============ CTA + MORE (shared on detail) ============ */
+.lg-cta{
+  display:flex;align-items:center;justify-content:space-between;gap:22px;flex-wrap:wrap;
+  margin-top:30px;padding:26px 28px;border-radius:18px;color:#fff;position:relative;overflow:hidden;
+  background:linear-gradient(125deg,#0f2a3e 0%,#163c52 55%,#16515a 100%);
 }
+.lg-cta::before{content:"";position:absolute;right:-60px;top:-60px;width:200px;height:200px;border-radius:50%;background:radial-gradient(circle,color-mix(in srgb,var(--accent) 30%,transparent),transparent 70%)}
+.lg-cta h3{font-size:19px;margin:6px 0 6px;color:#fff;letter-spacing:-.3px}
+.lg-cta p{font-size:11.5px;color:#b6cbda;margin:0;line-height:1.6}
+.lg-cta .lg-eyebrow.plain{color:color-mix(in srgb,var(--accent) 60%,#fff)}
+.lg-cta-actions{display:flex;gap:10px;flex-wrap:wrap;flex-shrink:0;position:relative;z-index:1}
+.lg-btn{display:inline-flex;align-items:center;gap:7px;font-size:11.5px;font-weight:800;text-decoration:none;padding:11px 16px;border-radius:10px;transition:all .2s;letter-spacing:.2px;white-space:nowrap}
+.lg-btn.primary{background:var(--accent);color:#fff}
+.lg-btn.primary:hover{transform:translateY(-1px);filter:brightness(1.08)}
+.lg-btn.ghost{background:rgba(255,255,255,.08);color:#fff;border:1px solid rgba(255,255,255,.16)}
+.lg-btn.ghost:hover{background:rgba(255,255,255,.14)}
 
-/* ===== SIDEBAR ===== */
-.lp-sidebar{
-  background:#fff;border:1px solid #e4ebf2;border-radius:20px;
-  padding:20px;position:sticky;top:96px;
-  box-shadow:0 14px 36px -20px rgba(20,54,80,.15);
-}
-.lp-side-head{padding:4px 6px 16px;border-bottom:1px solid #eef2f6}
-.lp-side-kicker{
-  font-size:9.5px;font-weight:900;letter-spacing:1.8px;
-  color:#92a3b4;text-transform:uppercase;
-}
-.lp-side-head h3{
-  font-size:15px;margin:8px 0 6px;color:#0f263c;
-  font-weight:800;letter-spacing:-.3px;
-}
-.lp-side-head p{font-size:11px;line-height:1.6;color:#7e90a2;margin:0}
+.lg-draft{font-size:11px;line-height:1.75;color:#8fa0b1;margin:20px 0 0;padding:14px 16px;border-radius:10px;background:#f8fafc;border:1px solid #edf1f5}
+.lg-draft b{color:#5f7488}
 
-.lp-side-nav{margin-top:12px}
-.lp-side-nav a{
-  display:grid;
-  grid-template-columns:34px 1fr auto;
-  align-items:center;gap:10px;
-  text-decoration:none;color:#4b6274;
-  padding:11px 10px;border-radius:11px;
-  margin:2px 0;transition:all .18s;
-  position:relative;
+.lg-more{padding-top:38px}
+.lg-more h2{font-size:22px;letter-spacing:-.5px;color:#0f263c;margin:8px 0 16px;font-weight:800}
+.lg-more-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:14px}
+.lg-more-card{display:flex;flex-direction:column;background:#fff;border:1px solid #e2eaf1;border-radius:16px;padding:20px;text-decoration:none;color:inherit;transition:transform .2s,border-color .2s}
+.lg-more-card:hover{transform:translateY(-3px);border-color:color-mix(in srgb,var(--accent) 35%,#e2eaf1)}
+.lg-more-top{display:flex;align-items:center;justify-content:space-between;margin-bottom:12px}
+.lg-more-card h3{font-size:14.5px;color:#0f263c;margin:0 0 12px;line-height:1.4;font-weight:750}
+.lg-more-link{display:inline-flex;align-items:center;gap:6px;font-size:11px;font-weight:800;color:var(--accent)}
+
+/* ============ PAGE 01 PRIVACY ============ */
+.lg-split-hero{
+  display:grid;grid-template-columns:minmax(0,1.4fr) minmax(0,1fr);gap:36px;align-items:center;
+  background:linear-gradient(125deg,#ffffff,#f5fbf9 60%,#e9f7f4);
+  border:1px solid #dbe7ee;border-radius:26px;padding:48px;
+  box-shadow:0 22px 55px -22px rgba(20,54,80,.18);
 }
-.lp-side-ico{
-  width:34px;height:34px;display:grid;place-items:center;
-  border-radius:9px;background:#f2f7fa;color:#6a8296;
+.lg-split-copy h1{font-size:clamp(32px,4vw,48px);letter-spacing:-1.6px;line-height:1.08;margin:16px 0 14px;color:#0d2237;font-weight:850}
+.lg-split-copy p{color:#5f7488;font-size:14px;line-height:1.85;margin:0;max-width:560px}
+.lg-split-art{display:grid;place-items:center;position:relative;min-height:220px}
+.lg-shield-art{
+  width:190px;height:190px;border-radius:50%;display:grid;place-items:center;
+  background:radial-gradient(circle at 50% 40%,#eaf8f5,#d8f0eb);
+  color:#149987;position:relative;
+  box-shadow:0 20px 50px -20px rgba(20,150,132,.5),0 0 0 1px rgba(255,255,255,.8) inset;
+}
+.lg-shield-ring{position:absolute;inset:-16px;border-radius:50%;border:1.5px dashed rgba(20,150,132,.4);animation:lgspin 40s linear infinite}
+@keyframes lgspin{to{transform:rotate(360deg)}}
+
+.lg-timeline{position:relative;margin-top:36px;padding-left:12px}
+.lg-timeline::before{
+  content:"";position:absolute;left:32px;top:10px;bottom:10px;width:2px;
+  background:linear-gradient(180deg,var(--accent),transparent);
+}
+.lg-tl-item{display:grid;grid-template-columns:64px minmax(0,1fr);gap:20px;padding:14px 0;position:relative}
+.lg-tl-marker{
+  width:44px;height:44px;border-radius:50%;display:grid;place-items:center;
+  background:#fff;border:2px solid var(--accent);color:var(--accent);
+  font-size:11px;font-weight:900;letter-spacing:.5px;position:relative;z-index:1;
+  box-shadow:0 6px 16px -6px rgba(20,150,132,.4);
+}
+.lg-tl-body{background:#fff;border:1px solid #e4ebf2;border-radius:14px;padding:20px 22px;box-shadow:0 10px 26px -18px rgba(20,54,80,.16)}
+.lg-tl-body h2{font-size:16px;color:#0f263c;margin:0 0 8px;font-weight:750}
+.lg-tl-body p{font-size:12.8px;line-height:1.85;color:#5f7488;margin:0}
+
+/* ============ PAGE 02 TERMS ============ */
+.lg-banner{
+  display:flex;align-items:center;justify-content:space-between;gap:30px;
+  background:linear-gradient(120deg,#0f2a3e,#1a3e56 60%,#3a2a10);
+  color:#fff;border-radius:26px;padding:44px 46px;position:relative;overflow:hidden;
+}
+.lg-banner::before{content:"";position:absolute;right:-60px;bottom:-60px;width:260px;height:260px;border-radius:50%;background:radial-gradient(circle,rgba(184,115,15,.3),transparent 70%)}
+.lg-banner h1{font-size:clamp(32px,4vw,48px);letter-spacing:-1.6px;line-height:1.08;margin:16px 0 14px;font-weight:850;color:#fff}
+.lg-banner p{color:#c6d4df;font-size:14px;line-height:1.8;margin:0;max-width:580px}
+.lg-banner .lg-eyebrow{color:#f3c47a}
+.lg-banner .lg-pill{background:rgba(243,196,122,.15);color:#f3c47a}
+.lg-banner-badge{
+  display:flex;flex-direction:column;align-items:center;gap:10px;
+  color:#f3c47a;font-size:10px;font-weight:900;letter-spacing:2px;text-align:center;
+  padding:18px 22px;border-radius:16px;border:1.5px dashed rgba(243,196,122,.4);
+  flex-shrink:0;background:rgba(243,196,122,.05);
+}
+.lg-banner-badge span{line-height:1.5}
+
+.lg-terms-nav{display:flex;gap:8px;flex-wrap:wrap;margin:28px 0 20px}
+.lg-terms-nav-item{
+  display:inline-flex;align-items:center;gap:8px;
+  font-size:11.5px;font-weight:700;color:#6b5a3a;text-decoration:none;
+  padding:8px 12px;border-radius:9px;background:#fdf3e2;border:1px solid #f5e2c1;
   transition:all .18s;
 }
-.lp-side-txt{min-width:0}
-.lp-side-txt b{
-  display:block;font-size:12px;font-weight:700;color:#1b3348;
-  line-height:1.3;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;
-  transition:color .18s;
-}
-.lp-side-txt small{
-  display:block;font-size:9.5px;letter-spacing:.8px;
-  color:#9aacba;margin-top:2px;font-weight:600;
-}
-.lp-side-no{
-  font-size:9px;font-weight:900;color:#b3c1cf;letter-spacing:1px;
-}
-.lp-side-nav a:hover{background:#f5fafb}
-.lp-side-nav a:hover .lp-side-ico{background:#e3f4ef;color:#118a7d}
-.lp-side-nav a.active{
-  background:linear-gradient(90deg,#eaf8f5,#f5fbfa);
-  box-shadow:inset 3px 0 #1ab79b;
-}
-.lp-side-nav a.active .lp-side-ico{background:#1ab79b;color:#fff}
-.lp-side-nav a.active .lp-side-txt b{color:#087e73}
-.lp-side-nav a.active .lp-side-no{color:#118a7d}
+.lg-terms-nav-item span{font-size:9px;font-weight:900;color:#b8730f;letter-spacing:.5px}
+.lg-terms-nav-item:hover{background:#f7e6c6;border-color:#e6ce9d;transform:translateY(-1px)}
 
-.lp-side-help{
-  margin-top:18px;padding:16px 14px;border-radius:13px;
-  background:linear-gradient(140deg,#0f2a3e,#123d4f);color:#fff;
+.lg-terms-body{display:grid;grid-template-columns:1fr;gap:16px}
+.lg-terms-block{
+  background:#fff;border:1px solid #f0e6d2;border-left:4px solid #b8730f;
+  border-radius:14px;padding:22px 24px;box-shadow:0 12px 30px -22px rgba(90,60,20,.25);
+  scroll-margin-top:100px;
 }
-.lp-side-help-ico{
-  width:34px;height:34px;border-radius:9px;
-  display:grid;place-items:center;margin-bottom:10px;
-  background:rgba(94,224,194,.15);color:#5ee0c2;
+.lg-terms-block-head{display:flex;align-items:center;gap:12px;margin-bottom:10px}
+.lg-terms-badge{
+  display:grid;place-items:center;width:34px;height:34px;border-radius:9px;
+  background:#fdf3e2;color:#b8730f;font-size:11px;font-weight:900;letter-spacing:.5px;
+  border:1px solid #f0e0c2;
 }
-.lp-side-help b{font-size:12.5px;display:block}
-.lp-side-help p{font-size:10.5px;line-height:1.6;color:#b4c8d6;margin:5px 0 10px}
-.lp-side-help a{
-  display:inline-block;font-size:11px;font-weight:800;
-  color:#5ee0c2;text-decoration:none;letter-spacing:.3px;
-}
+.lg-terms-block h2{font-size:16px;color:#3b2a10;margin:0;font-weight:750}
+.lg-terms-block p{font-size:12.8px;line-height:1.85;color:#5d4f39;margin:0;padding-left:46px}
 
-/* ===== MAIN ===== */
-.lp-main{min-width:0;display:flex;flex-direction:column;gap:24px}
+/* ============ PAGE 03 NETWORK ============ */
+.lg-net-hero{
+  background:linear-gradient(125deg,#ffffff 0%,#f4fbf7 55%,#e6f8ef 100%);
+  border:1px solid #d6ebdf;border-radius:26px;padding:48px;
+  box-shadow:0 22px 55px -22px rgba(10,60,40,.2);
+}
+.lg-net-hero h1{font-size:clamp(32px,4vw,48px);letter-spacing:-1.6px;line-height:1.08;margin:16px 0 14px;color:#0d2f24;font-weight:850;max-width:720px}
+.lg-net-hero p{color:#5a7268;font-size:14px;line-height:1.85;margin:0;max-width:660px}
+.lg-net-diagram{
+  display:flex;align-items:center;justify-content:center;gap:0;margin-top:36px;
+  padding:24px 12px;border-radius:16px;background:rgba(255,255,255,.6);
+  border:1px dashed rgba(14,159,110,.35);flex-wrap:wrap;
+}
+.lg-net-node{
+  display:flex;flex-direction:column;align-items:center;gap:8px;
+  padding:16px 22px;border-radius:14px;color:#0a3a2a;font-size:11px;font-weight:900;letter-spacing:1px;
+  background:#fff;border:1.5px solid rgba(14,159,110,.4);min-width:100px;
+}
+.lg-net-node.buyer{color:#12739b;border-color:rgba(18,115,155,.4)}
+.lg-net-node.vendor{color:#0e9f6e;border-color:rgba(14,159,110,.4)}
+.lg-net-node.handshake{background:linear-gradient(135deg,#0e9f6e,#12739b);color:#fff;border:none;box-shadow:0 12px 26px -12px rgba(14,159,110,.6)}
+.lg-net-line{width:60px;height:2px;background:linear-gradient(90deg,#12739b,#0e9f6e);opacity:.5;flex-shrink:0}
 
-/* TOC */
-.lp-toc{
-  background:#fff;border:1px solid #e4ebf2;border-radius:16px;
-  padding:16px 18px;box-shadow:0 10px 26px -18px rgba(20,54,80,.16);
-}
-.lp-toc-title{
-  display:block;font-size:9.5px;font-weight:900;letter-spacing:1.6px;
-  color:#92a3b4;text-transform:uppercase;margin-bottom:10px;
-}
-.lp-toc-list{
-  display:flex;flex-wrap:wrap;gap:8px;
-}
-.lp-toc-list a{
-  display:inline-flex;align-items:center;gap:7px;
-  font-size:11px;font-weight:600;color:#5b7288;
-  text-decoration:none;padding:6px 10px;border-radius:8px;
-  background:#f4f8fa;transition:all .18s;
-}
-.lp-toc-num{
-  font-size:9px;font-weight:900;color:#a2b3c1;letter-spacing:.5px;
-}
-.lp-toc-list a:hover{background:#e8f6f2;color:#0f9488}
-.lp-toc-list a.active{background:#1ab79b;color:#fff}
-.lp-toc-list a.active .lp-toc-num{color:rgba(255,255,255,.8)}
+.lg-net-split{display:grid;grid-template-columns:1fr 1fr;gap:18px;margin-top:26px}
+.lg-net-col{background:#fff;border:1px solid #e4ebf2;border-radius:18px;padding:24px}
+.lg-net-col.buyer{border-top:4px solid #12739b}
+.lg-net-col.vendor{border-top:4px solid #0e9f6e}
+.lg-net-col-title{display:flex;align-items:center;gap:8px;font-size:12px;font-weight:900;letter-spacing:1.2px;text-transform:uppercase;margin:0 0 16px;color:#0a3a2a}
+.lg-net-col.buyer .lg-net-col-title{color:#12739b}
+.lg-net-col.vendor .lg-net-col-title{color:#0e9f6e}
+.lg-net-card{padding:16px 0;border-top:1px solid #eef2f6}
+.lg-net-card:first-of-type{border-top:none;padding-top:0}
+.lg-net-card h4{font-size:14px;color:#0f263c;margin:0 0 6px;font-weight:750}
+.lg-net-card p{font-size:12.3px;line-height:1.8;color:#5f7488;margin:0}
 
-/* Content */
-.lp-content{
-  background:#fff;border:1px solid #e4ebf2;border-radius:20px;
-  padding:34px 38px 30px;
-  box-shadow:0 16px 40px -22px rgba(20,54,80,.16);
-}
-.lp-section{padding:24px 0;border-bottom:1px solid #eef2f6}
-.lp-section:last-of-type{border-bottom:none}
-.lp-section-head{
-  display:flex;align-items:center;gap:14px;margin-bottom:12px;
-}
-.lp-section-num{
-  flex-shrink:0;width:36px;height:36px;border-radius:10px;
-  display:grid;place-items:center;
-  background:linear-gradient(135deg,#eaf8f5,#e6f2fa);
-  color:#128a7d;font-size:11px;font-weight:900;letter-spacing:1px;
-  border:1px solid rgba(20,150,132,.14);
-}
-.lp-section h2{
-  font-size:16.5px;line-height:1.4;color:#0f263c;
-  margin:0;font-weight:750;letter-spacing:-.2px;
-}
-.lp-section p{
-  font-size:13px;line-height:1.9;color:#5f7488;
-  margin:0;padding-left:50px;
-}
+.lg-net-shared{margin-top:26px;background:#fff;border:1px solid #e4ebf2;border-radius:18px;padding:26px}
+.lg-net-shared>h3{font-size:15px;color:#0f263c;margin:0 0 16px;font-weight:800;letter-spacing:-.2px}
+.lg-net-shared-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}
+.lg-net-shared-card{display:grid;grid-template-columns:36px 1fr;gap:12px;padding:14px;border-radius:12px;background:#f7fbf9;border:1px solid #e4f1ea}
+.lg-net-shared-card>span{width:32px;height:32px;border-radius:9px;display:grid;place-items:center;background:#0e9f6e;color:#fff;font-size:10px;font-weight:900}
+.lg-net-shared-card h4{font-size:13px;color:#0f263c;margin:0 0 4px;font-weight:750}
+.lg-net-shared-card p{font-size:11.5px;line-height:1.75;color:#5f7488;margin:0}
 
-/* Contact */
-.lp-contact{
-  display:flex;align-items:center;justify-content:space-between;
-  gap:24px;flex-wrap:wrap;
-  margin-top:28px;padding:26px 28px;border-radius:16px;
-  background:linear-gradient(125deg,#0f2a3e 0%,#163c52 55%,#16515a 100%);
-  color:#fff;position:relative;overflow:hidden;
+/* ============ PAGE 04 DISCLAIMER ============ */
+.lg-alert-hero{
+  display:grid;grid-template-columns:auto 1fr;gap:28px;align-items:center;
+  background:linear-gradient(125deg,#fffaf2,#fef3e2 60%,#fde9c5);
+  border:1px solid #f2d9a8;border-radius:26px;padding:44px 46px;
+  box-shadow:0 22px 55px -22px rgba(120,70,10,.22);
 }
-.lp-contact::before{
-  content:"";position:absolute;right:-60px;top:-60px;
-  width:200px;height:200px;border-radius:50%;
-  background:radial-gradient(circle,rgba(94,224,194,.2),transparent 70%);
+.lg-alert-icon{
+  width:96px;height:96px;border-radius:24px;display:grid;place-items:center;
+  background:linear-gradient(145deg,#f59e0b,#d97706);color:#fff;
+  box-shadow:0 18px 40px -14px rgba(217,119,6,.6);
 }
-.lp-contact h3{font-size:19px;margin:6px 0 6px;color:#fff;letter-spacing:-.3px}
-.lp-contact p{font-size:11.5px;line-height:1.6;color:#b6cbda;margin:0}
-.lp-contact .lp-eyebrow.plain{color:#5ee0c2}
-.lp-contact-actions{
-  display:flex;gap:10px;flex-wrap:wrap;flex-shrink:0;position:relative;z-index:1;
-}
-.lp-btn{
-  display:inline-flex;align-items:center;gap:7px;
-  font-size:11.5px;font-weight:800;text-decoration:none;
-  padding:11px 16px;border-radius:10px;transition:all .2s;
-  letter-spacing:.2px;white-space:nowrap;
-}
-.lp-btn.primary{background:#1ab99b;color:#062c35}
-.lp-btn.primary:hover{background:#1ecaa9;transform:translateY(-1px)}
-.lp-btn.ghost{
-  background:rgba(255,255,255,.08);color:#fff;
-  border:1px solid rgba(255,255,255,.16);
-}
-.lp-btn.ghost:hover{background:rgba(255,255,255,.14)}
+.lg-alert-copy h1{font-size:clamp(32px,4vw,46px);letter-spacing:-1.5px;line-height:1.08;margin:14px 0 12px;color:#3b2105;font-weight:850}
+.lg-alert-copy p{color:#6b4a1f;font-size:14px;line-height:1.8;margin:0;max-width:640px}
 
-/* Draft notice */
-.lp-draft{
-  font-size:11px;line-height:1.75;color:#8fa0b1;
-  margin:22px 0 0;padding:14px 16px;border-radius:10px;
-  background:#f8fafc;border:1px solid #edf1f5;
+.lg-alert-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:16px;margin-top:26px}
+.lg-alert-card{
+  background:#fff;border:1px solid #f0e2c8;border-radius:16px;padding:22px 24px;
+  position:relative;transition:transform .2s,box-shadow .2s;
 }
-.lp-draft b{color:#5f7488}
+.lg-alert-card:hover{transform:translateY(-3px);box-shadow:0 18px 36px -22px rgba(120,70,10,.3)}
+.lg-alert-card::before{content:"";position:absolute;left:0;top:18px;bottom:18px;width:3px;border-radius:2px;background:#d97706}
+.lg-alert-card-top{display:flex;align-items:center;justify-content:space-between;margin-bottom:12px;padding-left:12px}
+.lg-alert-num{font-size:11px;font-weight:900;letter-spacing:1.5px;color:#d97706}
+.lg-alert-tag{font-size:9px;font-weight:900;letter-spacing:1.5px;color:#b45309;padding:4px 8px;border-radius:6px;background:#fef3e2;border:1px solid #f2d9a8}
+.lg-alert-card h3{font-size:15px;color:#3b2105;margin:0 0 8px;font-weight:750;padding-left:12px}
+.lg-alert-card p{font-size:12.5px;line-height:1.85;color:#5d4526;margin:0;padding-left:12px}
 
-/* Related */
-.lp-related-head h2{
-  font-size:20px;letter-spacing:-.5px;color:#0f263c;
-  margin:8px 0 0;font-weight:800;
+/* ============ PAGE 05 COPYRIGHT ============ */
+.lg-editorial-hero{
+  display:flex;align-items:center;justify-content:space-between;gap:30px;
+  background:linear-gradient(125deg,#faf8ff,#f1edff 65%,#e8e1ff);
+  border:1px solid #ddd2ff;border-radius:26px;padding:48px;
+  box-shadow:0 22px 55px -22px rgba(80,60,180,.22);position:relative;overflow:hidden;
 }
-.lp-related-grid{
-  display:grid;grid-template-columns:repeat(3,minmax(0,1fr));
-  gap:14px;margin-top:18px;
+.lg-editorial-hero h1{font-size:clamp(32px,4vw,48px);letter-spacing:-1.6px;line-height:1.08;margin:16px 0 14px;color:#1f1650;font-weight:850;max-width:720px}
+.lg-editorial-hero p{color:#5f5878;font-size:14px;line-height:1.85;margin:0;max-width:640px}
+.lg-editorial-mark{
+  font-size:180px;line-height:1;color:#7c5cff;opacity:.18;font-weight:900;
+  font-family:Georgia,serif;flex-shrink:0;transform:translateY(-8px);
 }
 
-/* ===== FOOTER ===== */
-.lp-footer{
-  background:#0b1c2a;color:#dbe6ed;
-  padding:38px max(22px,calc((100% - 1200px)/2)) 28px;
-  position:relative;z-index:1;
-}
-.lp-footer-inner{max-width:1200px;margin:0 auto}
-.lp-footer-brand{display:flex;align-items:center;gap:12px}
-.lp-mark{
-  display:grid;place-items:center;width:46px;height:46px;
-  border-radius:13px;background:linear-gradient(145deg,#1685a8,#20b99b);
-  font-size:22px;font-weight:900;color:#fff;
-  box-shadow:0 10px 24px -8px rgba(32,185,155,.5);
-}
-.lp-footer-brand b{
-  display:block;font-size:16px;letter-spacing:2.5px;color:#fff;
-}
-.lp-footer-brand small{
-  display:block;margin-top:4px;font-size:10.5px;color:#9fb3c1;
-  letter-spacing:.5px;
-}
-.lp-footer-links{
-  display:flex;gap:12px 22px;flex-wrap:wrap;
-  margin:26px 0 20px;padding:20px 0;
-  border-top:1px solid #263b4b;border-bottom:1px solid #263b4b;
-}
-.lp-footer-links a{
-  font-size:11px;text-decoration:none;color:#b8c9d4;
-  transition:color .18s;font-weight:600;
-}
-.lp-footer-links a:hover{color:#5ee0c2}
-.lp-footer-meta{
-  display:flex;gap:10px 22px;flex-wrap:wrap;margin-bottom:20px;
-}
-.lp-footer-meta a{
-  display:inline-flex;align-items:center;gap:6px;
-  font-size:11px;color:#9fb3c1;text-decoration:none;
-  transition:color .18s;
-}
-.lp-footer-meta a:hover{color:#5ee0c2}
-.lp-footer-bottom{
-  display:flex;justify-content:space-between;gap:10px;flex-wrap:wrap;
-  font-size:10.5px;color:#7f95a6;padding-top:20px;
-  border-top:1px solid #263b4b;
-}
+.lg-editorial-list{margin-top:32px;background:#fff;border:1px solid #ece7ff;border-radius:20px;overflow:hidden;box-shadow:0 16px 40px -22px rgba(80,60,180,.18)}
+.lg-editorial-item{display:grid;grid-template-columns:100px 1fr;gap:24px;padding:28px 34px;border-bottom:1px solid #f0ecff}
+.lg-editorial-item:last-child{border-bottom:none}
+.lg-editorial-num{font-size:44px;font-weight:900;color:#e4dcff;line-height:1;letter-spacing:-2px;font-family:Georgia,serif}
+.lg-editorial-content h2{font-size:17px;color:#1f1650;margin:0 0 10px;font-weight:750;letter-spacing:-.2px}
+.lg-editorial-content p{font-size:12.8px;line-height:1.9;color:#5b5570;margin:0}
 
-/* ===== RESPONSIVE ===== */
+/* ============ PAGE 06 CONTACT ============ */
+.lg-contact-hero{
+  background:linear-gradient(125deg,#ffffff 0%,#f2f9ff 55%,#e3f3fc 100%);
+  border:1px solid #cfe6f4;border-radius:26px;padding:44px 46px;
+  box-shadow:0 22px 55px -22px rgba(10,60,100,.2);
+}
+.lg-contact-hero h1{font-size:clamp(32px,4vw,48px);letter-spacing:-1.6px;line-height:1.08;margin:16px 0 14px;color:#062e44;font-weight:850;max-width:700px}
+.lg-contact-hero p{color:#547085;font-size:14px;line-height:1.85;margin:0;max-width:640px}
+.lg-contact-cards{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-top:28px}
+.lg-contact-tile{
+  display:flex;align-items:center;gap:14px;text-decoration:none;color:inherit;
+  padding:18px 20px;border-radius:14px;background:#fff;
+  border:1px solid #d6e9f4;transition:all .2s;
+}
+.lg-contact-tile:hover{transform:translateY(-2px);border-color:#0284c7;box-shadow:0 16px 34px -20px rgba(2,132,199,.35)}
+.lg-ct-ico{width:44px;height:44px;border-radius:12px;display:grid;place-items:center;background:#e6f4fb;color:#0284c7;flex-shrink:0}
+.lg-contact-tile small{display:block;font-size:9.5px;font-weight:900;letter-spacing:1.5px;color:#0284c7;margin-bottom:2px}
+.lg-contact-tile b{font-size:12.5px;color:#062e44;word-break:break-word}
+
+.lg-contact-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:14px;margin-top:26px}
+.lg-contact-card{
+  background:#fff;border:1px solid #e2eaf1;border-radius:16px;padding:22px 24px;position:relative;
+  transition:transform .2s,box-shadow .2s;
+}
+.lg-contact-card:hover{transform:translateY(-2px);box-shadow:0 16px 34px -22px rgba(10,60,100,.28)}
+.lg-contact-card-ico{width:38px;height:38px;border-radius:11px;display:grid;place-items:center;background:#e6f4fb;color:#0284c7;margin-bottom:12px}
+.lg-contact-card-no{position:absolute;top:20px;right:22px;font-size:11px;font-weight:900;color:#b4c8d6;letter-spacing:1px}
+.lg-contact-card h3{font-size:15px;color:#062e44;margin:0 0 8px;font-weight:750}
+.lg-contact-card p{font-size:12.5px;line-height:1.85;color:#5f7488;margin:0}
+
+/* ============ FOOTER ============ */
+.lg-footer{background:#0b1c2a;color:#dbe6ed;padding:38px max(22px,calc((100% - 1160px)/2)) 28px;position:relative;z-index:1}
+.lg-footer-in{max-width:1160px;margin:0 auto}
+.lg-f-brand{display:flex;align-items:center;gap:12px}
+.lg-f-mark{display:grid;place-items:center;width:46px;height:46px;border-radius:13px;background:linear-gradient(145deg,#1685a8,#20b99b);font-size:22px;font-weight:900;color:#fff;box-shadow:0 10px 24px -8px rgba(32,185,155,.5)}
+.lg-f-brand b{display:block;font-size:16px;letter-spacing:2.5px;color:#fff}
+.lg-f-brand small{display:block;margin-top:4px;font-size:10.5px;color:#9fb3c1}
+.lg-f-links{display:flex;gap:12px 22px;flex-wrap:wrap;margin:26px 0 20px;padding:20px 0;border-top:1px solid #263b4b;border-bottom:1px solid #263b4b}
+.lg-f-links a{font-size:11px;text-decoration:none;color:#b8c9d4;transition:color .18s;font-weight:600}
+.lg-f-links a:hover{color:#5ee0c2}
+.lg-f-meta{display:flex;gap:10px 22px;flex-wrap:wrap;margin-bottom:20px}
+.lg-f-meta a{display:inline-flex;align-items:center;gap:6px;font-size:11px;color:#9fb3c1;text-decoration:none;transition:color .18s}
+.lg-f-meta a:hover{color:#5ee0c2}
+.lg-f-bottom{display:flex;justify-content:space-between;gap:10px;flex-wrap:wrap;font-size:10.5px;color:#7f95a6;padding-top:20px;border-top:1px solid #263b4b}
+
+/* ============ RESPONSIVE ============ */
 @media (max-width:980px){
-  .lp-layout{grid-template-columns:1fr}
-  .lp-sidebar{position:static}
-  .lp-side-nav{
-    display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:4px;
-  }
-  .lp-side-help{grid-column:1/-1}
-  .lp-index-grid{grid-template-columns:repeat(2,minmax(0,1fr))}
-  .lp-related-grid{grid-template-columns:repeat(2,minmax(0,1fr))}
-  .lp-hero{padding:40px}
-  .lp-hero-art{width:170px;height:170px;flex-basis:170px}
-  .lp-hero-badge{width:92px;height:92px;font-size:22px;border-radius:26px}
-  .lp-section p{padding-left:0}
+  .lg-index-grid{grid-template-columns:repeat(2,minmax(0,1fr))}
+  .lg-split-hero{grid-template-columns:1fr}
+  .lg-split-art{display:none}
+  .lg-net-split{grid-template-columns:1fr}
+  .lg-net-shared-grid{grid-template-columns:1fr}
+  .lg-alert-grid{grid-template-columns:1fr}
+  .lg-editorial-mark{font-size:120px}
+  .lg-contact-cards{grid-template-columns:1fr}
+  .lg-contact-grid{grid-template-columns:1fr}
+  .lg-more-grid{grid-template-columns:repeat(2,minmax(0,1fr))}
+  .lg-banner{flex-direction:column;align-items:flex-start;padding:38px}
+  .lg-editorial-hero{padding:38px}
+  .lg-hero-chips{font-size:11px}
 }
-
 @media (max-width:640px){
-  .lp-page{padding:16px 13px 60px}
-  .lp-crumb{margin:2px 0 16px;font-size:11px}
-  .lp-hero{padding:26px 22px;border-radius:22px;min-height:0}
-  .lp-hero-art{display:none}
-  .lp-hero h1{font-size:32px;letter-spacing:-1.1px;margin-top:14px}
-  .lp-hero p{font-size:13px;line-height:1.75}
-  .lp-hero-meta{font-size:10.5px;gap:8px 16px;margin-top:20px}
-  .lp-index{margin-top:34px}
-  .lp-index-grid{grid-template-columns:1fr;gap:12px}
-  .lp-card{padding:20px}
-  .lp-layout{margin-top:20px;gap:16px}
-  .lp-sidebar{padding:14px}
-  .lp-side-nav{grid-template-columns:1fr}
-  .lp-content{padding:22px 18px;border-radius:16px}
-  .lp-section{padding:20px 0}
-  .lp-section-head{gap:12px;margin-bottom:10px}
-  .lp-section-num{width:32px;height:32px;border-radius:9px}
-  .lp-section h2{font-size:14.5px}
-  .lp-section p{font-size:12px;line-height:1.85}
-  .lp-contact{padding:20px;flex-direction:column;align-items:flex-start}
-  .lp-contact h3{font-size:17px}
-  .lp-contact-actions{width:100%}
-  .lp-btn{flex:1;justify-content:center}
-  .lp-related-grid{grid-template-columns:1fr}
-  .lp-related-head h2{font-size:18px}
-  .lp-toc-list a{font-size:10.5px;padding:5px 9px}
-  .lp-footer{padding:28px 16px 22px}
-  .lp-footer-links{gap:12px 16px;margin:22px 0 16px;padding:16px 0}
-  .lp-footer-bottom{flex-direction:column;line-height:1.6}
+  .lg-page{padding:16px 13px 60px}
+  .lg-crumb{margin:2px 0 16px;font-size:11px}
+  .lg-index-hero,.lg-split-hero,.lg-net-hero,.lg-alert-hero,.lg-editorial-hero,.lg-contact-hero,.lg-banner{padding:26px 22px;border-radius:20px}
+  .lg-index-hero h1,.lg-split-copy h1,.lg-net-hero h1,.lg-alert-copy h1,.lg-editorial-hero h1,.lg-contact-hero h1,.lg-banner h1{font-size:30px;letter-spacing:-1px}
+  .lg-index-grid,.lg-more-grid{grid-template-columns:1fr;gap:12px}
+  .lg-timeline{padding-left:0}
+  .lg-timeline::before{left:22px}
+  .lg-tl-item{grid-template-columns:48px minmax(0,1fr);gap:12px}
+  .lg-tl-marker{width:36px;height:36px;font-size:10px}
+  .lg-tl-body{padding:16px 16px}
+  .lg-tl-body h2,.lg-terms-block h2,.lg-alert-card h3,.lg-editorial-content h2,.lg-contact-card h3{font-size:14px}
+  .lg-tl-body p,.lg-terms-block p,.lg-alert-card p,.lg-editorial-content p,.lg-contact-card p{font-size:12px;line-height:1.85}
+  .lg-terms-block{padding:18px 16px}
+  .lg-terms-block p{padding-left:0}
+  .lg-terms-nav{gap:6px}
+  .lg-terms-nav-item{font-size:10.5px;padding:7px 10px}
+  .lg-banner-badge,.lg-alert-icon{display:none}
+  .lg-net-diagram{flex-direction:column;gap:12px}
+  .lg-net-line{width:2px;height:24px}
+  .lg-net-node{width:100%;max-width:220px}
+  .lg-net-col,.lg-net-shared{padding:18px 16px}
+  .lg-editorial-item{grid-template-columns:1fr;gap:6px;padding:22px}
+  .lg-editorial-num{font-size:32px}
+  .lg-contact-tile{padding:14px}
+  .lg-contact-tile b{font-size:11.5px}
+  .lg-cta{padding:20px;flex-direction:column;align-items:flex-start}
+  .lg-cta h3{font-size:17px}
+  .lg-cta-actions{width:100%}
+  .lg-btn{flex:1;justify-content:center}
+  .lg-footer{padding:28px 16px 22px}
+  .lg-f-links{gap:12px 16px;margin:22px 0 16px;padding:16px 0}
+  .lg-f-bottom{flex-direction:column;line-height:1.6}
 }
-
 @media (prefers-reduced-motion:reduce){
-  .lp-ring{animation:none}
-  .lp-card,.lp-side-nav a{transition:none}
+  .lg-shield-ring{animation:none}
+  .lg-icard,.lg-more-card,.lg-alert-card,.lg-contact-card,.lg-contact-tile{transition:none}
 }
 `
