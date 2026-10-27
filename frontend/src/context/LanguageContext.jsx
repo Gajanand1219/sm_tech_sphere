@@ -131,7 +131,7 @@ const translations = {
     backBtn: 'Back',
     secureAccessLabel: 'SECURE ACCESS',
     welcomeBack: 'Welcome Back',
-    signInSub: 'Sign In To Access Your Dashboard.',
+    signInSub: 'Sign in to access your dashboard.',
 
     emailLabel: 'Email',
     emailPlaceholder: 'Enter Your Email',
@@ -464,7 +464,7 @@ const translations = {
     homeFormMobile: 'Mobile Number',
     homeFormEmail: 'Email ID',
     homeFormMessage: 'Tell us about your requirement...',
-    homeFormSend: 'SEND ENQUIRY',
+    homeFormSend: 'Send Enquiry',
     homeFormSending: 'SENDING...',
 
     homeContactFillAll: 'Please fill in all fields.',
