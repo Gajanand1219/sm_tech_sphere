@@ -86,56 +86,92 @@ function Footer() {
   const { t } = useLanguage()
 
   return (
-    <footer className="footer">
-      <div className="section-container">
-        <div className="footer-main">
-          <div className="footer-brand">
-            <img
-              src="/image.png"
-              alt="S&M CleanTech"
-              className="footer__logo-image"
-            />
-            <p>ENVIQUO</p>
-            <span>{t('footerTagline')}</span>
-          </div>
+          
+      <footer className="footer">
+        <div className="section-container">
+          <div className="footer-main">
 
-          <div className="footer-column">
-            <h4>{t('footerPlatform')}</h4>
-            <Link to="/">{t('Home')}</Link>
-            <Link to="/solutions">{t('Domain')}</Link>
-            <Link to="/how-it-works">{t('About Us')}</Link>
-            <a href="#contact">{t('footerContactLink')}</a>
-          </div>
+            {/* Brand */}
+            <div className="footer-brand">
+              <Link to="/" className="footer-brand__logo">
+                <img
+                  src="/image.png"
+                  alt="ENVIQUO"
+                  className="footer__logo-image"
+                />
+                <span>ENVIQUO</span>
+              </Link>
+              <p className="footer-brand__tagline">
+                {t('footerTagline')}
+              </p>
+            </div>
 
-          <div className="footer-column">
-            <h4>{t('footerJoinNetwork')}</h4>
-            <Link to="/register/buyer">{t('Register as Buyer')}</Link>
-            <Link to="/register/vendor">{t('Register as Vendor')}</Link>
-            <Link to="/login">{t('Login')}</Link>
-          </div>
+            {/* Platform */}
+            <div className="footer-column">
+              <h4>{t('footerPlatform')}</h4>
+              <Link to="/">{t('Home')}</Link>
+              <Link to="/solutions">{t('Domain')}</Link>
+              <Link to="/how-it-works">{t('About Us')}</Link>
+              <a href="#contact">{t('footerContactLink')}</a>
+            </div>
 
-          <div className="footer-column footer-contact">
-            <h4>{t('footerContact')}</h4>
-            <p>Enviquo SM Pvt. Ltd.</p>
-            <p>
-              Email:{' '}
+            {/* Join Network */}
+            <div className="footer-column">
+              <h4>{t('footerJoinNetwork')}</h4>
+              <Link to="/register/buyer">
+                {t('Register as Buyer')}
+              </Link>
+              <Link to="/register/vendor">
+                {t('Register as Vendor')}
+              </Link>
+              <Link to="/login">{t('Login')}</Link>
+            </div>
+
+            {/* Legal Policies */}
+            <div className="footer-column footer-legal">
+              <h4>Legal & Policies</h4>
+              <Link to="/privacy-policy">Privacy Policy</Link>
+              <Link to="/terms-and-conditions">
+                Terms & Conditions
+              </Link>
+              <Link to="/buyer-vendor-policy">
+                Buyer & Vendor Policy
+              </Link>
+              <Link to="/disclaimer">Disclaimer</Link>
+              <Link to="/copyright">Copyright Policy</Link>
+              <Link to="/contact-grievance">
+                Contact & Grievance
+              </Link>
+            </div>
+
+            {/* Contact */}
+            <div className="footer-column footer-contact">
+              <h4>{t('footerContact')}</h4>
+              <p className="footer-contact__company">
+                Enviquo SM Pvt. Ltd.
+              </p>
+
               <a
+                className="footer-contact__email"
                 href="mailto:smteschsphere2910@gmail.com"
-                style={{ color: 'blue', textDecoration: 'none' }}
               >
-                smteschsphere2910@gmail.com
+                ✉ smteschsphere2910@gmail.com
               </a>
-            </p>
-            <p>{t('footerCountry')}</p>
+
+              <p className="footer-contact__country">
+                {t('footerCountry')}
+              </p>
+            </div>
+          </div>
+
+          {/* Copyright */}
+          <div className="footer-bottom">
+            <span>{t('footerRights')}</span>
+            <span>{t('footerDomains')}</span>
           </div>
         </div>
+      </footer>
 
-        <div className="footer-bottom">
-          <span>{t('footerRights')}</span>
-          <span>{t('footerDomains')}</span>
-        </div>
-      </div>
-    </footer>
   )
 }
 
