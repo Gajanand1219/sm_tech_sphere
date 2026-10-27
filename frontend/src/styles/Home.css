@@ -3462,3 +3462,42 @@
     transition: none;
   }
 }
+
+
+/* Mobile: Legal Links and Contact side by side */
+@media (max-width: 700px) {
+  .footer-main {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 28px 18px;
+  }
+
+  .footer-brand {
+    grid-column: 1 / -1;
+  }
+
+  /* Legal left, Contact right */
+  .footer-legal {
+    grid-column: 1;
+    grid-row: auto;
+  }
+
+  .footer-contact {
+    grid-column: 2;
+    grid-row: auto;
+    min-width: 0;
+  }
+
+  .footer-contact__email {
+    overflow-wrap: anywhere;
+    word-break: break-word;
+  }
+
+  .footer-column h4 {
+    font-size: 13px;
+  }
+
+  .footer-column > a {
+    font-size: 12px;
+  }
+}
