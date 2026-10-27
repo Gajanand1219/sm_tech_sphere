@@ -1753,7 +1753,7 @@ export default function RegistrationForm({ type }) {
 
                     .map(renderField)}
 
-                </div>
+                </div> <br></br>
 
 
 
