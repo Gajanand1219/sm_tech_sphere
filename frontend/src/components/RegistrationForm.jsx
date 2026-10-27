@@ -1121,7 +1121,7 @@ export default function RegistrationForm({ type }) {
 
           <small className="select-help">
 
-            Fill the field and press Enter to add the next one.
+            Fill the field and press enter to add the next one.
 
           </small>
 
