@@ -385,7 +385,7 @@ export default function VendorEnquiries() {
         </nav>
 
         <div className="ev-side-foot">
-          <b>SM Techsphere Pvt Ltd.</b>
+           <b>Enviquo SM Pvt. Ltd.</b>
           Vendor workspace
         </div>
       </aside>
