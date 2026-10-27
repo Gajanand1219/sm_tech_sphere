@@ -99,7 +99,7 @@ function Footer() {
                   alt="ENVIQUO"
                   className="footer__logo-image"
                 />
-                <span>ENVIQUO</span>
+                <span>Enviquo SM Pvt. Ltd.</span>
               </Link>
               <p className="footer-brand__tagline">
                 {t('footerTagline')}
