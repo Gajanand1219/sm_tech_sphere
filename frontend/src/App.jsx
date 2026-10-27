@@ -35,6 +35,7 @@ import AdminEnquiries from './pages/AdminEnquiries'
 
 import ProfilePage from './pages/ProfilePage'
 import Welcome from './pages/welcome'
+import LegalPages from './pages/LegalPages'
 
 // Shared
 import CRM from './pages/CRM'
@@ -170,6 +171,14 @@ export default function App() {
               </ProtectedRoute>
             }
           />
+
+          <Route path="/privacy-policy" element={<LegalPages />} />
+          <Route path="/terms-and-conditions" element={<LegalPages />} />
+          <Route path="/buyer-vendor-policy" element={<LegalPages />} />
+          <Route path="/disclaimer" element={<LegalPages />} />
+          <Route path="/copyright" element={<LegalPages />} />
+          <Route path="/contact-grievance" element={<LegalPages />} />
+
         </Routes>
 
         <FloatingChatButton />
