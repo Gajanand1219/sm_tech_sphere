@@ -226,7 +226,7 @@ const translations = {
     regVendorKicker: 'VENDOR REGISTRATION',
     regBuyerTitle: 'Create Your Buyer Account',
     regVendorTitle: 'Create Your Vendor Account',
-    regSubtitle: 'Fill In Your Business Information To Get Started.',
+    regSubtitle: 'Fill in your business information to get started.',
 
     regSection1: 'Business Information',
     regSection2Buyer: 'Account Information',
@@ -298,7 +298,7 @@ const translations = {
     addrPincodePh: '6-digit',
 
     addrEnterHint:
-      'Fill the field and press Enter to add the next one.',
+      'Fill the field and press enter to add the next one.',
 
     // Multi-select helpers
     regSelectedCount: 'selected',
