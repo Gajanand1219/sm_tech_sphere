@@ -314,7 +314,7 @@ Create the frontend environment file:
 **Windows:**
 
 ```cmd
-.env                                         # Check Once Time
+.env                                         # Check Once Time Frontend Folder
 ```
 
 Configure the backend API URL in `frontend/.env`:
