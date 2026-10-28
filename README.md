@@ -283,7 +283,7 @@ Create your local environment file.
 **Windows:**
 
 ```cmd
-.env                                        # Check Once Time
+.env                                        # Check Once Time Backend Folder
 ```
 
 Configure the required environment variables in `backend/.env`, then start the server:
