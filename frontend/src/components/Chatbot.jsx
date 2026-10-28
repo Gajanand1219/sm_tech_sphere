@@ -331,13 +331,14 @@ export default function Chatbot() {
 
     try {
       const response = await fetch(
-        'https://sm-tech-sphere-mem9.onrender.com/api/chat',
-        {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ question }),
-        }
-      )
+          `${import.meta.env.VITE_API_URL}/chat`,
+          {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ question }),
+          }
+        )
+
 
       const data = await response.json()
 
