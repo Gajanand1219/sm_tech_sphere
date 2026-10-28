@@ -256,7 +256,7 @@ Install the following before running the project:
 
 ## 🚀 Run the Backend
 
-Open a terminal in the project root and run:
+Open a terminal 1 in the project root and run:
 
 ```bash
 cd backend
@@ -302,7 +302,7 @@ Backend URLs:
 
 ## 💻 Run the Frontend
 
-Open another terminal from the project root:
+Open another terminal 2 from the project root:
 
 ```bash
 cd frontend
@@ -344,7 +344,7 @@ Restart the Vite development server after changing environment variables.
 Configure the values required by your backend settings.
 
 ```env
-APP_NAME=Enviquo SM Pvt. Ltd.
+APP_NAME=SM Clean Tech Engineering Solutions
 
 DATABASE_URL=sqlite:///./sm_cleantech.db
 
@@ -362,7 +362,7 @@ SMTP_PORT=587
 SMTP_USERNAME=
 SMTP_PASSWORD=
 SMTP_FROM_EMAIL=
-SMTP_FROM_NAME=Enviquo SM Pvt. Ltd.
+SMTP_FROM_NAME=SM Clean Tech Engineering Solutions
 
 GROQ_API_KEY=
 GEMINI_API_KEY=
@@ -484,7 +484,7 @@ Before deploying the application:
 
 ---
 
-**Enviquo SM Pvt. Ltd.**
+**SM Clean Tech Engineering Solutions**
 
 *Industrial B2B CleanTech Marketplace*
 
@@ -492,7 +492,7 @@ Before deploying the application:
 
 <div align="center">
 
-**Enviquo SM Pvt. Ltd.**  
+**SM Clean Tech Engineering Solutions**  
 *Industrial B2B CleanTech Marketplace*
 
 </div>
