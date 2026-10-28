@@ -7,6 +7,7 @@ from app.dependencies import require_roles
 from app.db import get_db
 import secrets
 from pydantic import BaseModel, Field, model_validator
+from app.core.config import settings
 
 import os
 from dotenv import load_dotenv
@@ -909,6 +910,11 @@ async def forgot_password(
         f"{frontend_url.rstrip('/')}/reset-password"
         f"?token={token}"
     )
+
+    # reset_url = (
+    #     f"{settings.FRONTEND_URL.rstrip('/')}/reset-password"
+    #     f"?token={token}"
+    # )
 
 
 
