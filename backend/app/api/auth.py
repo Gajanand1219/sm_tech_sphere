@@ -8,6 +8,11 @@ from app.db import get_db
 import secrets
 from pydantic import BaseModel, Field, model_validator
 
+import os
+from dotenv import load_dotenv
+
+load_dotenv()
+
 from app.models import (
     User,
     BuyerProfile,
@@ -892,15 +897,20 @@ async def forgot_password(
 
     token = create_password_reset_token(user.id)
 
-    # reset_url = (
-    #     "http://localhost:5173/reset-password"
-    #     f"?token={token}"
-    # )
+    frontend_url = os.getenv("FRONTEND_URL")
+
+    if not frontend_url:
+        raise HTTPException(
+            status_code=500,
+            detail="FRONTEND_URL is not configured."
+        )
 
     reset_url = (
-            "https://smtechsphere-virid.vercel.app/reset-password"
-            f"?token={token}"
-        )
+        f"{frontend_url.rstrip('/')}/reset-password"
+        f"?token={token}"
+    )
+
+
 
     html = email_template(
         "Reset your password",
