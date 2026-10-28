@@ -345,7 +345,7 @@ Restart the Vite development server after changing environment variables.
 Configure the values required by your backend settings.
 
 ```env
-APP_NAME=SM Clean Tech Engineering Solutions
+APP_NAME=Enviquo SM Pvt. Ltd.
 
 DATABASE_URL=sqlite:///./sm_cleantech.db
 
@@ -363,7 +363,7 @@ SMTP_PORT=587
 SMTP_USERNAME=
 SMTP_PASSWORD=
 SMTP_FROM_EMAIL=
-SMTP_FROM_NAME=SM Clean Tech Engineering Solutions
+SMTP_FROM_NAME=Enviquo SM Pvt. Ltd.
 
 GROQ_API_KEY=
 GEMINI_API_KEY=
@@ -485,7 +485,7 @@ Before deploying the application:
 
 ---
 
-**SM Clean Tech Engineering Solutions**
+**Enviquo SM Pvt. Ltd.**
 
 *Industrial B2B CleanTech Marketplace*
 
@@ -493,7 +493,7 @@ Before deploying the application:
 
 <div align="center">
 
-**SM Clean Tech Engineering Solutions**  
+**Enviquo SM Pvt. Ltd.**  
 *Industrial B2B CleanTech Marketplace*
 
 </div>
