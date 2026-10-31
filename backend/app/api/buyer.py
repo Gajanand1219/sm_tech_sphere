@@ -1,3 +1,4 @@
+import asyncio
 from datetime import datetime
 import uuid
 from fastapi import APIRouter, Depends, HTTPException, UploadFile, File
@@ -373,46 +374,60 @@ async def create_enquiry(
     db.refresh(e)
 
     # --------------------------------------------------------
-    # EMAIL: ADMIN
+    # PREPARE ALL EMAILS, THEN SEND THEM IN PARALLEL
     # --------------------------------------------------------
-    await send_enquiry_submitted_email(
+    email_jobs = []
+
+    # Admin notification
+    email_jobs.append(("admin", None, send_enquiry_submitted_email(
         admin_email=settings.ADMIN_EMAIL,
         enquiry=e,
         buyer=user,
-    )
+    )))
 
-    # --------------------------------------------------------
-    # EMAIL: BUYER
-    # --------------------------------------------------------
+    # Buyer confirmation
     if user.email:
-        await send_buyer_enquiry_confirmation_email(
+        email_jobs.append(("buyer", None, send_buyer_enquiry_confirmation_email(
             buyer=user,
             enquiry=e,
-        )
+        )))
 
-    # --------------------------------------------------------
-    # EMAIL: MATCHED VENDORS
-    # --------------------------------------------------------
+    # Load match records once; do not query the database inside the email loop.
+    matches_by_vendor = {
+        match.vendor_id: match
+        for match in db.query(EnquiryMatch).filter(
+            EnquiryMatch.enquiry_id == e.id
+        ).all()
+    }
+
+    # Matched vendor notifications
     for vendor in matched_vendors:
         if not vendor.email:
             continue
 
-        await send_vendor_new_enquiry_email(
+        match = matches_by_vendor.get(vendor.id)
+        email_jobs.append(("vendor", match, send_vendor_new_enquiry_email(
             vendor=vendor,
             enquiry=e,
-        )
+        )))
 
-        match = (
-            db.query(EnquiryMatch)
-            .filter(
-                EnquiryMatch.enquiry_id == e.id,
-                EnquiryMatch.vendor_id == vendor.id,
+    # All emails run concurrently. One failure will not cancel other emails.
+    email_results = await asyncio.gather(
+        *(job[2] for job in email_jobs),
+        return_exceptions=True,
+    )
+
+    for (email_type, match, _), result in zip(email_jobs, email_results):
+        if isinstance(result, Exception):
+            print(
+                f"[ENQUIRY EMAIL ERROR] type={email_type} "
+                f"enquiry={e.id} error={result}"
             )
-            .first()
-        )
+            continue
 
-        if match:
-            match.notified = True
+        # Mark vendor as notified only when its email was actually sent.
+        if email_type == "vendor" and match:
+            match.notified = bool(result)
 
     db.commit()
 
