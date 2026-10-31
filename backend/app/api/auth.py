@@ -1,3 +1,4 @@
+import asyncio
 from datetime import datetime, timedelta
 import random
 
@@ -170,7 +171,7 @@ async def send_verification(email, name, code):
 
     await send_email(
         email,
-        "Verify your SM Clean Tech account",
+        "Verify your SM Enviquo account",
         email_template(
             "Verify your email",
             f"""
@@ -256,6 +257,7 @@ async def match_existing_enquiries_for_vendor(
     )
 
     matched_count = 0
+    pending_notifications = []
 
     for enquiry in enquiries:
 
@@ -386,27 +388,40 @@ async def match_existing_enquiries_for_vendor(
         # Flush so the match exists before email processing
         db.flush()
 
-        # ----------------------------------------------------
-        # Vendor notification email
-        # ----------------------------------------------------
+        # Queue email now; send all matched-enquiry emails concurrently below.
+        pending_notifications.append((match, enquiry))
 
-        try:
+    # --------------------------------------------------------
+    # SEND MATCH EMAILS IN PARALLEL (max 10 at a time)
+    # --------------------------------------------------------
+    semaphore = asyncio.Semaphore(10)
 
-            await send_vendor_matched_email(
-                vendor=vendor,
-                enquiry=enquiry,
-            )
+    async def send_one_match_email(match, enquiry):
+        async with semaphore:
+            try:
+                sent = await send_vendor_matched_email(
+                    vendor=vendor,
+                    enquiry=enquiry,
+                )
+                return match, bool(sent)
+            except Exception as exc:
+                print(
+                    f"[VENDOR MATCH EMAIL ERROR] "
+                    f"vendor={vendor.id} "
+                    f"enquiry={enquiry.id} "
+                    f"error={exc}"
+                )
+                return match, False
 
-            match.notified = True
+    email_results = await asyncio.gather(
+        *[
+            send_one_match_email(match, enquiry)
+            for match, enquiry in pending_notifications
+        ]
+    )
 
-        except Exception as exc:
-
-            print(
-                f"[VENDOR MATCH EMAIL ERROR] "
-                f"vendor={vendor.id} "
-                f"enquiry={enquiry.id} "
-                f"error={exc}"
-            )
+    for match, sent in email_results:
+        match.notified = sent
 
     db.commit()
 
@@ -450,6 +465,8 @@ async def refresh_vendor_enquiry_matches(db: Session, vendor: User):
         .order_by(Enquiry.id.desc())
         .all()
     )
+
+    pending_notifications = []
 
     for enquiry in enquiries:
         domain_name = (
@@ -518,21 +535,38 @@ async def refresh_vendor_enquiry_matches(db: Session, vendor: User):
         db.add(new_match)
         db.flush()
 
-        try:
-            if vendor.email:
-                await send_vendor_matched_email(
+        if vendor.email:
+            pending_notifications.append((new_match, enquiry))
+
+    # Send all newly matched-enquiry emails concurrently.
+    semaphore = asyncio.Semaphore(10)
+
+    async def send_one_rematch_email(match, enquiry):
+        async with semaphore:
+            try:
+                sent = await send_vendor_matched_email(
                     vendor=vendor,
                     enquiry=enquiry,
                 )
-                new_match.notified = True
-        except Exception as exc:
-            # Keep the match even if the notification email fails.
-            print(
-                f"[VENDOR REMATCH EMAIL ERROR] "
-                f"vendor={vendor.id} "
-                f"enquiry={enquiry.id} "
-                f"error={exc}"
-            )
+                return match, bool(sent)
+            except Exception as exc:
+                print(
+                    f"[VENDOR REMATCH EMAIL ERROR] "
+                    f"vendor={vendor.id} "
+                    f"enquiry={enquiry.id} "
+                    f"error={exc}"
+                )
+                return match, False
+
+    email_results = await asyncio.gather(
+        *[
+            send_one_rematch_email(match, enquiry)
+            for match, enquiry in pending_notifications
+        ]
+    )
+
+    for match, sent in email_results:
+        match.notified = sent
 
     db.commit()
 
@@ -923,7 +957,7 @@ async def forgot_password(
         f"""
         Hello {user.full_name},<br><br>
 
-        We received a request to reset your SM Techsphere Pvt. Ltd
+        We received a request to reset your  Enviquo SM Pvt. Ltd.
         account password.<br><br>
 
         Click the button below to create a new password:
@@ -959,14 +993,14 @@ async def forgot_password(
         <br><br>
 
         Regards,<br>
-        <strong>SM Techsphere Pvt. Ltd</strong>
+        <strong> Enviquo SM Pvt. Ltd.</strong>
         """,
     )
 
     background.add_task(
         send_email,
         user.email,
-        "Reset your SM Techsphere Pvt. Ltd password",
+        "Reset your  Enviquo SM Pvt. Ltd. password",
         html,
     )
 
