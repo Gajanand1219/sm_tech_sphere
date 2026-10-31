@@ -1,3 +1,4 @@
+import asyncio
 from pathlib import Path
 from datetime import datetime, timedelta
 from uuid import uuid4
@@ -604,13 +605,16 @@ async def vendor_handshake(
     db.commit()
 
     if mutual:
-        await send_mutual_handshake_buyer_email(
-            buyer=q.enquiry.buyer,
-            enquiry=q.enquiry,
-        )
-        await send_mutual_handshake_vendor_email(
-            vendor=user,
-            enquiry=q.enquiry,
+        await asyncio.gather(
+            send_mutual_handshake_buyer_email(
+                buyer=q.enquiry.buyer,
+                enquiry=q.enquiry,
+            ),
+            send_mutual_handshake_vendor_email(
+                vendor=user,
+                enquiry=q.enquiry,
+            ),
+            return_exceptions=True,
         )
     else:
         await send_vendor_acceptance_email(
