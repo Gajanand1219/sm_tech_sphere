@@ -11,6 +11,7 @@ from fastapi import (
 )
 from starlette.responses import FileResponse
 from sqlalchemy.orm import Session
+from app.core.config import ENQUIRY_REPORTS_DIR, QUESTION_FILES_DIR
 
 from app.db import get_db
 from app.dependencies import require_roles
@@ -47,13 +48,7 @@ router = APIRouter(prefix="/vendor", tags=["Vendor"])
 # CONSTANTS
 # ============================================================
 
-REPORTS_DIR = (
-    Path(__file__).resolve().parents[2]
-    / "uploads"
-    / "question_files"
-)
-
-REPORTS_DIR.mkdir(parents=True, exist_ok=True)
+REPORTS_DIR = QUESTION_FILES_DIR
 
 ALLOWED_QUESTION_FILE_EXTENSIONS = {
     ".pdf",
@@ -421,6 +416,7 @@ async def quotation(
             detail="Quotation already submitted",
         )
 
+
     # Optional vendor question/technical document
     saved_file_path = None
 
@@ -774,7 +770,15 @@ def download_enquiry_report(
             detail="Report not found",
         )
 
-    file_path = Path(report.file_path)
+    
+    file_path = Path(report.file_path).resolve()
+    reports_root = ENQUIRY_REPORTS_DIR.resolve()
+
+    if not file_path.is_relative_to(reports_root):
+        raise HTTPException(
+            status_code=403,
+            detail="Invalid file path",
+        )
 
     if not file_path.is_file():
         raise HTTPException(
