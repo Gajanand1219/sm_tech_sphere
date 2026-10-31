@@ -4,7 +4,7 @@ from pydantic_settings import BaseSettings, SettingsConfigDict
 class Settings(BaseSettings):
     APP_NAME: str = "Enviquo SM Pvt. Ltd."
 
-    DATABASE_URL: str = "sqlite:///./sm_cleantech.db"
+    DATABASE_URL: str
 
     JWT_SECRET_KEY: str = "change-this-in-production"
     JWT_ALGORITHM: str = "HS256"
