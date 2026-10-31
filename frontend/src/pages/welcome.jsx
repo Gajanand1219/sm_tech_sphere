@@ -110,7 +110,7 @@ export default function Welcome() {
 </h1>
 
 <p className="welcome-to">
-  to <span>ENVIQUO</span>
+  to <br></br> <br /> <span>ENVIQUO</span>
 </p>
 
 <p className="welcome-tagline">
