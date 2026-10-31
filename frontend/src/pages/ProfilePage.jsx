@@ -39,10 +39,44 @@ export default function ProfilePage() {
       setError('')
 
       const response = await API.get('/auth/profile')
-
       const data = response.data
 
+      // Fetch company logo from network-companies
+      try {
+        const net = await API.get('/public/network-companies')
+
+        const list =
+          data.role === 'vendor'
+            ? (Array.isArray(net.data?.vendors) ? net.data.vendors : [])
+            : (Array.isArray(net.data?.buyers) ? net.data.buyers : [])
+
+        const myCompany = String(
+          data.company_name || data.company || data.name || ''
+        ).toLowerCase().trim()
+
+        const me =
+          list.find(
+            (b) =>
+              b.company_name &&
+              String(b.company_name).toLowerCase().trim() === myCompany
+          ) ||
+          list.find(
+            (b) =>
+              b.email &&
+              data.email &&
+              String(b.email).toLowerCase().trim() ===
+                String(data.email).toLowerCase().trim()
+          )
+
+        if (me?.logo) {
+          data.logo = me.logo
+        }
+      } catch (netErr) {
+        console.debug('Network company logo fetch failed:', netErr)
+      }
+
       setProfile(data)
+
       setForm({
         ...data,
         new_password: '',
@@ -52,6 +86,7 @@ export default function ProfilePage() {
           ? data.domains
           : [],
       })
+
     } catch (err) {
       console.error('Profile load error:', err)
 
@@ -63,6 +98,9 @@ export default function ProfilePage() {
       setLoading(false)
     }
   }
+
+
+  
 
   // ============================================================
   // UPDATE PROFILE
@@ -476,7 +514,18 @@ const handleUpdate = async () => {
           <div
             className={`profile-avatar profile-avatar--${role}`}
           >
-            {initial}
+            {(profile?.logo || profile?.company_logo || profile?.profile_image) ? (
+                  <img
+                    src={profile.logo || profile.company_logo || profile.profile_image}
+                    alt={profile.company_name || 'Company'}
+                    style={{
+                      width: '100%',
+                      height: '100%',
+                      objectFit: 'contain',
+                      borderRadius: '50%'
+                    }}
+                  />
+                ) : initial}
           </div>
 
         </div>
