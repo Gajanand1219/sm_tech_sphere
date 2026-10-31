@@ -7,6 +7,12 @@ from app.db import get_db
 from app.dependencies import require_roles
 from pathlib import Path
 
+from app.core.config import (
+    settings,
+    ENQUIRY_REPORTS_DIR,
+    QUESTION_FILES_DIR,
+)
+
 from app.models import (
     User,
     Domain,
@@ -541,6 +547,7 @@ def enquiry(
                 "status": q.status,
             }
 
+
             for q in e.quotations
         ],
 
@@ -865,9 +872,7 @@ def crm(
 
 
 
-REPORTS_DIR = Path(__file__).resolve().parents[2] / "uploads" / "enquiry_reports"
-REPORTS_DIR.mkdir(parents=True, exist_ok=True)
-
+REPORTS_DIR = ENQUIRY_REPORTS_DIR
 
 @router.post("/enquiries/{enquiry_id}/reports")
 async def upload_enquiry_report(
@@ -991,11 +996,7 @@ def get_quotation_file(
     file_path = Path(quotation.question_file_path).resolve()
 
     # Ensure the stored path is inside the designated upload folder.
-    upload_dir = (
-        Path(__file__).resolve().parents[2]
-        / "uploads"
-        / "question_files"
-    ).resolve()
+    upload_dir = QUESTION_FILES_DIR.resolve()
 
     if not file_path.is_relative_to(upload_dir):
         raise HTTPException(status_code=403, detail="Invalid file path")
