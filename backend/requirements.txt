@@ -12,3 +12,4 @@ numpy
 google-genai
 groq
 python-dotenv
+pymysql
